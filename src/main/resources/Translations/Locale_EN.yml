@@ -1,0 +1,6 @@
+#if Empty, Plugin uses default prefix
+#MiniMessage format: https://webui.advntr.dev/
+prefix: ""
+reloadMsg: "<green>Completed reloading config</green>"
+commandWrongUsage: "<red>Wrong Usage</red><gray>,</gray> <white>Use /rslib reload</white>"
+noPermission: "<red>You don't have permission</red>"

@@ -1,0 +1,9 @@
+#비어있다면 플러그인의 내장 기본 Prefix를 씁니다
+#MiniMessage 형식: https://webui.advntr.dev/
+prefix: ""
+reload: "<green>구성 파일을 다시 읽었습니다</green>"
+noPermission: "<red>당신은 권한이 없습니다</red>"
+
+wrongUsage:
+  wrongUsage: "<red>잘못된 사용</red>"
+  reload: "<gray> - </gray><white>/rslib reload</white>"
