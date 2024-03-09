@@ -1,7 +1,7 @@
 package com.github.ipecter.rtuserver.lib.nms.v1_18_r2;
 
-import com.github.ipecter.rtuserver.lib.nms.NMSBiome;
 import com.github.ipecter.rtuserver.lib.nms.NMS;
+import com.github.ipecter.rtuserver.lib.nms.NMSBiome;
 
 public class NMS_1_18_R2 implements NMS {
 

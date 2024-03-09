@@ -1,6 +1,16 @@
 #if Empty, Plugin uses default prefix
 #MiniMessage format: https://webui.advntr.dev/
 prefix: ""
-reloadMsg: "<green>Completed reloading config</green>"
-commandWrongUsage: "<red>Wrong Usage</red><gray>,</gray> <white>Use /rslib reload</white>"
+reload: "<green>Completed reloading config</green>"
 noPermission: "<red>You don't have permission</red>"
+
+wrongUsage:
+  wrongUsage: "<red>Wrong Usage</red>"
+  reload: "<gray> - </gray><white>/rslib reload</white>"
+
+dataNameType:
+  black: "<red>You can't use this name</red>"
+  all: "<red>All word of name is wrong format, You can use only English, Korean, Number and _</red>"
+  wrong: "<red>Name contains wrong format, You can use only English, Korean, Number and _</red>"
+  long: "<red>Max length of name is 15</red>"
+  exist: "<red>This name is duplicated</red>"

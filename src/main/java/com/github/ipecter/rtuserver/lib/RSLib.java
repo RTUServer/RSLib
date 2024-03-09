@@ -26,16 +26,14 @@ public class RSLib extends RSPlugin {
 
     @Getter
     private static RSLib instance;
-
-    @Getter
-    private final ConfigManager configManager = new ConfigManager();
-
     @Getter
     private static NMS NMS;
-
+    @Getter
+    private final ConfigManager configManager = new ConfigManager();
     @Getter
     private final Map<String, RSPlugin> plugins = new HashMap<>();
     private final Map<String, Boolean> hooks = new HashMap<>();
+    private String nmsVersion;
 
     public RSLib() {
         super(MiniMessage.miniMessage().deserialize("<gradient:#6680ff:#cc66ff>【 RSLib 】</gradient>"));
@@ -64,8 +62,6 @@ public class RSLib extends RSPlugin {
         instance = this;
         loadNMS();
     }
-
-    private String nmsVersion;
 
     private void loadNMS() {
         nmsVersion = VersionUtil.getNMSVersion(VersionUtil.getVersionStr());

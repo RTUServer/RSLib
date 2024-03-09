@@ -7,3 +7,10 @@ noPermission: "<red>당신은 권한이 없습니다</red>"
 wrongUsage:
   wrongUsage: "<red>잘못된 사용</red>"
   reload: "<gray> - </gray><white>/rslib reload</white>"
+
+dataNameType:
+  black: "<red>사용할 수 없는 이름입니다</red>"
+  all: "<red>이름 전체가 잘못된 문자들로 이루어져있습니다 (한글, 영어, 숫자, _)만 사용가능합니다</red>"
+  wrong: "<red>이름에 잘못된 문자가 포함되어 있습니다 (한글, 영어, 숫자, _)만 사용가능합니다</red>"
+  long: "<red>이름은 15자를 넘을 수 없습니다</red>"
+  exist: "<red>이미 사용중인 이름입니다</red>"
