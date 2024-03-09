@@ -14,6 +14,7 @@ import com.github.ipecter.rtuserver.lib.nms.v1_20_r1.NMS_1_20_R1;
 import com.github.ipecter.rtuserver.lib.nms.v1_20_r2.NMS_1_20_R2;
 import com.github.ipecter.rtuserver.lib.nms.v1_20_r3.NMS_1_20_R3;
 import com.github.ipecter.rtuserver.lib.plugin.RSPlugin;
+import com.github.ipecter.rtuserver.lib.plugin.inventory.RSInventoryListener;
 import com.github.ipecter.rtuserver.lib.util.common.VersionUtil;
 import lombok.Getter;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -86,6 +87,7 @@ public class RSLib extends RSPlugin {
     public void enable() {
         console(MiniMessage.miniMessage().deserialize("<white>NMS: " + nmsVersion + "</white>"));
         registerEvent(new MotdOnJoin());
+        registerEvent(new RSInventoryListener());
         registerCommand(new Command());
         configManager.init();
         console(MiniMessage.miniMessage().deserialize("<green>Enable!</green>"));

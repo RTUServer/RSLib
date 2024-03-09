@@ -4,7 +4,6 @@ main: com.github.ipecter.rtuserver.lib.RSLib
 description: RSLib - Library Plugin for RSPlugins
 api-version: 1.17
 authors: [ IPECTER ]
-depend: [ CMI, DiscordSRV ]
 softdepend: [ PlaceholderAPI, Oraxen, ItemsAdder ]
 commands:
   rslib:
@@ -18,3 +17,4 @@ libraries:
   - com.google.code.gson:gson:2.10.1
   - com.google.guava:guava:31.1-jre
   - org.apache.commons:commons-lang3:3.14.0
+  - org.quartz-scheduler:quartz:2.5.0-rc1

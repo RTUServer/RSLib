@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.github.ipecter.rtuserver'
-version = '0.10.0'
+version = '0.12.0'
 
 ConfigurableFileTree libsImplementation = fileTree(dir: 'libs-implementation', include: ['*.jar'])
 
@@ -83,7 +83,7 @@ dependencies {
     compileOnly 'org.apache.commons:commons-lang3:3.14.0'
 
     implementation 'org.mongodb:mongodb-driver-sync:4.11.1'
-    compileOnly 'org.quartz-scheduler:quartz:2.3.2'
+    compileOnly 'org.quartz-scheduler:quartz:2.5.0-rc1'
 
     compileOnly 'com.discordsrv:discordsrv:1.27.0'
 
