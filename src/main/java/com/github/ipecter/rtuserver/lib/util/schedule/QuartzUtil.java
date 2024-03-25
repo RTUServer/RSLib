@@ -14,10 +14,13 @@ public class QuartzUtil {
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity("rslib", name)
                 .withSchedule(CronScheduleBuilder.cronSchedule(cron))
+                .forJob(detail)
                 .startNow()
                 .build();
         try {
-            StdSchedulerFactory.getDefaultScheduler().scheduleJob(detail, trigger);
+            Scheduler scheduler = new StdSchedulerFactory().getScheduler();
+            if (!scheduler.isStarted()) scheduler.start();
+            scheduler.scheduleJob(detail, trigger);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
@@ -33,7 +36,7 @@ public class QuartzUtil {
 
     public static String getNextFireTime(String name) {
         try {
-            Trigger trigger = StdSchedulerFactory.getDefaultScheduler().getTrigger(new TriggerKey(name));
+            Trigger trigger = StdSchedulerFactory.getDefaultScheduler().getTrigger(TriggerKey.triggerKey("rslib", name));
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime nextFireTime = trigger.getNextFireTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
             Duration duration = Duration.between(now, nextFireTime);

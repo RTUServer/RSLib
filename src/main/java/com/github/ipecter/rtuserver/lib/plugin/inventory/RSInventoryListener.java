@@ -18,7 +18,7 @@ public class RSInventoryListener implements Listener {
             boolean isPlayerInventory = inv != null && !(inv.getHolder() instanceof RSInventory);
             RSInventory.Event event = new RSInventory.Event(inv, player, isPlayerInventory);
             RSInventory.Click click = new RSInventory.Click(e.getSlot(), e.getSlotType(), e.getClick());
-            rsInventory.onClick(event, click);
+            e.setCancelled(!rsInventory.onClick(event, click));
         }
     }
 

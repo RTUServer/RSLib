@@ -16,7 +16,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -24,7 +27,7 @@ public class JsonFile {
     private final Gson gson = new Gson();
     private final File file;
     @Getter
-    private final JsonArray data;
+    private JsonArray data;
     @Getter
     private final AtomicBoolean needSave = new AtomicBoolean(false);
     private final BukkitTask task;
@@ -48,60 +51,59 @@ public class JsonFile {
     }
 
     protected boolean set(Pair<String, Object> find, Pair<String, Object> value) {
-        Result result = find(find);
-        if (result == null) return false;
-        JsonElement resultValue = result.object();
-        if (resultValue == null || resultValue.isJsonNull()) return false;
-        JsonObject valObj = resultValue.getAsJsonObject();
-        if (value == null) {
-            data.remove(result.index());
-        } else {
-            Object object = value.getValue();
-            if (object instanceof JsonElement element) {
-                valObj.add(value.getKey(), element);
-            } else if (object instanceof Number number) {
-                valObj.addProperty(value.getKey(), number);
-            } else if (object instanceof Boolean bool) {
-                valObj.addProperty(value.getKey(), bool);
-            } else if (object instanceof String str) {
-                valObj.addProperty(value.getKey(), str);
+        Map<Integer, JsonObject> list = find(find);
+        if (list.isEmpty()) return false;
+        JsonArray copy = data.deepCopy();
+        for (int key : list.keySet()) {
+            JsonElement resultValue = list.get(key);
+            if (resultValue == null || resultValue.isJsonNull()) return false;
+            JsonObject valObj = resultValue.getAsJsonObject();
+            if (value == null) {
+                copy.remove(key);
             } else {
-                RSLib.getPlugin().console(ComponentUtil.miniMessage("<red>Unsupported type of data tried to be saved! Only supports JsonElement, Number, Boolean, and String</red>"));
-                RSLib.getPlugin().console(ComponentUtil.miniMessage("<red>지원하지 않는 타입의 데이터가 저장되려고 했습니다! JsonElement, Number, Boolean, String만 지원합니다</red>"));
-                return false;
-            }
-            if (data.contains(valObj)) {
-                data.set(result.index(), valObj);
-            } else {
-                data.add(valObj);
+                Object object = value.getValue();
+                if (object instanceof JsonElement element) {
+                    valObj.add(value.getKey(), element);
+                } else if (object instanceof Number number) {
+                    valObj.addProperty(value.getKey(), number);
+                } else if (object instanceof Boolean bool) {
+                    valObj.addProperty(value.getKey(), bool);
+                } else if (object instanceof String str) {
+                    valObj.addProperty(value.getKey(), str);
+                } else {
+                    RSLib.getPlugin().console(ComponentUtil.miniMessage("<red>Unsupported type of data tried to be saved! Only supports JsonElement, Number, Boolean, and String</red>"));
+                    RSLib.getPlugin().console(ComponentUtil.miniMessage("<red>지원하지 않는 타입의 데이터가 저장되려고 했습니다! JsonElement, Number, Boolean, String만 지원합니다</red>"));
+                    return false;
+                }
+                if (copy.contains(valObj)) {
+                    copy.set(key, valObj);
+                } else {
+                    copy.add(valObj);
+                }
             }
         }
+        this.data = copy;
         needSave.lazySet(true);
         return true;
     }
 
     @Nullable
-    protected JsonObject get(Pair<String, Object> find) {
-        Result result = find(find);
-        if (result == null) return null;
-        JsonElement val = result.object();
-        if (val != null && !val.isJsonNull()) {
-            return val.getAsJsonObject();
-        } else {
-            return null;
-        }
+    protected List<JsonObject> get(Pair<String, Object> find) {
+        Map<Integer, JsonObject> list = find(find);
+        return new ArrayList<>(list.values());
     }
 
-    private Result find(Pair<String, Object> find) {
+    private Map<Integer, JsonObject> find(Pair<String, Object> find) {
         List<JsonElement> list = data.asList();
+        Map<Integer, JsonObject> result = new HashMap<>();
         for (int i = 0; i < list.size(); i++) {
-            JsonElement element = list.get(i);
-            JsonObject object = element.getAsJsonObject();
-            JsonElement result = object.get(find.getKey());
-            if (result == null || result.isJsonNull()) continue;
-            return new Result(i, element.getAsJsonObject());
+            JsonObject object = list.get(i).getAsJsonObject();
+            JsonElement get = object.get(find.getKey());
+            if (get == null || get.isJsonNull()) continue;
+            if (!gson.fromJson(get, Object.class).equals(find.getValue())) continue;
+            result.put(i, object);
         }
-        return null;
+        return result;
     }
 
     private void save() {
@@ -117,8 +119,4 @@ public class JsonFile {
         task.cancel();
         save();
     }
-
-    private record Result(int index, JsonObject object) {
-    }
-
 }

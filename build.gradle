@@ -6,12 +6,12 @@ plugins {
 }
 
 group = 'com.github.ipecter.rtuserver'
-version = '0.12.0'
+version = '1.0.1'
 
 ConfigurableFileTree libsImplementation = fileTree(dir: 'libs-implementation', include: ['*.jar'])
 
 runServer {
-    minecraftVersion("1.20.1")
+    minecraftVersion("1.20.4")
 }
 subprojects {
 

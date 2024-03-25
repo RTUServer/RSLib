@@ -12,7 +12,14 @@ import org.bukkit.inventory.InventoryHolder;
 
 public abstract class RSInventory implements InventoryHolder, Listener {
 
-    public void onClick(Event event, Click click) {
+    /***
+     *
+     * @param event
+     * @param click
+     * @return false = 이벤트가 캔슬됩니다
+     */
+    public boolean onClick(Event event, Click click) {
+        return true;
     }
 
     public void onClose(Event event) {

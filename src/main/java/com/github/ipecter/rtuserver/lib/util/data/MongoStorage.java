@@ -7,10 +7,7 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerApi;
 import com.mongodb.ServerApiVersion;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
@@ -19,6 +16,10 @@ import com.mongodb.client.result.UpdateResult;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MongoStorage implements Storage {
 
@@ -72,11 +73,18 @@ public class MongoStorage implements Storage {
     }
 
 
+    @NotNull
     @Override
-    public JsonObject get(String collectionName, Pair<String, Object> find) {
+    public List<JsonObject> get(String collectionName, Pair<String, Object> find) {
         Bson filter = Filters.eq(find.getKey(), find.getValue());
-        Document result = database.getCollection(collectionName).find(filter).first();
-        return result != null ? JsonParser.parseString(result.toJson()).getAsJsonObject() : null;
+        FindIterable<Document> documents = database.getCollection(collectionName).find(filter);
+        List<JsonObject> result = new ArrayList<>();
+        for (Document document : documents) {
+            if (document != null && !document.isEmpty()) {
+                result.add(JsonParser.parseString(document.toJson()).getAsJsonObject());
+            }
+        }
+        return result;
     }
 
 
