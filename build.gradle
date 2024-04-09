@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.github.ipecter.rtuserver'
-version = '1.0.1'
+version = '1.1.0'
 
 ConfigurableFileTree libsImplementation = fileTree(dir: 'libs-implementation', include: ['*.jar'])
 
@@ -76,6 +76,7 @@ repositories {
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
 
+    implementation "io.papermc:paperlib:1.0.7"
     compileOnly "net.kyori:adventure-platform-bukkit:4.3.2"
     compileOnly "net.kyori:adventure-text-minimessage:4.14.0"
     compileOnly 'com.google.code.gson:gson:2.10.1'
@@ -89,7 +90,7 @@ dependencies {
 
     compileOnly 'me.clip:placeholderapi:2.11.2'
     compileOnly 'io.th0rgal:oraxen:1.168.0'
-    compileOnly 'com.github.LoneDev6:API-ItemsAdder:3.6.1'
+    compileOnly 'com.github.LoneDev6:API-ItemsAdder:3.6.2-beta-r3-b'
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
 
@@ -109,6 +110,7 @@ dependencies {
 shadowJar {
     setArchiveClassifier("")
     mkdir("$projectDir/builds")
+    relocate "io.papermc.lib", "com.github.ipecter.rtuserver.lib.paperlib"
     doLast {
         copy {
             from archiveFile.get().asFile

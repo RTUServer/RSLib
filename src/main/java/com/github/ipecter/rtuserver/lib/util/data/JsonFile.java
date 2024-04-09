@@ -53,13 +53,13 @@ public class JsonFile {
     protected boolean set(Pair<String, Object> find, Pair<String, Object> value) {
         Map<Integer, JsonObject> list = find(find);
         if (list.isEmpty()) return false;
-        JsonArray copy = data.deepCopy();
+        final JsonArray backup = data;
         for (int key : list.keySet()) {
             JsonElement resultValue = list.get(key);
             if (resultValue == null || resultValue.isJsonNull()) return false;
             JsonObject valObj = resultValue.getAsJsonObject();
             if (value == null) {
-                copy.remove(key);
+                data.remove(key);
             } else {
                 Object object = value.getValue();
                 if (object instanceof JsonElement element) {
@@ -73,16 +73,16 @@ public class JsonFile {
                 } else {
                     RSLib.getPlugin().console(ComponentUtil.miniMessage("<red>Unsupported type of data tried to be saved! Only supports JsonElement, Number, Boolean, and String</red>"));
                     RSLib.getPlugin().console(ComponentUtil.miniMessage("<red>지원하지 않는 타입의 데이터가 저장되려고 했습니다! JsonElement, Number, Boolean, String만 지원합니다</red>"));
+                    data = backup;
                     return false;
                 }
-                if (copy.contains(valObj)) {
-                    copy.set(key, valObj);
+                if (data.contains(valObj)) {
+                    data.set(key, valObj);
                 } else {
-                    copy.add(valObj);
+                    data.add(valObj);
                 }
             }
         }
-        this.data = copy;
         needSave.lazySet(true);
         return true;
     }
