@@ -15,6 +15,7 @@ import com.github.ipecter.rtuserver.lib.nms.v1_20_r2.NMS_1_20_R2;
 import com.github.ipecter.rtuserver.lib.nms.v1_20_r3.NMS_1_20_R3;
 import com.github.ipecter.rtuserver.lib.plugin.RSPlugin;
 import com.github.ipecter.rtuserver.lib.plugin.inventory.RSInventoryListener;
+import com.github.ipecter.rtuserver.lib.util.common.ComponentUtil;
 import com.github.ipecter.rtuserver.lib.util.common.VersionUtil;
 import lombok.Getter;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -37,7 +38,7 @@ public class RSLib extends RSPlugin {
     private String nmsVersion;
 
     public RSLib() {
-        super(MiniMessage.miniMessage().deserialize("<gradient:#6680ff:#cc66ff>【 RSLib 】</gradient>"));
+        super(ComponentUtil.miniMessage("<gradient:#00f260:#057eff>RSLib » </gradient>"));
     }
 
     public void loadPlugin(RSPlugin plugin) {

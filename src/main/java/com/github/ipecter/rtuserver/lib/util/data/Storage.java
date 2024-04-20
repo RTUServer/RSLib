@@ -11,7 +11,6 @@ public interface Storage {
 
     boolean set(String name, Pair<String, Object> find, Pair<String, Object> data);
 
-    @NotNull
     List<JsonObject> get(String name, Pair<String, Object> find);
 
     void close();

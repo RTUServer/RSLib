@@ -54,37 +54,42 @@ public class MongoStorage implements Storage {
     @Override
     public boolean set(String collectionName, Pair<String, Object> find, Pair<String, Object> data) {
         MongoCollection<Document> collection = database.getCollection(collectionName);
-        Bson filter;
-        if (find.getValue() instanceof JsonObject jsonElement) {
-            filter = Filters.eq(find.getKey(), Document.parse(jsonElement.toString()));
-        } else filter = Filters.eq(find.getKey(), (String) find.getValue());
-        if (data == null) {
-            DeleteResult result = collection.deleteOne(filter);
-            return result.wasAcknowledged();
+        if (find != null) {
+            Bson filter;
+            if (find.getValue() instanceof JsonObject jsonElement) {
+                filter = Filters.eq(find.getKey(), Document.parse(jsonElement.toString()));
+            } else filter = Filters.eq(find.getKey(), (String) find.getValue());
+            if (data == null) {
+                DeleteResult result = collection.deleteMany(filter);
+                return result.wasAcknowledged();
+            } else {
+                UpdateOptions options = new UpdateOptions().upsert(true);
+                Bson update;
+                if (data.getValue() instanceof JsonObject jsonObject) {
+                    update = Updates.set(data.getKey(), Document.parse(jsonObject.toString()));
+                } else update = Updates.set(data.getKey(), data.getValue());
+                UpdateResult result = collection.updateOne(filter, update, options);
+                return result.wasAcknowledged();
+            }
         } else {
-            UpdateOptions options = new UpdateOptions().upsert(true);
-            Bson update;
-            if (data.getValue() instanceof JsonObject jsonObject) {
-                update = Updates.set(data.getKey(), Document.parse(jsonObject.toString()));
-            } else update = Updates.set(data.getKey(), data.getValue());
-            UpdateResult result = collection.updateOne(filter, update, options);
-            return result.wasAcknowledged();
+            FindIterable<Document> documents = collection.find();
+            for (Document document : documents) collection.deleteMany(document);
+            return true;
         }
     }
 
 
-    @NotNull
     @Override
     public List<JsonObject> get(String collectionName, Pair<String, Object> find) {
-        Bson filter = Filters.eq(find.getKey(), find.getValue());
-        FindIterable<Document> documents = database.getCollection(collectionName).find(filter);
+        MongoCollection<Document> collection = database.getCollection(collectionName);
+        FindIterable<Document> documents = find != null ? collection.find(Filters.eq(find.getKey(), find.getValue())) : collection.find();
         List<JsonObject> result = new ArrayList<>();
         for (Document document : documents) {
             if (document != null && !document.isEmpty()) {
                 result.add(JsonParser.parseString(document.toJson()).getAsJsonObject());
             }
         }
-        return result;
+        return result.isEmpty() ? null : result;
     }
 
 

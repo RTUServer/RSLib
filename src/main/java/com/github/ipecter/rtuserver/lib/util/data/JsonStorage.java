@@ -53,7 +53,6 @@ public class JsonStorage implements Storage {
         return map.get(name).set(find, data);
     }
 
-    @NotNull
     @Override
     public List<JsonObject> get(String name, Pair<String, Object> find) {
         if (!map.containsKey(name)) {
@@ -62,6 +61,15 @@ public class JsonStorage implements Storage {
             return null;
         }
         return map.get(name).get(find);
+    }
+
+    public boolean sync(String name) {
+        if (!map.containsKey(name)) {
+            RSLib.getPlugin().console(ComponentUtil.miniMessage("<red>Can't load " + name + " data!</red>"));
+            RSLib.getPlugin().console(ComponentUtil.miniMessage("<red>" + name + " 파일을 불러오는 도중 오류가 발생하였습니다!</red>"));
+            return false;
+        }
+        return map.get(name).sync();
     }
 
     public void close() {

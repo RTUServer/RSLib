@@ -2,20 +2,14 @@ package com.github.ipecter.rtuserver.lib.util.data;
 
 import com.github.ipecter.rtuserver.lib.RSLib;
 import com.github.ipecter.rtuserver.lib.util.common.ComponentUtil;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import lombok.Getter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -98,12 +92,26 @@ public class JsonFile {
         Map<Integer, JsonObject> result = new HashMap<>();
         for (int i = 0; i < list.size(); i++) {
             JsonObject object = list.get(i).getAsJsonObject();
-            JsonElement get = object.get(find.getKey());
-            if (get == null || get.isJsonNull()) continue;
-            if (!gson.fromJson(get, Object.class).equals(find.getValue())) continue;
+            if (find != null) {
+                JsonElement get = object.get(find.getKey());
+                if (get == null || get.isJsonNull()) continue;
+                if (!gson.fromJson(get, Object.class).equals(find.getValue())) continue;
+            }
             result.put(i, object);
         }
         return result;
+    }
+
+    public boolean sync() {
+        try {
+            JsonElement json = JsonParser.parseReader(new FileReader(file));
+            data = json != null && !json.isJsonNull() ? json.getAsJsonArray() : new JsonArray();
+            return true;
+        } catch (FileNotFoundException e) {
+            RSLib.getPlugin().console(ComponentUtil.miniMessage("<red>Error when sync " + file.getName() + "!</red>"));
+            RSLib.getPlugin().console(ComponentUtil.miniMessage("<red> " + file.getName() + " 파일과 동기화 도중 오류가 발생하였습니다!</red>"));
+            return false;
+        }
     }
 
     private void save() {
