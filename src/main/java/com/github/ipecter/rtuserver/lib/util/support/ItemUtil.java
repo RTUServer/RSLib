@@ -47,4 +47,30 @@ public class ItemUtil {
         }
         return "minecraft:" + itemStack.getType().toString().toLowerCase();
     }
+
+    public static boolean isSimilar(ItemStack stack1, ItemStack stack2) {
+        if (RSLib.getInstance().isEnabledDependency("Oraxen")) {
+            String oraxen1 = OraxenItems.getIdByItem(stack1);
+            String oraxen2 = OraxenItems.getIdByItem(stack2);
+            if (oraxen1 != null && oraxen2 != null) {
+                return oraxen1.equalsIgnoreCase(oraxen2);
+            } else if (oraxen1 != null) {
+                return OraxenItems.getItemById(oraxen1).build().isSimilar(stack2);
+            } else if (oraxen2 != null) {
+                return OraxenItems.getItemById(oraxen2).build().isSimilar(stack1);
+            }
+        }
+        if (RSLib.getInstance().isEnabledDependency("ItemsAdder")) {
+            CustomStack itemsAdder1 = CustomStack.byItemStack(stack1);
+            CustomStack itemsAdder2 = CustomStack.byItemStack(stack2);
+            if (itemsAdder1 != null && itemsAdder2 != null) {
+                return itemsAdder1.getNamespacedID().equalsIgnoreCase(itemsAdder2.getNamespacedID());
+            } else if (itemsAdder1 != null) {
+                return itemsAdder1.getItemStack().isSimilar(stack2);
+            } else if (itemsAdder2 != null) {
+                return itemsAdder2.getItemStack().isSimilar(stack1);
+            }
+        }
+        return stack1.isSimilar(stack2);
+    }
 }
