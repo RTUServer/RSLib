@@ -6,8 +6,15 @@ import io.th0rgal.oraxen.api.OraxenItems;
 import io.th0rgal.oraxen.items.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.xerial.snappy.Snappy;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.Base64;
 
 public class ItemUtil {
 
@@ -72,5 +79,30 @@ public class ItemUtil {
             }
         }
         return stack1.isSimilar(stack2);
+    }
+
+    private static String encode(ItemStack itemStack) {
+        try {
+            final ByteArrayOutputStream str = new ByteArrayOutputStream();
+            final BukkitObjectOutputStream data = new BukkitObjectOutputStream(str);
+            data.writeObject(itemStack);
+            data.close();
+            return Base64.getEncoder().encodeToString(Snappy.compress(str.toByteArray()));
+        } catch (final Exception e) {
+            return "";
+        }
+    }
+
+    public static ItemStack decode(String dataString) {
+        ItemStack itemStack;
+        try {
+            final ByteArrayInputStream stream = new ByteArrayInputStream(Snappy.uncompress(Base64.getDecoder().decode(dataString)));
+            final BukkitObjectInputStream data = new BukkitObjectInputStream(stream);
+            itemStack = (ItemStack) data.readObject();
+            data.close();
+        } catch (final Exception e) {
+            return null;
+        }
+        return itemStack;
     }
 }

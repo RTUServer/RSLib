@@ -1,6 +1,7 @@
 package com.github.ipecter.rtuserver.lib.managers;
 
 import com.github.ipecter.rtuserver.lib.RSLib;
+import com.github.ipecter.rtuserver.lib.managers.config.CommandConfig;
 import com.github.ipecter.rtuserver.lib.managers.config.SettingConfig;
 import com.github.ipecter.rtuserver.lib.managers.config.SystemMessageConfig;
 import com.github.ipecter.rtuserver.lib.util.common.FileUtil;
@@ -20,6 +21,8 @@ public class ConfigManager {
 
     @Getter
     private final SystemMessageConfig systemMessage = new SystemMessageConfig();
+    @Getter
+    private final CommandConfig command = new CommandConfig();
 
     private final Map<String, String> msgKeyMap = Collections.synchronizedMap(new HashMap<>());
 
@@ -57,6 +60,7 @@ public class ConfigManager {
 
     private void initModule() {
         initSystemMessage(FileUtil.copyResource(RSLib.getInstance(), "Modules", "SystemMessage.yml"));
+        initCommand(FileUtil.copyResource(RSLib.getInstance(), "Modules", "Command.yml"));
     }
 
     private void initSystemMessage(File file) {
@@ -64,4 +68,10 @@ public class ConfigManager {
         systemMessage.setPrefix(config.getString("prefix", systemMessage.getPrefix()));
         systemMessage.setLore(config.getString("lore", systemMessage.getLore()));
     }
+
+    private void initCommand(File file) {
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+        command.setCooldown(config.getInt("cooldown", command.getCooldown()));
+    }
+
 }

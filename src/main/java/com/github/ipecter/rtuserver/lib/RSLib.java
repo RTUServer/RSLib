@@ -13,6 +13,7 @@ import com.github.ipecter.rtuserver.lib.nms.v1_19_r3.NMS_1_19_R3;
 import com.github.ipecter.rtuserver.lib.nms.v1_20_r1.NMS_1_20_R1;
 import com.github.ipecter.rtuserver.lib.nms.v1_20_r2.NMS_1_20_R2;
 import com.github.ipecter.rtuserver.lib.nms.v1_20_r3.NMS_1_20_R3;
+import com.github.ipecter.rtuserver.lib.plugin.RSCommand;
 import com.github.ipecter.rtuserver.lib.plugin.RSPlugin;
 import com.github.ipecter.rtuserver.lib.plugin.inventory.RSInventoryListener;
 import com.github.ipecter.rtuserver.lib.util.common.ComponentUtil;
@@ -42,12 +43,12 @@ public class RSLib extends RSPlugin {
     }
 
     public void loadPlugin(RSPlugin plugin) {
-        console(MiniMessage.miniMessage().deserialize("<white>loading RSPlugin: " + plugin.getName() + "</white>"));
+        console(ComponentUtil.miniMessage("<white>loading RSPlugin: " + plugin.getName() + "</white>"));
         plugins.put(plugin.getName(), plugin);
     }
 
     public void unloadPlugin(RSPlugin plugin) {
-        console(MiniMessage.miniMessage().deserialize("<white>unloading RSPlugin: " + plugin.getName() + "</white>"));
+        console(ComponentUtil.miniMessage("<white>unloading RSPlugin: " + plugin.getName() + "</white>"));
         plugins.remove(plugin.getName());
     }
 
@@ -86,16 +87,16 @@ public class RSLib extends RSPlugin {
 
     @Override
     public void enable() {
-        console(MiniMessage.miniMessage().deserialize("<white>NMS: " + nmsVersion + "</white>"));
+        console(ComponentUtil.miniMessage("<white>NMS: " + nmsVersion + "</white>"));
         registerEvent(new MotdOnJoin());
         registerEvent(new RSInventoryListener());
         registerCommand(new Command());
         configManager.init();
-        console(MiniMessage.miniMessage().deserialize("<green>Enable!</green>"));
+        console(ComponentUtil.miniMessage("<green>Enable!</green>"));
     }
 
     @Override
     public void disable() {
-        console(MiniMessage.miniMessage().deserialize("<red>Disable!</red>"));
+        console(ComponentUtil.miniMessage("<red>Disable!</red>"));
     }
 }

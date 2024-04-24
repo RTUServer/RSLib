@@ -18,3 +18,4 @@ libraries:
   - com.google.guava:guava:31.1-jre
   - org.apache.commons:commons-lang3:3.14.0
   - org.quartz-scheduler:quartz:2.5.0-rc1
+  - org.xerial.snappy:snappy-java:1.1.10.5

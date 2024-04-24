@@ -14,3 +14,6 @@ dataNameType:
   wrong: "<red>Name contains wrong format, You can use only English, Korean, Number and _</red>"
   long: "<red>Max length of name is 15</red>"
   exist: "<red>This name is duplicated</red>"
+
+command:
+  cooldown: "<red>Too Quickly! You must try again later</red>"
