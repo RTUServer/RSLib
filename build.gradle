@@ -78,7 +78,7 @@ dependencies {
 
     implementation "io.papermc:paperlib:1.0.7"
     compileOnly "net.kyori:adventure-platform-bukkit:4.3.2"
-    compileOnly "net.kyori:adventure-text-minimessage:4.14.0"
+    compileOnly "net.kyori:adventure-text-minimessage:4.16.0"
     compileOnly 'com.google.code.gson:gson:2.10.1'
     compileOnly 'com.google.guava:guava:33.0.0-jre'
     compileOnly 'org.apache.commons:commons-lang3:3.14.0'
