@@ -18,7 +18,6 @@ public class ConfigManager {
 
     @Getter
     private final SettingConfig setting = new SettingConfig();
-
     @Getter
     private final SystemMessageConfig systemMessage = new SystemMessageConfig();
     @Getter
