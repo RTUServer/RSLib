@@ -64,12 +64,11 @@ repositories {
     maven {
         url = 'https://repo.oraxen.com/releases'
     }
-
-    maven {
-        url = 'https://nexus.scarsz.me/content/groups/public/'
-    }
     maven {
         url = 'https://jitpack.io'
+    }
+    maven {
+        url = 'https://papermc.io/repo/repository/maven-public/'
     }
 }
 
@@ -86,8 +85,6 @@ dependencies {
 
     implementation 'org.mongodb:mongodb-driver-sync:4.11.1'
     compileOnly 'org.quartz-scheduler:quartz:2.5.0-rc1'
-
-    compileOnly 'com.discordsrv:discordsrv:1.27.0'
 
     compileOnly 'me.clip:placeholderapi:2.11.2'
     compileOnly 'io.th0rgal:oraxen:1.168.0'
