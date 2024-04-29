@@ -13,13 +13,13 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.server.TabCompleteEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
@@ -34,8 +34,6 @@ public abstract class RSCommand implements CommandExecutor, TabCompleter, Runnab
     private Audience audience;
 
     private final Map<UUID, Integer> cooldownMap = new ConcurrentHashMap<>();
-    private final Map<UUID, Integer> tabCompleteLengthMap = new HashMap<>();
-    private final Map<UUID, List<String>> tabCompleteListMap = new HashMap<>();
 
     public RSCommand(String name) {
         this(name, RSLib.getInstance().getConfigManager().getCommand().getCooldown());
@@ -74,8 +72,6 @@ public abstract class RSCommand implements CommandExecutor, TabCompleter, Runnab
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if (sender instanceof Player player) {
-            tabCompleteLengthMap.remove(player.getUniqueId());
-            tabCompleteListMap.remove(player.getUniqueId());
             if (cooldownMap.getOrDefault(player.getUniqueId(), 0) <= 0) cooldownMap.put(player.getUniqueId(), cooldown);
             else {
                 sendMessage(ComponentUtil.systemMessage(config.getTranslation("command.cooldown")));
@@ -92,17 +88,9 @@ public abstract class RSCommand implements CommandExecutor, TabCompleter, Runnab
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
-        if (sender instanceof Player player) {
-            UUID uuid = player.getUniqueId();
-            if ((args.length != tabCompleteLengthMap.getOrDefault(uuid, -1))) {
-                tabCompleteLengthMap.put(uuid, args.length);
-                this.sender = sender;
-                this.audience = RSPlugin.getPlugin().getAdventure().sender(sender);
-                return tabCompleteListMap.put(uuid, tabComplete(new CommandData(args)));
-            } else {
-                return tabCompleteListMap.get(uuid);
-            }
-        } else return tabComplete(new CommandData(args));
+        this.sender = sender;
+        this.audience = RSPlugin.getPlugin().getAdventure().sender(sender);
+        return tabComplete(new CommandData(args));
     }
 
 //    @Override

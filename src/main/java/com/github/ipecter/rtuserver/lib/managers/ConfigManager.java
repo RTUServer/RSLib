@@ -42,7 +42,7 @@ public class ConfigManager {
     private void initMessage(File file) {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
         msgKeyMap.clear();
-        for (String key : config.getKeys(false)) {
+        for (String key : config.getKeys(true)) {
             if (key.equals("prefix")) {
                 String prefixText = config.getString("prefix", "");
                 msgKeyMap.put(key, prefixText.isEmpty() ? MiniMessage.miniMessage().serialize(RSLib.getInstance().getPrefix()) : prefixText);
