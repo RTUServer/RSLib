@@ -1,0 +1,42 @@
+--- a/net/minecraft/world/level/block/IceBlock.java
++++ b/net/minecraft/world/level/block/IceBlock.java
+@@ -17,6 +17,7 @@
+ import net.minecraft.world.level.material.PushReaction;
+ 
+ public class IceBlock extends HalfTransparentBlock {
++
+     public IceBlock(BlockBehaviour.Properties settings) {
+         super(settings);
+     }
+@@ -24,6 +25,11 @@
+     @Override
+     public void playerDestroy(Level world, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack stack) {
+         super.playerDestroy(world, player, pos, state, blockEntity, stack);
++        // Paper start
++        this.afterDestroy(world, pos, stack);
++    }
++    public void afterDestroy(Level world, BlockPos pos, ItemStack stack) {
++        // Paper end
+         if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, stack) == 0) {
+             if (world.dimensionType().ultraWarm()) {
+                 world.removeBlock(pos, false);
+@@ -31,6 +37,7 @@
+             }
+ 
+             Material material = world.getBlockState(pos.below()).getMaterial();
++
+             if (material.blocksMotion() || material.isLiquid()) {
+                 world.setBlockAndUpdate(pos, Blocks.WATER.defaultBlockState());
+             }
+@@ -47,6 +54,11 @@
+     }
+ 
+     protected void melt(BlockState state, Level world, BlockPos pos) {
++        // CraftBukkit start
++        if (org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callBlockFadeEvent(world, pos, world.dimensionType().ultraWarm() ? Blocks.AIR.defaultBlockState() : Blocks.WATER.defaultBlockState()).isCancelled()) {
++            return;
++        }
++        // CraftBukkit end
+         if (world.dimensionType().ultraWarm()) {
+             world.removeBlock(pos, false);
+         } else {

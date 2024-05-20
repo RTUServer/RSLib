@@ -1,0 +1,69 @@
+--- a/net/minecraft/world/level/ClipContext.java
++++ b/net/minecraft/world/level/ClipContext.java
+@@ -12,6 +12,7 @@
+ import net.minecraft.world.phys.shapes.VoxelShape;
+ 
+ public class ClipContext {
++
+     private final Vec3 from;
+     private final Vec3 to;
+     private final ClipContext.Block block;
+@@ -23,7 +24,7 @@
+         this.to = end;
+         this.block = shapeType;
+         this.fluid = fluidHandling;
+-        this.collisionContext = CollisionContext.of(entity);
++        this.collisionContext = (entity == null) ? CollisionContext.empty() : CollisionContext.of(entity); // CraftBukkit
+     }
+ 
+     public Vec3 getTo() {
+@@ -43,14 +44,13 @@
+     }
+ 
+     public static enum Block implements ClipContext.ShapeGetter {
+-        COLLIDER(BlockBehaviour.BlockStateBase::getCollisionShape),
+-        OUTLINE(BlockBehaviour.BlockStateBase::getShape),
+-        VISUAL(BlockBehaviour.BlockStateBase::getVisualShape);
++
++        COLLIDER(BlockBehaviour.BlockStateBase::getCollisionShape), OUTLINE(BlockBehaviour.BlockStateBase::getShape), VISUAL(BlockBehaviour.BlockStateBase::getVisualShape);
+ 
+         private final ClipContext.ShapeGetter shapeGetter;
+ 
+-        private Block(ClipContext.ShapeGetter provider) {
+-            this.shapeGetter = provider;
++        private Block(ClipContext.ShapeGetter raytrace_c) {
++            this.shapeGetter = raytrace_c;
+         }
+ 
+         @Override
+@@ -60,17 +60,16 @@
+     }
+ 
+     public static enum Fluid {
+-        NONE((fluidState) -> {
++
++        NONE((fluid) -> {
+             return false;
+-        }),
+-        SOURCE_ONLY(FluidState::isSource),
+-        ANY((fluidState) -> {
+-            return !fluidState.isEmpty();
++        }), SOURCE_ONLY(FluidState::isSource), ANY((fluid) -> {
++            return !fluid.isEmpty();
+         });
+ 
+         private final Predicate<FluidState> canPick;
+ 
+-        private Fluid(Predicate<FluidState> predicate) {
++        private Fluid(Predicate<FluidState> predicate) { // CraftBukkit - decompile error
+             this.canPick = predicate;
+         }
+ 
+@@ -80,6 +79,7 @@
+     }
+ 
+     public interface ShapeGetter {
++
+         VoxelShape get(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context);
+     }
+ }

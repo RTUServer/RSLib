@@ -1,0 +1,107 @@
+--- a/net/minecraft/world/damagesource/DamageSource.java
++++ b/net/minecraft/world/damagesource/DamageSource.java
+@@ -13,6 +13,7 @@
+ import net.minecraft.world.phys.Vec3;
+ 
+ public class DamageSource {
++
+     public static final DamageSource IN_FIRE = (new DamageSource("inFire")).bypassArmor().setIsFire();
+     public static final DamageSource LIGHTNING_BOLT = new DamageSource("lightningBolt");
+     public static final DamageSource ON_FIRE = (new DamageSource("onFire")).bypassArmor().setIsFire();
+@@ -48,6 +49,32 @@
+     private boolean isFall;
+     private boolean noAggro;
+     public final String msgId;
++    // CraftBukkit start
++    private boolean sweep;
++
++    public boolean isSweep() {
++        return this.sweep;
++    }
++
++    public DamageSource sweep() {
++        this.sweep = true;
++        return this;
++    }
++    // CraftBukkit end
++    // Paper start - add critical damage API
++    private boolean critical;
++    public boolean isCritical() {
++        return this.critical;
++    }
++    public DamageSource critical() {
++        return this.critical(true);
++    }
++    public DamageSource critical(boolean critical) {
++        this.critical = critical;
++        return this;
++    }
++    // Paper end
++    public @Nullable org.bukkit.block.BlockState explodedBlockState; // Paper - add exploded state
+ 
+     public static DamageSource fallingBlock(Entity attacker) {
+         return (new EntityDamageSource("fallingBlock", attacker)).damageHelmet();
+@@ -110,26 +137,29 @@
+     }
+ 
+     public static DamageSource explosion(@Nullable Explosion explosion) {
+-        return explosion != null ? explosion(explosion.getDirectSourceEntity(), explosion.getIndirectSourceEntity()) : explosion((Entity)null, (Entity)null);
++        return explosion != null ? DamageSource.explosion(explosion.getDirectSourceEntity(), explosion.getIndirectSourceEntity()) : DamageSource.explosion((Entity) null, (Entity) null);
+     }
+ 
+     public static DamageSource explosion(@Nullable Entity explosion, @Nullable Entity attacker) {
+-        if (attacker != null && explosion != null) {
+-            return (new IndirectEntityDamageSource("explosion.player", explosion, attacker)).setScalesWithDifficulty().setExplosion();
+-        } else {
+-            return explosion != null ? (new EntityDamageSource("explosion", explosion)).setScalesWithDifficulty().setExplosion() : (new DamageSource("explosion")).setScalesWithDifficulty().setExplosion();
+-        }
++        return attacker != null && explosion != null ? (new IndirectEntityDamageSource("explosion.player", explosion, attacker)).setScalesWithDifficulty().setExplosion() : (explosion != null ? (new EntityDamageSource("explosion", explosion)).setScalesWithDifficulty().setExplosion() : (new DamageSource("explosion")).setScalesWithDifficulty().setExplosion());
+     }
+ 
+     public static DamageSource sonicBoom(Entity attacker) {
+         return (new EntityDamageSource("sonic_boom", attacker)).bypassArmor().bypassEnchantments().setMagic();
+     }
+ 
++    @Deprecated @io.papermc.paper.annotation.DoNotUse // Paper
+     public static DamageSource badRespawnPointExplosion(Vec3 pos) {
+-        return new BadRespawnPointDamage(pos);
++        // Paper start
++        return badRespawnPointExplosion(pos, null);
++    }
++    public static DamageSource badRespawnPointExplosion(Vec3 pos, @Nullable org.bukkit.block.BlockState explodedBlockState) {
++        DamageSource source = new BadRespawnPointDamage(pos);
++        source.explodedBlockState = explodedBlockState;
++        return source;
++        // Paper end
+     }
+ 
+-    @Override
+     public String toString() {
+         return "DamageSource (" + this.msgId + ")";
+     }
+@@ -228,10 +258,11 @@
+     }
+ 
+     public Component getLocalizedDeathMessage(LivingEntity entity) {
+-        LivingEntity livingEntity = entity.getKillCredit();
+-        String string = "death.attack." + this.msgId;
+-        String string2 = string + ".player";
+-        return livingEntity != null ? Component.translatable(string2, entity.getDisplayName(), livingEntity.getDisplayName()) : Component.translatable(string, entity.getDisplayName());
++        LivingEntity entityliving1 = entity.getKillCredit();
++        String s = "death.attack." + this.msgId;
++        String s1 = s + ".player";
++
++        return entityliving1 != null ? Component.translatable(s1, entity.getDisplayName(), entityliving1.getDisplayName()) : Component.translatable(s, entity.getDisplayName());
+     }
+ 
+     public boolean isFire() {
+@@ -275,7 +306,8 @@
+ 
+     public boolean isCreativePlayer() {
+         Entity entity = this.getEntity();
+-        return entity instanceof Player && ((Player)entity).getAbilities().instabuild;
++
++        return entity instanceof Player && ((Player) entity).getAbilities().instabuild;
+     }
+ 
+     @Nullable

@@ -1,0 +1,198 @@
+--- a/net/minecraft/server/packs/repository/Pack.java
++++ b/net/minecraft/server/packs/repository/Pack.java
+@@ -17,9 +17,10 @@
+ import org.slf4j.Logger;
+ 
+ public class Pack {
++
+     private static final Logger LOGGER = LogUtils.getLogger();
+     private final String id;
+-    private final Pack.ResourcesSupplier resources;
++    public final Pack.ResourcesSupplier resources; // PAIL private -> public
+     private final Component title;
+     private final Component description;
+     private final PackCompatibility compatibility;
+@@ -31,8 +32,9 @@
+ 
+     @Nullable
+     public static Pack readMetaAndCreate(String name, Component displayName, boolean alwaysEnabled, Pack.ResourcesSupplier packFactory, PackType type, Pack.Position position, PackSource source) {
+-        Pack.Info info = readPackInfo(name, packFactory);
+-        return info != null ? create(name, displayName, alwaysEnabled, packFactory, info, type, position, false, source) : null;
++        Pack.Info resourcepackloader_a = Pack.readPackInfo(name, packFactory);
++
++        return resourcepackloader_a != null ? Pack.create(name, displayName, alwaysEnabled, packFactory, resourcepackloader_a, type, position, false, source) : null;
+     }
+ 
+     public static Pack create(String name, Component displayName, boolean alwaysEnabled, Pack.ResourcesSupplier packFactory, Pack.Info metadata, PackType type, Pack.Position position, boolean pinned, PackSource source) {
+@@ -54,18 +56,53 @@
+ 
+     @Nullable
+     public static Pack.Info readPackInfo(String name, Pack.ResourcesSupplier packFactory) {
+-        try (PackResources packResources = packFactory.open(name)) {
+-            PackMetadataSection packMetadataSection = packResources.getMetadataSection(PackMetadataSection.TYPE);
+-            if (packMetadataSection == null) {
+-                LOGGER.warn("Missing metadata in pack {}", (Object)name);
+-                return null;
+-            } else {
+-                FeatureFlagsMetadataSection featureFlagsMetadataSection = packResources.getMetadataSection(FeatureFlagsMetadataSection.TYPE);
+-                FeatureFlagSet featureFlagSet = featureFlagsMetadataSection != null ? featureFlagsMetadataSection.flags() : FeatureFlagSet.of();
+-                return new Pack.Info(packMetadataSection.getDescription(), packMetadataSection.getPackFormat(), featureFlagSet);
++        try {
++            PackResources iresourcepack = packFactory.open(name);
++
++            Pack.Info resourcepackloader_a = null; // CraftBukkit - decompile fix
++            label53:
++            {
++                FeatureFlagsMetadataSection featureflagsmetadatasection;
++
++                try {
++                    PackMetadataSection resourcepackinfo = (PackMetadataSection) iresourcepack.getMetadataSection(PackMetadataSection.TYPE);
++
++                    if (resourcepackinfo != null) {
++                        featureflagsmetadatasection = (FeatureFlagsMetadataSection) iresourcepack.getMetadataSection(FeatureFlagsMetadataSection.TYPE);
++                        FeatureFlagSet featureflagset = featureflagsmetadatasection != null ? featureflagsmetadatasection.flags() : FeatureFlagSet.of();
++
++                        resourcepackloader_a = new Pack.Info(resourcepackinfo.getDescription(), resourcepackinfo.getPackFormat(), featureflagset);
++                        break label53;
++                    }
++
++                    Pack.LOGGER.warn("Missing metadata in pack {}", name);
++                    featureflagsmetadatasection = null;
++                } catch (Throwable throwable) {
++                    if (iresourcepack != null) {
++                        try {
++                            iresourcepack.close();
++                        } catch (Throwable throwable1) {
++                            throwable.addSuppressed(throwable1);
++                        }
++                    }
++
++                    throw throwable;
++                }
++
++                if (iresourcepack != null) {
++                    iresourcepack.close();
++                }
++
++                return resourcepackloader_a; // CraftBukkit - decompile fix
+             }
+-        } catch (Exception var9) {
+-            LOGGER.warn("Failed to read pack metadata", (Throwable)var9);
++
++            if (iresourcepack != null) {
++                iresourcepack.close();
++            }
++
++            return resourcepackloader_a;
++        } catch (Exception exception) {
++            Pack.LOGGER.warn("Failed to read pack metadata", exception);
+             return null;
+         }
+     }
+@@ -79,8 +116,8 @@
+     }
+ 
+     public Component getChatLink(boolean enabled) {
+-        return ComponentUtils.wrapInSquareBrackets(this.packSource.decorate(Component.literal(this.id))).withStyle((style) -> {
+-            return style.withColor(enabled ? ChatFormatting.GREEN : ChatFormatting.RED).withInsertion(StringArgumentType.escapeIfRequired(this.id)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.empty().append(this.title).append("\n").append(this.description)));
++        return ComponentUtils.wrapInSquareBrackets(this.packSource.decorate(Component.literal(this.id))).withStyle((chatmodifier) -> {
++            return chatmodifier.withColor(enabled ? ChatFormatting.GREEN : ChatFormatting.RED).withInsertion(StringArgumentType.escapeIfRequired(this.id)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.empty().append(this.title).append("\n").append(this.description)));
+         });
+     }
+ 
+@@ -116,40 +153,50 @@
+         return this.packSource;
+     }
+ 
+-    @Override
+     public boolean equals(Object object) {
+         if (this == object) {
+             return true;
+         } else if (!(object instanceof Pack)) {
+             return false;
+         } else {
+-            Pack pack = (Pack)object;
+-            return this.id.equals(pack.id);
++            Pack resourcepackloader = (Pack) object;
++
++            return this.id.equals(resourcepackloader.id);
+         }
+     }
+ 
+-    @Override
+     public int hashCode() {
+         return this.id.hashCode();
+     }
+ 
++    @FunctionalInterface
++    public interface ResourcesSupplier {
++
++        PackResources open(String name);
++    }
++
+     public static record Info(Component description, int format, FeatureFlagSet requestedFeatures) {
++
+         public PackCompatibility compatibility(PackType type) {
+             return PackCompatibility.forFormat(this.format, type);
+         }
+     }
+ 
+     public static enum Position {
+-        TOP,
+-        BOTTOM;
++
++        TOP, BOTTOM;
++
++        private Position() {}
+ 
+         public <T> int insert(List<T> items, T item, Function<T, Pack> profileGetter, boolean listInverted) {
+-            Pack.Position position = listInverted ? this.opposite() : this;
+-            if (position == BOTTOM) {
+-                int i;
+-                for(i = 0; i < items.size(); ++i) {
+-                    Pack pack = profileGetter.apply(items.get(i));
+-                    if (!pack.isFixedPosition() || pack.getDefaultPosition() != this) {
++            Pack.Position resourcepackloader_position = listInverted ? this.opposite() : this;
++            Pack resourcepackloader;
++            int i;
++
++            if (resourcepackloader_position == Pack.Position.BOTTOM) {
++                for (i = 0; i < items.size(); ++i) {
++                    resourcepackloader = (Pack) profileGetter.apply(items.get(i));
++                    if (!resourcepackloader.isFixedPosition() || resourcepackloader.getDefaultPosition() != this) {
+                         break;
+                     }
+                 }
+@@ -157,26 +204,20 @@
+                 items.add(i, item);
+                 return i;
+             } else {
+-                int j;
+-                for(j = items.size() - 1; j >= 0; --j) {
+-                    Pack pack2 = profileGetter.apply(items.get(j));
+-                    if (!pack2.isFixedPosition() || pack2.getDefaultPosition() != this) {
++                for (i = items.size() - 1; i >= 0; --i) {
++                    resourcepackloader = (Pack) profileGetter.apply(items.get(i));
++                    if (!resourcepackloader.isFixedPosition() || resourcepackloader.getDefaultPosition() != this) {
+                         break;
+                     }
+                 }
+ 
+-                items.add(j + 1, item);
+-                return j + 1;
++                items.add(i + 1, item);
++                return i + 1;
+             }
+         }
+ 
+         public Pack.Position opposite() {
+-            return this == TOP ? BOTTOM : TOP;
++            return this == Pack.Position.TOP ? Pack.Position.BOTTOM : Pack.Position.TOP;
+         }
+     }
+-
+-    @FunctionalInterface
+-    public interface ResourcesSupplier {
+-        PackResources open(String name);
+-    }
+ }

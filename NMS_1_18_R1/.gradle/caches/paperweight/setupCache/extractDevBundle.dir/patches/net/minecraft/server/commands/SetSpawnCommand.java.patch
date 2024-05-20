@@ -1,0 +1,11 @@
+--- a/net/minecraft/server/commands/SetSpawnCommand.java
++++ b/net/minecraft/server/commands/SetSpawnCommand.java
+@@ -33,7 +33,7 @@
+         ResourceKey<Level> resourceKey = source.getLevel().dimension();
+ 
+         for(ServerPlayer serverPlayer : targets) {
+-            serverPlayer.setRespawnPosition(resourceKey, pos, angle, true, false);
++            serverPlayer.setRespawnPosition(resourceKey, pos, angle, true, false, com.destroystokyo.paper.event.player.PlayerSetSpawnEvent.Cause.COMMAND); // Paper - PlayerSetSpawnEvent
+         }
+ 
+         String string = resourceKey.location().toString();

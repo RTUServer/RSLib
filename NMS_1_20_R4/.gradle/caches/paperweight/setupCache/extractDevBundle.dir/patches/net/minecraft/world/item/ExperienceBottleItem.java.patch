@@ -1,0 +1,60 @@
+--- a/net/minecraft/world/item/ExperienceBottleItem.java
++++ b/net/minecraft/world/item/ExperienceBottleItem.java
+@@ -22,27 +22,46 @@
+     @Override
+     public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+         ItemStack itemStack = user.getItemInHand(hand);
+-        world.playSound(
+-            null,
+-            user.getX(),
+-            user.getY(),
+-            user.getZ(),
+-            SoundEvents.EXPERIENCE_BOTTLE_THROW,
+-            SoundSource.NEUTRAL,
+-            0.5F,
+-            0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F)
+-        );
++        // Paper - PlayerLaunchProjectileEvent; moved down
+         if (!world.isClientSide) {
+             ThrownExperienceBottle thrownExperienceBottle = new ThrownExperienceBottle(world, user);
+             thrownExperienceBottle.setItem(itemStack);
+             thrownExperienceBottle.shootFromRotation(user, user.getXRot(), user.getYRot(), -20.0F, 0.7F, 1.0F);
+-            world.addFreshEntity(thrownExperienceBottle);
++            // Paper start - PlayerLaunchProjectileEvent
++            com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent event = new com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent((org.bukkit.entity.Player) user.getBukkitEntity(), org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack.asCraftMirror(itemStack), (org.bukkit.entity.Projectile) thrownExperienceBottle.getBukkitEntity());
++            if (event.callEvent() && world.addFreshEntity(thrownExperienceBottle)) {
++                if (event.shouldConsume() && !user.getAbilities().instabuild) {
++                    itemStack.shrink(1);
++                } else if (user instanceof net.minecraft.server.level.ServerPlayer) {
++                    ((net.minecraft.server.level.ServerPlayer) user).getBukkitEntity().updateInventory();
++                }
++
++                world.playSound(
++                    null,
++                    user.getX(),
++                    user.getY(),
++                    user.getZ(),
++                    SoundEvents.EXPERIENCE_BOTTLE_THROW,
++                    SoundSource.NEUTRAL,
++                    0.5F,
++                    0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F)
++                );
++                user.awardStat(Stats.ITEM_USED.get(this));
++            } else {
++                if (user instanceof net.minecraft.server.level.ServerPlayer) {
++                    ((net.minecraft.server.level.ServerPlayer) user).getBukkitEntity().updateInventory();
++                }
++                return InteractionResultHolder.fail(itemStack);
++            }
++            // Paper end - PlayerLaunchProjectileEvent
+         }
+ 
++        /* // Paper start - PlayerLaunchProjectileEvent; moved up
+         user.awardStat(Stats.ITEM_USED.get(this));
+         if (!user.getAbilities().instabuild) {
+             itemStack.shrink(1);
+         }
++        */ // Paper end - PlayerLaunchProjectileEvent
+ 
+         return InteractionResultHolder.sidedSuccess(itemStack, world.isClientSide());
+     }

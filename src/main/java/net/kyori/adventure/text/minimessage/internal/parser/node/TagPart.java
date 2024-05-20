@@ -34,88 +34,88 @@ import org.jetbrains.annotations.NotNull;
  * @since 4.10.0
  */
 public final class TagPart implements Tag.Argument {
-  private final String value;
-  private final Token token;
+    private final String value;
+    private final Token token;
 
-  /**
-   * Constructs a new tag part.
-   *
-   * @param sourceMessage the source message
-   * @param token the token that creates this tag part
-   * @param tagResolver the combined tag resolver
-   * @since 4.10.0
-   */
-  public TagPart(
-    final @NotNull String sourceMessage,
-    final @NotNull Token token,
-    final TokenParser.@NotNull TagProvider tagResolver
-  ) {
-    String v = unquoteAndEscape(sourceMessage, token.startIndex(), token.endIndex());
-    v = TokenParser.resolvePreProcessTags(v, tagResolver);
+    /**
+     * Constructs a new tag part.
+     *
+     * @param sourceMessage the source message
+     * @param token         the token that creates this tag part
+     * @param tagResolver   the combined tag resolver
+     * @since 4.10.0
+     */
+    public TagPart(
+            final @NotNull String sourceMessage,
+            final @NotNull Token token,
+            final TokenParser.@NotNull TagProvider tagResolver
+    ) {
+        String v = unquoteAndEscape(sourceMessage, token.startIndex(), token.endIndex());
+        v = TokenParser.resolvePreProcessTags(v, tagResolver);
 
-    this.value = v;
-    this.token = token;
-  }
-
-  /**
-   * Returns the value of this tag part.
-   *
-   * @return the value
-   * @since 4.10.0
-   */
-  @Override
-  public @NotNull String value() {
-    return this.value;
-  }
-
-  /**
-   * Returns the token that created this tag part.
-   *
-   * @return the token
-   * @since 4.10.0
-   */
-  public @NotNull Token token() {
-    return this.token;
-  }
-
-  /**
-   * Removes leading/trailing quotes from the given string, if necessary, and removes escaping {@code '\'} characters.
-   *
-   * @param text the input text
-   * @param start the starting index of the substring
-   * @param end the ending index of the substring
-   * @return the output substring
-   * @since 4.10.0
-   */
-  public static @NotNull String unquoteAndEscape(final @NotNull String text, final int start, final int end) {
-    if (start == end) {
-      return "";
+        this.value = v;
+        this.token = token;
     }
 
-    int startIndex = start;
-    int endIndex = end;
+    /**
+     * Removes leading/trailing quotes from the given string, if necessary, and removes escaping {@code '\'} characters.
+     *
+     * @param text  the input text
+     * @param start the starting index of the substring
+     * @param end   the ending index of the substring
+     * @return the output substring
+     * @since 4.10.0
+     */
+    public static @NotNull String unquoteAndEscape(final @NotNull String text, final int start, final int end) {
+        if (start == end) {
+            return "";
+        }
 
-    final char firstChar = text.charAt(startIndex);
-    final char lastChar = text.charAt(endIndex - 1);
-    if (firstChar == '\'' || firstChar == '"') {
-      startIndex++;
-    } else {
-      return text.substring(startIndex, endIndex); // plain text is unescapable
+        int startIndex = start;
+        int endIndex = end;
+
+        final char firstChar = text.charAt(startIndex);
+        final char lastChar = text.charAt(endIndex - 1);
+        if (firstChar == '\'' || firstChar == '"') {
+            startIndex++;
+        } else {
+            return text.substring(startIndex, endIndex); // plain text is unescapable
+        }
+        if (lastChar == '\'' || lastChar == '"') {
+            endIndex--;
+        }
+
+        if (startIndex > endIndex) {
+            // We were given only a single quote that doesn't terminate, we can't unescape it
+            return text.substring(start, end);
+        }
+
+        return TokenParser.unescape(text, startIndex, endIndex, i -> i == firstChar || i == TokenParser.ESCAPE);
     }
-    if (lastChar == '\'' || lastChar == '"') {
-      endIndex--;
+
+    /**
+     * Returns the value of this tag part.
+     *
+     * @return the value
+     * @since 4.10.0
+     */
+    @Override
+    public @NotNull String value() {
+        return this.value;
     }
 
-    if (startIndex > endIndex) {
-      // We were given only a single quote that doesn't terminate, we can't unescape it
-      return text.substring(start, end);
+    /**
+     * Returns the token that created this tag part.
+     *
+     * @return the token
+     * @since 4.10.0
+     */
+    public @NotNull Token token() {
+        return this.token;
     }
 
-    return TokenParser.unescape(text, startIndex, endIndex, i -> i == firstChar || i == TokenParser.ESCAPE);
-  }
-
-  @Override
-  public String toString() {
-    return this.value;
-  }
+    @Override
+    public String toString() {
+        return this.value;
+    }
 }

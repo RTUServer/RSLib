@@ -1,0 +1,325 @@
+--- a/net/minecraft/nbt/NbtIo.java
++++ b/net/minecraft/nbt/NbtIo.java
+@@ -1,3 +1,4 @@
++// mc-dev import
+ package net.minecraft.nbt;
+ 
+ import java.io.BufferedOutputStream;
+@@ -20,10 +21,28 @@
+ import net.minecraft.util.FastBufferedInputStream;
+ 
+ public class NbtIo {
++
++    public NbtIo() {}
++
+     public static CompoundTag readCompressed(File file) throws IOException {
+-        try (InputStream inputStream = new FileInputStream(file)) {
+-            return readCompressed(inputStream);
++        FileInputStream fileinputstream = new FileInputStream(file);
++
++        CompoundTag nbttagcompound;
++
++        try {
++            nbttagcompound = NbtIo.readCompressed((InputStream) fileinputstream);
++        } catch (Throwable throwable) {
++            try {
++                fileinputstream.close();
++            } catch (Throwable throwable1) {
++                throwable.addSuppressed(throwable1);
++            }
++
++            throw throwable;
+         }
++
++        fileinputstream.close();
++        return nbttagcompound;
+     }
+ 
+     private static DataInputStream createDecompressorStream(InputStream stream) throws IOException {
+@@ -31,47 +50,138 @@
+     }
+ 
+     public static CompoundTag readCompressed(InputStream stream) throws IOException {
+-        try (DataInputStream dataInputStream = createDecompressorStream(stream)) {
+-            return read(dataInputStream, NbtAccounter.UNLIMITED);
++        DataInputStream datainputstream = NbtIo.createDecompressorStream(stream);
++
++        CompoundTag nbttagcompound;
++
++        try {
++            nbttagcompound = NbtIo.read(datainputstream, NbtAccounter.UNLIMITED);
++        } catch (Throwable throwable) {
++            if (datainputstream != null) {
++                try {
++                    datainputstream.close();
++                } catch (Throwable throwable1) {
++                    throwable.addSuppressed(throwable1);
++                }
++            }
++
++            throw throwable;
++        }
++
++        if (datainputstream != null) {
++            datainputstream.close();
+         }
++
++        return nbttagcompound;
+     }
+ 
+     public static void parseCompressed(File file, StreamTagVisitor scanner) throws IOException {
+-        try (InputStream inputStream = new FileInputStream(file)) {
+-            parseCompressed(inputStream, scanner);
++        FileInputStream fileinputstream = new FileInputStream(file);
++
++        try {
++            NbtIo.parseCompressed((InputStream) fileinputstream, scanner);
++        } catch (Throwable throwable) {
++            try {
++                fileinputstream.close();
++            } catch (Throwable throwable1) {
++                throwable.addSuppressed(throwable1);
++            }
++
++            throw throwable;
+         }
+ 
++        fileinputstream.close();
+     }
+ 
+     public static void parseCompressed(InputStream stream, StreamTagVisitor scanner) throws IOException {
+-        try (DataInputStream dataInputStream = createDecompressorStream(stream)) {
+-            parse(dataInputStream, scanner);
++        DataInputStream datainputstream = NbtIo.createDecompressorStream(stream);
++
++        try {
++            NbtIo.parse(datainputstream, scanner);
++        } catch (Throwable throwable) {
++            if (datainputstream != null) {
++                try {
++                    datainputstream.close();
++                } catch (Throwable throwable1) {
++                    throwable.addSuppressed(throwable1);
++                }
++            }
++
++            throw throwable;
++        }
++
++        if (datainputstream != null) {
++            datainputstream.close();
+         }
+ 
+     }
+ 
+     public static void writeCompressed(CompoundTag nbt, File file) throws IOException {
+-        try (OutputStream outputStream = new FileOutputStream(file)) {
+-            writeCompressed(nbt, outputStream);
++        FileOutputStream fileoutputstream = new FileOutputStream(file);
++
++        try {
++            NbtIo.writeCompressed(nbt, (OutputStream) fileoutputstream);
++        } catch (Throwable throwable) {
++            try {
++                fileoutputstream.close();
++            } catch (Throwable throwable1) {
++                throwable.addSuppressed(throwable1);
++            }
++
++            throw throwable;
+         }
+ 
++        fileoutputstream.close();
+     }
+ 
+     public static void writeCompressed(CompoundTag nbt, OutputStream stream) throws IOException {
+-        try (DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new GZIPOutputStream(stream)))) {
+-            write(nbt, dataOutputStream);
++        DataOutputStream dataoutputstream = new DataOutputStream(new BufferedOutputStream(new GZIPOutputStream(stream)));
++
++        try {
++            NbtIo.write(nbt, (DataOutput) dataoutputstream);
++        } catch (Throwable throwable) {
++            try {
++                dataoutputstream.close();
++            } catch (Throwable throwable1) {
++                throwable.addSuppressed(throwable1);
++            }
++
++            throw throwable;
+         }
+ 
++        dataoutputstream.close();
+     }
+ 
+     public static void write(CompoundTag nbt, File file) throws IOException {
+-        try (
+-            FileOutputStream fileOutputStream = new FileOutputStream(file);
+-            DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
+-        ) {
+-            write(nbt, dataOutputStream);
++        FileOutputStream fileoutputstream = new FileOutputStream(file);
++
++        try {
++            DataOutputStream dataoutputstream = new DataOutputStream(fileoutputstream);
++
++            try {
++                NbtIo.write(nbt, (DataOutput) dataoutputstream);
++            } catch (Throwable throwable) {
++                try {
++                    dataoutputstream.close();
++                } catch (Throwable throwable1) {
++                    throwable.addSuppressed(throwable1);
++                }
++
++                throw throwable;
++            }
++
++            dataoutputstream.close();
++        } catch (Throwable throwable2) {
++            try {
++                fileoutputstream.close();
++            } catch (Throwable throwable3) {
++                throwable2.addSuppressed(throwable3);
++            }
++
++            throw throwable2;
+         }
+ 
++        fileoutputstream.close();
+     }
+ 
+     @Nullable
+@@ -79,54 +189,85 @@
+         if (!file.exists()) {
+             return null;
+         } else {
+-            CompoundTag var3;
+-            try (
+-                FileInputStream fileInputStream = new FileInputStream(file);
+-                DataInputStream dataInputStream = new DataInputStream(fileInputStream);
+-            ) {
+-                var3 = read(dataInputStream, NbtAccounter.UNLIMITED);
++            FileInputStream fileinputstream = new FileInputStream(file);
++
++            CompoundTag nbttagcompound;
++
++            try {
++                DataInputStream datainputstream = new DataInputStream(fileinputstream);
++
++                try {
++                    nbttagcompound = NbtIo.read(datainputstream, NbtAccounter.UNLIMITED);
++                } catch (Throwable throwable) {
++                    try {
++                        datainputstream.close();
++                    } catch (Throwable throwable1) {
++                        throwable.addSuppressed(throwable1);
++                    }
++
++                    throw throwable;
++                }
++
++                datainputstream.close();
++            } catch (Throwable throwable2) {
++                try {
++                    fileinputstream.close();
++                } catch (Throwable throwable3) {
++                    throwable2.addSuppressed(throwable3);
++                }
++
++                throw throwable2;
+             }
+ 
+-            return var3;
++            fileinputstream.close();
++            return nbttagcompound;
+         }
+     }
+ 
+     public static CompoundTag read(DataInput input) throws IOException {
+-        return read(input, NbtAccounter.UNLIMITED);
++        return NbtIo.read(input, NbtAccounter.UNLIMITED);
+     }
+ 
+     public static CompoundTag read(DataInput input, NbtAccounter tracker) throws IOException {
+-        Tag tag = readUnnamedTag(input, 0, tracker);
+-        if (tag instanceof CompoundTag) {
+-            return (CompoundTag)tag;
++        // Spigot start
++        if ( input instanceof io.netty.buffer.ByteBufInputStream )
++        {
++            input = new DataInputStream(new org.spigotmc.LimitStream((InputStream) input, tracker));
++        }
++        // Spigot end
++        Tag nbtbase = NbtIo.readUnnamedTag(input, 0, tracker);
++
++        if (nbtbase instanceof CompoundTag) {
++            return (CompoundTag) nbtbase;
+         } else {
+             throw new IOException("Root tag must be a named compound tag");
+         }
+     }
+ 
+     public static void write(CompoundTag nbt, DataOutput output) throws IOException {
+-        writeUnnamedTag(nbt, output);
++        NbtIo.writeUnnamedTag(nbt, output);
+     }
+ 
+     public static void parse(DataInput input, StreamTagVisitor scanner) throws IOException {
+-        TagType<?> tagType = TagTypes.getType(input.readByte());
+-        if (tagType == EndTag.TYPE) {
++        TagType<?> nbttagtype = TagTypes.getType(input.readByte());
++
++        if (nbttagtype == EndTag.TYPE) {
+             if (scanner.visitRootEntry(EndTag.TYPE) == StreamTagVisitor.ValueResult.CONTINUE) {
+                 scanner.visitEnd();
+             }
+ 
+         } else {
+-            switch (scanner.visitRootEntry(tagType)) {
++            switch (scanner.visitRootEntry(nbttagtype)) {
+                 case HALT:
+                 default:
+                     break;
+                 case BREAK:
+                     StringTag.skipString(input);
+-                    tagType.skip(input);
++                    nbttagtype.skip(input);
+                     break;
+                 case CONTINUE:
+                     StringTag.skipString(input);
+-                    tagType.parse(input, scanner);
++                    nbttagtype.parse(input, scanner);
+             }
+ 
+         }
+@@ -141,19 +282,21 @@
+     }
+ 
+     private static Tag readUnnamedTag(DataInput input, int depth, NbtAccounter tracker) throws IOException {
+-        byte b = input.readByte();
+-        if (b == 0) {
++        byte b0 = input.readByte();
++
++        if (b0 == 0) {
+             return EndTag.INSTANCE;
+         } else {
+             StringTag.skipString(input);
+ 
+             try {
+-                return TagTypes.getType(b).load(input, depth, tracker);
+-            } catch (IOException var7) {
+-                CrashReport crashReport = CrashReport.forThrowable(var7, "Loading NBT data");
+-                CrashReportCategory crashReportCategory = crashReport.addCategory("NBT Tag");
+-                crashReportCategory.setDetail("Tag type", b);
+-                throw new ReportedException(crashReport);
++                return TagTypes.getType(b0).load(input, depth, tracker);
++            } catch (IOException ioexception) {
++                CrashReport crashreport = CrashReport.forThrowable(ioexception, "Loading NBT data");
++                CrashReportCategory crashreportsystemdetails = crashreport.addCategory("NBT Tag");
++
++                crashreportsystemdetails.setDetail("Tag type", (Object) b0);
++                throw new ReportedException(crashreport);
+             }
+         }
+     }

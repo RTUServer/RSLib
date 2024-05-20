@@ -37,31 +37,31 @@ import java.util.List;
  * @since 4.10.0
  */
 public final class TokenListProducingMatchedTokenConsumer extends MatchedTokenConsumer<List<Token>> {
-  private List<Token> result = null;
+    private List<Token> result = null;
 
-  /**
-   * Creates a new token list producing matched token consumer.
-   *
-   * @param input the input
-   * @since 4.10.0
-   */
-  public TokenListProducingMatchedTokenConsumer(final @NotNull String input) {
-    super(input);
-  }
-
-  @Override
-  public void accept(final int start, final int end, final @NotNull TokenType tokenType) {
-    super.accept(start, end, tokenType);
-
-    if (this.result == null) {
-      this.result = new ArrayList<>();
+    /**
+     * Creates a new token list producing matched token consumer.
+     *
+     * @param input the input
+     * @since 4.10.0
+     */
+    public TokenListProducingMatchedTokenConsumer(final @NotNull String input) {
+        super(input);
     }
 
-    this.result.add(new Token(start, end, tokenType));
-  }
+    @Override
+    public void accept(final int start, final int end, final @NotNull TokenType tokenType) {
+        super.accept(start, end, tokenType);
 
-  @Override
-  public @NotNull List<Token> result() {
-    return this.result == null ? Collections.emptyList() : this.result;
-  }
+        if (this.result == null) {
+            this.result = new ArrayList<>();
+        }
+
+        this.result.add(new Token(start, end, tokenType));
+    }
+
+    @Override
+    public @NotNull List<Token> result() {
+        return this.result == null ? Collections.emptyList() : this.result;
+    }
 }

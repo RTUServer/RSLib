@@ -35,27 +35,25 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.Nullable;
 
 final class ScoreTag {
-  public static final String SCORE = "score";
+    public static final String SCORE = "score";
 
-  static final TagResolver RESOLVER = SerializableResolver.claimingComponent(ScoreTag.SCORE, ScoreTag::create, ScoreTag::emit);
+    static final TagResolver RESOLVER = SerializableResolver.claimingComponent(ScoreTag.SCORE, ScoreTag::create, ScoreTag::emit);
 
-  private ScoreTag() {
-  }
+    private ScoreTag() {
+    }
 
-  static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
-    final String name = args.popOr("A scoreboard member name is required").value();
-    final String objective = args.popOr("An objective name is required").value();
-    return Tag.inserting(Component.score(name, objective));
-  }
+    static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
+        final String name = args.popOr("A scoreboard member name is required").value();
+        final String objective = args.popOr("An objective name is required").value();
+        return Tag.inserting(Component.score(name, objective));
+    }
 
-  static @Nullable Emitable emit(final Component component) {
-    if (!(component instanceof ScoreComponent)) return null;
+    static @Nullable Emitable emit(final Component component) {
+        if (!(component instanceof ScoreComponent score)) return null;
 
-    final ScoreComponent score = (ScoreComponent) component;
-
-    return emit -> emit.tag(SCORE)
-      .argument(score.name())
-      .argument(score.objective());
-  }
+        return emit -> emit.tag(SCORE)
+                .argument(score.name())
+                .argument(score.objective());
+    }
 
 }

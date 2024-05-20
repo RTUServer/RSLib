@@ -1,0 +1,10 @@
+--- a/net/minecraft/world/level/levelgen/feature/treedecorators/CocoaDecorator.java
++++ b/net/minecraft/world/level/levelgen/feature/treedecorators/CocoaDecorator.java
+@@ -29,6 +29,7 @@
+ 
+     @Override
+     public void place(LevelSimulatedReader world, BiConsumer<BlockPos, BlockState> replacer, Random random, List<BlockPos> logPositions, List<BlockPos> leavesPositions) {
++        if (logPositions.isEmpty()) return; // Paper
+         if (!(random.nextFloat() >= this.probability)) {
+             int i = logPositions.get(0).getY();
+             logPositions.stream().filter((pos) -> {

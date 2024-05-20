@@ -1,0 +1,75 @@
+--- a/net/minecraft/world/level/chunk/ImposterProtoChunk.java
++++ b/net/minecraft/world/level/chunk/ImposterProtoChunk.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.world.level.chunk;
+ 
++import ca.spottedleaf.starlight.light.SWMRNibbleArray;
+ import it.unimi.dsi.fastutil.longs.LongSet;
+ import java.util.BitSet;
+ import java.util.Map;
+@@ -25,10 +26,52 @@
+     private final LevelChunk wrapped;
+ 
+     public ImposterProtoChunk(LevelChunk wrapped) {
+-        super(wrapped.getPos(), UpgradeData.EMPTY, wrapped);
++        super(wrapped.getPos(), UpgradeData.EMPTY, wrapped, wrapped.level); // Paper - add level
+         this.wrapped = wrapped;
+     }
+ 
++    // Paper start - rewrite light engine
++    @Override
++    public SWMRNibbleArray[] getBlockNibbles() {
++        return this.getWrapped().getBlockNibbles();
++    }
++
++    @Override
++    public void setBlockNibbles(SWMRNibbleArray[] nibbles) {
++        this.getWrapped().setBlockNibbles(nibbles);
++    }
++
++    @Override
++    public SWMRNibbleArray[] getSkyNibbles() {
++        return this.getWrapped().getSkyNibbles();
++    }
++
++    @Override
++    public void setSkyNibbles(SWMRNibbleArray[] nibbles) {
++        this.getWrapped().setSkyNibbles(nibbles);
++    }
++
++    @Override
++    public boolean[] getSkyEmptinessMap() {
++        return this.getWrapped().getSkyEmptinessMap();
++    }
++
++    @Override
++    public void setSkyEmptinessMap(boolean[] emptinessMap) {
++        this.getWrapped().setSkyEmptinessMap(emptinessMap);
++    }
++
++    @Override
++    public boolean[] getBlockEmptinessMap() {
++        return this.getWrapped().getBlockEmptinessMap();
++    }
++
++    @Override
++    public void setBlockEmptinessMap(boolean[] emptinessMap) {
++        this.getWrapped().setBlockEmptinessMap(emptinessMap);
++    }
++    // Paper end - rewrite light engine
++
+     @Nullable
+     @Override
+     public BlockEntity getBlockEntity(BlockPos pos) {
+@@ -40,6 +83,11 @@
+     public BlockState getBlockState(BlockPos pos) {
+         return this.wrapped.getBlockState(pos);
+     }
++    // Paper start
++    public final BlockState getType(final int x, final int y, final int z) {
++        return this.wrapped.getBlockData(x, y, z);
++    }
++    // Paper end
+ 
+     @Override
+     public FluidState getFluidState(BlockPos pos) {

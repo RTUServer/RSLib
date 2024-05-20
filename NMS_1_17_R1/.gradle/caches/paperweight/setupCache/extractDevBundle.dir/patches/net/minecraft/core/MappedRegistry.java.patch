@@ -1,0 +1,32 @@
+--- a/net/minecraft/core/MappedRegistry.java
++++ b/net/minecraft/core/MappedRegistry.java
+@@ -30,14 +30,14 @@
+ import net.minecraft.resources.RegistryDataPackCodec;
+ import net.minecraft.resources.ResourceKey;
+ import net.minecraft.resources.ResourceLocation;
+-import org.apache.commons.lang3.Validate;
++import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.Validate;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class MappedRegistry<T> extends WritableRegistry<T> {
+     protected static final Logger LOGGER = LogManager.getLogger();
+     private final ObjectList<T> byId = new ObjectArrayList<>(256);
+-    private final Object2IntMap<T> toId = new Object2IntOpenCustomHashMap<>(Util.identityStrategy());
++    private final it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap<T> toId = new it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap<T>(2048);// Paper - use bigger expected size to reduce collisions and direct intent for FastUtil to be identity map
+     private final BiMap<ResourceLocation, T> storage;
+     private final BiMap<ResourceKey<T>, T> keyStorage;
+     private final Map<T, Lifecycle> lifecycles;
+@@ -48,9 +48,9 @@
+     public MappedRegistry(ResourceKey<? extends Registry<T>> key, Lifecycle lifecycle) {
+         super(key, lifecycle);
+         this.toId.defaultReturnValue(-1);
+-        this.storage = HashBiMap.create();
+-        this.keyStorage = HashBiMap.create();
+-        this.lifecycles = Maps.newIdentityHashMap();
++        this.storage = HashBiMap.create(2048); // Paper - use bigger expected size to reduce collisions
++        this.keyStorage = HashBiMap.create(2048); // Paper - use bigger expected size to reduce collisions
++        this.lifecycles = new java.util.IdentityHashMap<>(2048); // Paper - use bigger expected size to reduce collisions
+         this.elementsLifecycle = lifecycle;
+     }
+ 

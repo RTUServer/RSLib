@@ -1,0 +1,214 @@
+--- a/net/minecraft/world/level/chunk/PalettedContainer.java
++++ b/net/minecraft/world/level/chunk/PalettedContainer.java
+@@ -28,6 +28,7 @@
+     private final Function<CompoundTag, T> reader;
+     private final Function<T, CompoundTag> writer;
+     private final T defaultValue;
++    private final T[] presetValues; // Paper - Anti-Xray - Add preset values
+     protected BitStorage storage;
+     private Palette<T> palette;
+     private int bits;
+@@ -36,27 +37,61 @@
+     private final DebugBuffer<Pair<Thread, StackTraceElement[]>> traces = null;
+ 
+     public void acquire() {
++        /* // Paper start - disable this - use proper synchronization
+         if (this.traces != null) {
+             Thread thread = Thread.currentThread();
+             this.traces.push(Pair.of(thread, thread.getStackTrace()));
+         }
+ 
+         ThreadingDetector.checkAndLock(this.lock, this.traces, "PalettedContainer");
++        */ // Paper end
+     }
+ 
+     public void release() {
+-        this.lock.release();
++        //this.lock.release(); // Paper - disable this
+     }
+ 
+-    public PalettedContainer(Palette<T> fallbackPalette, IdMapper<T> idList, Function<CompoundTag, T> elementDeserializer, Function<T, CompoundTag> elementSerializer, T defaultElement) {
++    // Paper start - Anti-Xray - Add preset values
++    @Deprecated public PalettedContainer(Palette<T> fallbackPalette, IdMapper<T> idList, Function<CompoundTag, T> elementDeserializer, Function<T, CompoundTag> elementSerializer, T defaultElement) { // Notice for updates: Please make sure this constructor isn't used anywhere
++        this(fallbackPalette, idList, elementDeserializer, elementSerializer, defaultElement, null, true);
++    }
++    public PalettedContainer(Palette<T> fallbackPalette, IdMapper<T> idList, Function<CompoundTag, T> elementDeserializer, Function<T, CompoundTag> elementSerializer, T defaultElement, T[] presetValues, boolean initialize) {
++        // Paper end
+         this.globalPalette = fallbackPalette;
+         this.registry = idList;
+         this.reader = elementDeserializer;
+         this.writer = elementSerializer;
+         this.defaultValue = defaultElement;
+-        this.setBits(4);
++        // Paper start - Anti-Xray - Add preset values
++        this.presetValues = presetValues;
++
++        if (initialize) {
++            if (presetValues == null) {
++                // Default
++                this.setBits(4);
++            } else {
++                // Count the number of required bits
++                // Preset values:   presetValues.length - 1
++                // Air:                                 + 1
++                // Extra:                              + 15
++                // Air and extra correspond to the default behavior this.setBits(4)
++                this.setBits(32 - Integer.numberOfLeadingZeros(presetValues.length + 15));
++                this.addPresetValues();
++            }
++        }
++        // Paper end
+     }
+ 
++    // Paper start - Anti-Xray - Add preset values
++    private void addPresetValues() {
++        if (this.presetValues != null && this.palette != this.globalPalette) {
++            for (T presetValue : this.presetValues) {
++                this.palette.idFor(presetValue);
++            }
++        }
++    }
++    // Paper end
++
+     private static int getIndex(int x, int y, int z) {
+         return y << 8 | z << 4 | x;
+     }
+@@ -84,6 +119,7 @@
+         BitStorage bitStorage = this.storage;
+         Palette<T> palette = this.palette;
+         this.setBits(newSize);
++        this.addPresetValues(); // Paper - Anti-Xray - Add preset values
+ 
+         for(int i = 0; i < bitStorage.getSize(); ++i) {
+             T object = palette.valueFor(bitStorage.get(i));
+@@ -95,7 +131,7 @@
+         return this.palette.idFor(objectAdded);
+     }
+ 
+-    public T getAndSet(int x, int y, int z, T value) {
++    public synchronized T getAndSet(int x, int y, int z, T value) { // Paper - synchronize
+         Object var6;
+         try {
+             this.acquire();
+@@ -119,7 +155,7 @@
+         return (T)(object == null ? this.defaultValue : object);
+     }
+ 
+-    public void set(int i, int j, int k, T object) {
++    public synchronized void set(int i, int j, int k, T object) { // Paper - synchronize
+         try {
+             this.acquire();
+             this.set(getIndex(i, j, k), object);
+@@ -135,15 +171,15 @@
+     }
+ 
+     public T get(int x, int y, int z) {
+-        return this.get(getIndex(x, y, z));
++        return this.get(y << 8 | z << 4 | x); // Paper - inline
+     }
+ 
+-    protected T get(int index) {
++    public T get(int index) { // Paper - public
+         T object = this.palette.valueFor(this.storage.get(index));
+         return (T)(object == null ? this.defaultValue : object);
+     }
+ 
+-    public void read(FriendlyByteBuf buf) {
++    public synchronized void read(FriendlyByteBuf buf) { // Paper - synchronize
+         try {
+             this.acquire();
+             int i = buf.readByte();
+@@ -153,17 +189,38 @@
+ 
+             this.palette.read(buf);
+             buf.readLongArray(this.storage.getRaw());
++            // Paper start - Anti-Xray - Add preset values
++            // If there are many preset values this may require several resize operations
++            // This can be avoided by calculating the required bits in advance, as it is done in #read(ListTag, long[])
++            // However, this method is only used by the client, so it does not matter
++            this.addPresetValues();
++            // Paper end
+         } finally {
+             this.release();
+         }
+ 
+     }
+ 
+-    public void write(FriendlyByteBuf buf) {
++    // Paper start - Anti-Xray - Add chunk packet info
++    @Deprecated public void write(FriendlyByteBuf buf) { write(buf, null, 0); } // Notice for updates: Please make sure this method isn't used anywhere
++    public synchronized void write(FriendlyByteBuf buf, com.destroystokyo.paper.antixray.ChunkPacketInfo<T> chunkPacketInfo, int bottomBlockY) { // Paper - synchronize
++        // Paper end
+         try {
+             this.acquire();
+             buf.writeByte(this.bits);
+             this.palette.write(buf);
++
++            // Paper start - Anti-Xray - Add chunk packet info
++            if (chunkPacketInfo != null) {
++                // Bottom block to 0 based chunk section index
++                int chunkSectionIndex = (bottomBlockY >> 4) - chunkPacketInfo.getChunk().getMinSection();
++                chunkPacketInfo.setBits(chunkSectionIndex, this.bits);
++                chunkPacketInfo.setPalette(chunkSectionIndex, this.palette);
++                chunkPacketInfo.setIndex(chunkSectionIndex, buf.writerIndex() + FriendlyByteBuf.getVarIntSize(this.storage.getRaw().length));
++                chunkPacketInfo.setPresetValues(chunkSectionIndex, this.presetValues);
++            }
++            // Paper end
++
+             buf.writeLongArray(this.storage.getRaw());
+         } finally {
+             this.release();
+@@ -171,15 +228,17 @@
+ 
+     }
+ 
+-    public void read(ListTag paletteNbt, long[] data) {
++    public synchronized void read(ListTag paletteNbt, long[] data) { // Paper - synchronize
+         try {
+             this.acquire();
+-            int i = Math.max(4, Mth.ceillog2(paletteNbt.size()));
+-            if (i != this.bits) {
++            // Paper - Anti-Xray - TODO: Should this.presetValues.length just be added here (faster) or should the contents be compared to calculate the size (less RAM)?
++            int i = Math.max(4, Mth.ceillog2(paletteNbt.size() + (this.presetValues == null ? 0 : this.presetValues.length))); // Paper - Anti-Xray - Calculate the size with preset values
++            if (true || i != this.bits) { // Paper - Anti-Xray - Not initialized yet
+                 this.setBits(i);
+             }
+ 
+             this.palette.read(paletteNbt);
++            this.addPresetValues(); // Paper - Anti-Xray - Add preset values
+             int j = data.length * 64 / 4096;
+             if (this.palette == this.globalPalette) {
+                 Palette<T> palette = new HashMapPalette<>(this.registry, i, this.dummyPaletteResize, this.reader, this.writer);
+@@ -204,13 +263,17 @@
+ 
+     }
+ 
+-    public void write(CompoundTag nbt, String paletteKey, String dataKey) {
++    // Paper start - allow reusing int array
++    public synchronized void write(CompoundTag nbt, String paletteKey, String dataKey) { // Paper - synchronize
++        this.write(nbt, paletteKey, dataKey, new int[4096]);
++    }
++    public synchronized void write(CompoundTag nbt, String paletteKey, String dataKey, int[] is) { // Paper - synchronize // Paper end
+         try {
+             this.acquire();
+             HashMapPalette<T> hashMapPalette = new HashMapPalette<>(this.registry, this.bits, this.dummyPaletteResize, this.reader, this.writer);
+             T object = this.defaultValue;
+             int i = hashMapPalette.idFor(this.defaultValue);
+-            int[] is = new int[4096];
++            //int[] is = new int[4096]; // Paper - will now be pulled from ThreadLocal
+ 
+             for(int j = 0; j < 4096; ++j) {
+                 T object2 = this.get(j);
+@@ -261,4 +324,12 @@
+     public interface CountConsumer<T> {
+         void accept(T object, int count);
+     }
++
++    // Paper start
++   public void forEachLocation(PalettedContainer.CountConsumer<T> datapaletteblock_a) {
++       this.storage.forEach((int location, int data) -> {
++           datapaletteblock_a.accept(this.palette.valueFor(data), location);
++       });
++   }
++    // Paper end
+ }

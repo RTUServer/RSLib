@@ -1,0 +1,11 @@
+--- a/net/minecraft/server/packs/repository/ServerPacksSource.java
++++ b/net/minecraft/server/packs/repository/ServerPacksSource.java
+@@ -38,7 +38,7 @@
+     public static VanillaPackResources createVanillaPackSource() {
+         return new VanillaPackResourcesBuilder()
+             .setMetadata(BUILT_IN_METADATA)
+-            .exposeNamespace("minecraft")
++            .exposeNamespace("minecraft", ResourceLocation.PAPER_NAMESPACE) // Paper
+             .applyDevelopmentConfig()
+             .pushJarResources()
+             .build();

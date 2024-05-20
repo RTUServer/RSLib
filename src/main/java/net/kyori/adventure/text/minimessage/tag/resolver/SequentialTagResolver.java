@@ -35,77 +35,76 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 final class SequentialTagResolver implements TagResolver, SerializableResolver {
-  final TagResolver[] resolvers;
+    final TagResolver[] resolvers;
 
-  SequentialTagResolver(final @NotNull TagResolver@NotNull[] resolvers) {
-    this.resolvers = resolvers;
-  }
+    SequentialTagResolver(final @NotNull TagResolver @NotNull [] resolvers) {
+        this.resolvers = resolvers;
+    }
 
-  @Override
-  public @Nullable Tag resolve(final @NotNull String name, final @NotNull ArgumentQueue arguments, final @NotNull Context ctx) throws ParsingException {
-    @Nullable ParsingException thrown = null;
-    for (final TagResolver resolver : this.resolvers) {
-      try {
-        final @Nullable Tag placeholder = resolver.resolve(name, arguments, ctx);
+    @Override
+    public @Nullable Tag resolve(final @NotNull String name, final @NotNull ArgumentQueue arguments, final @NotNull Context ctx) throws ParsingException {
+        @Nullable ParsingException thrown = null;
+        for (final TagResolver resolver : this.resolvers) {
+            try {
+                final @Nullable Tag placeholder = resolver.resolve(name, arguments, ctx);
 
-        if (placeholder != null) return placeholder;
-      } catch (final ParsingException ex) {
-        arguments.reset();
-        if (thrown == null) {
-          thrown = ex;
-        } else {
-          thrown.addSuppressed(ex);
+                if (placeholder != null) return placeholder;
+            } catch (final ParsingException ex) {
+                arguments.reset();
+                if (thrown == null) {
+                    thrown = ex;
+                } else {
+                    thrown.addSuppressed(ex);
+                }
+            } catch (final Exception ex) {
+                arguments.reset();
+                final ParsingException err = ctx.newException("Exception thrown while parsing <" + name + ">", ex, arguments);
+                if (thrown == null) {
+                    thrown = err;
+                } else {
+                    thrown.addSuppressed(err);
+                }
+            }
         }
-      } catch (final Exception ex) {
-        arguments.reset();
-        final ParsingException err = ctx.newException("Exception thrown while parsing <" + name + ">", ex, arguments);
-        if (thrown == null) {
-          thrown = err;
-        } else {
-          thrown.addSuppressed(err);
+
+        if (thrown != null) {
+            throw thrown;
         }
-      }
+        return null;
     }
 
-    if (thrown != null) {
-      throw thrown;
+    @Override
+    public boolean has(final @NotNull String name) {
+        for (final TagResolver resolver : this.resolvers) {
+            if (resolver.has(name)) {
+                return true;
+            }
+        }
+        return false;
     }
-    return null;
-  }
 
-  @Override
-  public boolean has(final @NotNull String name) {
-    for (final TagResolver resolver : this.resolvers) {
-      if (resolver.has(name)) {
-        return true;
-      }
+    @Override
+    public void handle(final @NotNull Component serializable, final @NotNull ClaimConsumer consumer) {
+        for (final TagResolver resolver : this.resolvers) {
+            if (resolver instanceof SerializableResolver) {
+                ((SerializableResolver) resolver).handle(serializable, consumer);
+            }
+        }
     }
-    return false;
-  }
 
-  @Override
-  public void handle(final @NotNull Component serializable, final @NotNull ClaimConsumer consumer) {
-    for (final TagResolver resolver : this.resolvers) {
-      if (resolver instanceof SerializableResolver) {
-        ((SerializableResolver) resolver).handle(serializable, consumer);
-      }
+    @Override
+    public boolean equals(final @Nullable Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof SequentialTagResolver that)) {
+            return false;
+        }
+        return Arrays.equals(this.resolvers, that.resolvers);
     }
-  }
 
-  @Override
-  public boolean equals(final @Nullable Object other) {
-    if (other == this) {
-      return true;
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(this.resolvers);
     }
-    if (!(other instanceof SequentialTagResolver)) {
-      return false;
-    }
-    final SequentialTagResolver that = (SequentialTagResolver) other;
-    return Arrays.equals(this.resolvers, that.resolvers);
-  }
-
-  @Override
-  public int hashCode() {
-    return Arrays.hashCode(this.resolvers);
-  }
 }

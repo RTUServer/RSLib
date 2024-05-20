@@ -2,6 +2,9 @@ package com.github.ipecter.rtuserver.lib.nms.v1_20_r2;
 
 import com.github.ipecter.rtuserver.lib.nms.NMS;
 import com.github.ipecter.rtuserver.lib.nms.NMSBiome;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandMap;
+import org.bukkit.craftbukkit.v1_20_R2.CraftServer;
 
 public class NMS_1_20_R2 implements NMS {
 
@@ -10,5 +13,10 @@ public class NMS_1_20_R2 implements NMS {
     @Override
     public NMSBiome biome() {
         return biome;
+    }
+
+    @Override
+    public CommandMap commandMap() {
+        return ((CraftServer) Bukkit.getServer()).getCommandMap();
     }
 }

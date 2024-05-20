@@ -34,79 +34,78 @@ import org.jetbrains.annotations.Nullable;
  */
 @ApiStatus.NonExtendable
 public abstract class ParsingException extends RuntimeException {
-  private static final long serialVersionUID = 4502774670340827070L;
+    public static final int LOCATION_UNKNOWN = -1;
+    private static final long serialVersionUID = 4502774670340827070L;
 
-  public static final int LOCATION_UNKNOWN = -1;
+    /**
+     * Create a new parsing exception with only a message.
+     *
+     * @param message a detail message describing the error
+     * @since 4.10.0
+     */
+    protected ParsingException(final @Nullable String message) {
+        super(message);
+    }
 
-  /**
-   * Create a new parsing exception with only a message.
-   *
-   * @param message a detail message describing the error
-   * @since 4.10.0
-   */
-  protected ParsingException(final @Nullable String message) {
-    super(message);
-  }
+    /**
+     * Create a new parsing exception with a message and an optional cause.
+     *
+     * @param message a detail message describing the error
+     * @param cause   the cause
+     * @since 4.10.0
+     */
+    protected ParsingException(final @Nullable String message, final @Nullable Throwable cause) {
+        super(message, cause);
+    }
 
-  /**
-   * Create a new parsing exception with a message and an optional cause.
-   *
-   * @param message a detail message describing the error
-   * @param cause the cause
-   * @since 4.10.0
-   */
-  protected ParsingException(final @Nullable String message, final @Nullable Throwable cause) {
-    super(message, cause);
-  }
+    /**
+     * Create a new parsing exception with a message and an optional cause.
+     *
+     * @param message            a detail message describing the error
+     * @param cause              the cause
+     * @param enableSuppression  whether suppression is enabled or disabled
+     * @param writableStackTrace whether the stack trace should be writable
+     * @since 4.13.0
+     */
+    protected ParsingException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 
-  /**
-   * Create a new parsing exception with a message and an optional cause.
-   *
-   * @param message a detail message describing the error
-   * @param cause the cause
-   * @param enableSuppression whether suppression is enabled or disabled
-   * @param writableStackTrace whether the stack trace should be writable
-   * @since 4.13.0
-   */
-  protected ParsingException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
+    /**
+     * Get the input message which caused this exception.
+     *
+     * @return the original input message
+     * @since 4.10.0
+     */
+    public abstract @NotNull String originalText();
 
-  /**
-   * Get the input message which caused this exception.
-   *
-   * @return the original input message
-   * @since 4.10.0
-   */
-  public abstract @NotNull String originalText();
+    /**
+     * Get the detail message optionally passed with this exception.
+     *
+     * <p>Unlike {@link #getMessage()}, this method does not include location information.</p>
+     *
+     * @return the detail message passed to this exception
+     * @since 4.10.0
+     */
+    public abstract @Nullable String detailMessage();
 
-  /**
-   * Get the detail message optionally passed with this exception.
-   *
-   * <p>Unlike {@link #getMessage()}, this method does not include location information.</p>
-   *
-   * @return the detail message passed to this exception
-   * @since 4.10.0
-   */
-  public abstract @Nullable String detailMessage();
+    /**
+     * Get the start index of the location which caused this exception.
+     *
+     * <p>This index is an index into {@link #originalText()}. If location is unknown, {@link #LOCATION_UNKNOWN} will be returned instead.</p>
+     *
+     * @return the start index
+     * @since 4.10.0
+     */
+    public abstract int startIndex();
 
-  /**
-   * Get the start index of the location which caused this exception.
-   *
-   * <p>This index is an index into {@link #originalText()}. If location is unknown, {@link #LOCATION_UNKNOWN} will be returned instead.</p>
-   *
-   * @return the start index
-   * @since 4.10.0
-   */
-  public abstract int startIndex();
-
-  /**
-   * Get the end index of the location which caused this exception.
-   *
-   * <p>This index is an index into {@link #originalText()}. If location is unknown, {@link #LOCATION_UNKNOWN} will be returned instead.</p>
-   *
-   * @return the end index
-   * @since 4.10.0
-   */
-  public abstract int endIndex();
+    /**
+     * Get the end index of the location which caused this exception.
+     *
+     * <p>This index is an index into {@link #originalText()}. If location is unknown, {@link #LOCATION_UNKNOWN} will be returned instead.</p>
+     *
+     * @return the end index
+     * @since 4.10.0
+     */
+    public abstract int endIndex();
 }

@@ -36,65 +36,64 @@ import java.util.Map;
 import java.util.Objects;
 
 final class CachingTagResolver implements TagResolver.WithoutArguments, MappableResolver, SerializableResolver {
-  private static final Tag NULL_REPLACEMENT = (Inserting) () -> {
-    throw new UnsupportedOperationException("no-op null tag");
-  };
+    private static final Tag NULL_REPLACEMENT = (Inserting) () -> {
+        throw new UnsupportedOperationException("no-op null tag");
+    };
 
-  private final Map<String, Tag> cache = new HashMap<>();
-  private final WithoutArguments resolver;
+    private final Map<String, Tag> cache = new HashMap<>();
+    private final WithoutArguments resolver;
 
-  CachingTagResolver(final WithoutArguments resolver) {
-    this.resolver = resolver;
-  }
-
-  private Tag query(final @NotNull String key) {
-    return this.cache.computeIfAbsent(key, k -> {
-      final @Nullable Tag result = this.resolver.resolve(k);
-      return result == null ? NULL_REPLACEMENT : result;
-    });
-  }
-
-  @Override
-  public @Nullable Tag resolve(final @NotNull String name) {
-    final Tag potentialValue = this.query(name);
-    return potentialValue == NULL_REPLACEMENT ? null : potentialValue;
-  }
-
-  @Override
-  public boolean has(final @NotNull String name) {
-    return this.query(name) != NULL_REPLACEMENT;
-  }
-
-  @Override
-  public boolean contributeToMap(final @NotNull Map<String, Tag> map) {
-    if (this.resolver instanceof MappableResolver) {
-      return ((MappableResolver) this.resolver).contributeToMap(map);
-    } else {
-      return false;
+    CachingTagResolver(final WithoutArguments resolver) {
+        this.resolver = resolver;
     }
-  }
 
-  @Override
-  public void handle(final @NotNull Component serializable, final @NotNull ClaimConsumer consumer) {
-    if (this.resolver instanceof SerializableResolver) {
-      ((SerializableResolver) this.resolver).handle(serializable, consumer);
+    private Tag query(final @NotNull String key) {
+        return this.cache.computeIfAbsent(key, k -> {
+            final @Nullable Tag result = this.resolver.resolve(k);
+            return result == null ? NULL_REPLACEMENT : result;
+        });
     }
-  }
 
-  @Override
-  public boolean equals(final @Nullable Object other) {
-    if (this == other) {
-      return true;
+    @Override
+    public @Nullable Tag resolve(final @NotNull String name) {
+        final Tag potentialValue = this.query(name);
+        return potentialValue == NULL_REPLACEMENT ? null : potentialValue;
     }
-    if (!(other instanceof CachingTagResolver)) {
-      return false;
-    }
-    final CachingTagResolver that = (CachingTagResolver) other;
-    return Objects.equals(this.resolver, that.resolver);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.resolver);
-  }
+    @Override
+    public boolean has(final @NotNull String name) {
+        return this.query(name) != NULL_REPLACEMENT;
+    }
+
+    @Override
+    public boolean contributeToMap(final @NotNull Map<String, Tag> map) {
+        if (this.resolver instanceof MappableResolver) {
+            return ((MappableResolver) this.resolver).contributeToMap(map);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void handle(final @NotNull Component serializable, final @NotNull ClaimConsumer consumer) {
+        if (this.resolver instanceof SerializableResolver) {
+            ((SerializableResolver) this.resolver).handle(serializable, consumer);
+        }
+    }
+
+    @Override
+    public boolean equals(final @Nullable Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof CachingTagResolver that)) {
+            return false;
+        }
+        return Objects.equals(this.resolver, that.resolver);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.resolver);
+    }
 }

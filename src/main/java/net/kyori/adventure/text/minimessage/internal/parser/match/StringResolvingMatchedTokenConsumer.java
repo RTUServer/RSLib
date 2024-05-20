@@ -46,66 +46,66 @@ import static net.kyori.adventure.text.minimessage.internal.parser.TokenParser.t
  * @since 4.10.0
  */
 public final class StringResolvingMatchedTokenConsumer extends MatchedTokenConsumer<String> {
-  private final StringBuilder builder;
-  private final TagProvider tagProvider;
+    private final StringBuilder builder;
+    private final TagProvider tagProvider;
 
-  /**
-   * Creates a string resolving matched token consumer.
-   *
-   * @param input the input
-   * @param tagProvider the resolver for argument-less tags
-   * @since 4.10.0
-   */
-  public StringResolvingMatchedTokenConsumer(
-    final @NotNull String input,
-    final @NotNull TagProvider tagProvider
-  ) {
-    super(input);
-    this.builder = new StringBuilder(input.length());
-    this.tagProvider = tagProvider;
-  }
-
-  @Override
-  public void accept(final int start, final int end, final @NotNull TokenType tokenType) {
-    super.accept(start, end, tokenType);
-
-    if (tokenType != TokenType.OPEN_TAG) {
-      // just add it normally, we don't care about other tags
-      this.builder.append(this.input, start, end);
-    } else {
-      // well, now we need to work out if it's a tag or a placeholder!
-      final String match = this.input.substring(start, end);
-      final String cleanup = this.input.substring(start + 1, end - 1);
-
-      final int index = cleanup.indexOf(SEPARATOR);
-      final String tag = index == -1 ? cleanup : cleanup.substring(0, index);
-
-      // we might care if it's a valid tag!
-      if (TagInternals.sanitizeAndCheckValidTagName(tag)) {
-        final List<Token> tokens = tokenize(match, false);
-        final List<TagPart> parts = new ArrayList<>();
-        final List<Token> childs = tokens.isEmpty() ? null : tokens.get(0).childTokens();
-        if (childs != null) {
-          for (int i = 1; i < childs.size(); i++) {
-            parts.add(new TagPart(match, childs.get(i), this.tagProvider));
-          }
-        }
-        // we might care if it's a pre-process!
-        final @Nullable Tag replacement = this.tagProvider.resolve(TagProvider.sanitizePlaceholderName(tag), parts, tokens.get(0));
-
-        if (replacement instanceof PreProcess) {
-          this.builder.append(Objects.requireNonNull(((PreProcess) replacement).value(), "PreProcess replacements cannot return null"));
-          return;
-        }
-      }
-
-      // if we get here, the placeholder wasn't found or was null
-      this.builder.append(match);
+    /**
+     * Creates a string resolving matched token consumer.
+     *
+     * @param input       the input
+     * @param tagProvider the resolver for argument-less tags
+     * @since 4.10.0
+     */
+    public StringResolvingMatchedTokenConsumer(
+            final @NotNull String input,
+            final @NotNull TagProvider tagProvider
+    ) {
+        super(input);
+        this.builder = new StringBuilder(input.length());
+        this.tagProvider = tagProvider;
     }
-  }
 
-  @Override
-  public @NotNull String result() {
-    return this.builder.toString();
-  }
+    @Override
+    public void accept(final int start, final int end, final @NotNull TokenType tokenType) {
+        super.accept(start, end, tokenType);
+
+        if (tokenType != TokenType.OPEN_TAG) {
+            // just add it normally, we don't care about other tags
+            this.builder.append(this.input, start, end);
+        } else {
+            // well, now we need to work out if it's a tag or a placeholder!
+            final String match = this.input.substring(start, end);
+            final String cleanup = this.input.substring(start + 1, end - 1);
+
+            final int index = cleanup.indexOf(SEPARATOR);
+            final String tag = index == -1 ? cleanup : cleanup.substring(0, index);
+
+            // we might care if it's a valid tag!
+            if (TagInternals.sanitizeAndCheckValidTagName(tag)) {
+                final List<Token> tokens = tokenize(match, false);
+                final List<TagPart> parts = new ArrayList<>();
+                final List<Token> childs = tokens.isEmpty() ? null : tokens.get(0).childTokens();
+                if (childs != null) {
+                    for (int i = 1; i < childs.size(); i++) {
+                        parts.add(new TagPart(match, childs.get(i), this.tagProvider));
+                    }
+                }
+                // we might care if it's a pre-process!
+                final @Nullable Tag replacement = this.tagProvider.resolve(TagProvider.sanitizePlaceholderName(tag), parts, tokens.get(0));
+
+                if (replacement instanceof PreProcess) {
+                    this.builder.append(Objects.requireNonNull(((PreProcess) replacement).value(), "PreProcess replacements cannot return null"));
+                    return;
+                }
+            }
+
+            // if we get here, the placeholder wasn't found or was null
+            this.builder.append(match);
+        }
+    }
+
+    @Override
+    public @NotNull String result() {
+        return this.builder.toString();
+    }
 }

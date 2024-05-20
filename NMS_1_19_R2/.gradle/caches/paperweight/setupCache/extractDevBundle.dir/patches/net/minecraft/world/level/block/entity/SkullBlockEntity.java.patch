@@ -1,0 +1,132 @@
+--- a/net/minecraft/world/level/block/entity/SkullBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/SkullBlockEntity.java
+@@ -21,6 +21,7 @@
+ import net.minecraft.world.level.block.state.BlockState;
+ 
+ public class SkullBlockEntity extends BlockEntity {
++
+     public static final String TAG_SKULL_OWNER = "SkullOwner";
+     public static final String TAG_NOTE_BLOCK_SOUND = "note_block_sound";
+     @Nullable
+@@ -32,7 +33,7 @@
+     @Nullable
+     public GameProfile owner;
+     @Nullable
+-    private ResourceLocation noteBlockSound;
++    public ResourceLocation noteBlockSound; // PAIL private->public
+     private int animationTickCount;
+     private boolean isAnimating;
+ 
+@@ -41,24 +42,25 @@
+     }
+ 
+     public static void setup(Services apiServices, Executor executor) {
+-        profileCache = apiServices.profileCache();
+-        sessionService = apiServices.sessionService();
+-        mainThreadExecutor = executor;
++        SkullBlockEntity.profileCache = apiServices.profileCache();
++        SkullBlockEntity.sessionService = apiServices.sessionService();
++        SkullBlockEntity.mainThreadExecutor = executor;
+     }
+ 
+     public static void clear() {
+-        profileCache = null;
+-        sessionService = null;
+-        mainThreadExecutor = null;
++        SkullBlockEntity.profileCache = null;
++        SkullBlockEntity.sessionService = null;
++        SkullBlockEntity.mainThreadExecutor = null;
+     }
+ 
+     @Override
+     protected void saveAdditional(CompoundTag nbt) {
+         super.saveAdditional(nbt);
+         if (this.owner != null) {
+-            CompoundTag compoundTag = new CompoundTag();
+-            NbtUtils.writeGameProfile(compoundTag, this.owner);
+-            nbt.put("SkullOwner", compoundTag);
++            CompoundTag nbttagcompound1 = new CompoundTag();
++
++            NbtUtils.writeGameProfile(nbttagcompound1, this.owner);
++            nbt.put("SkullOwner", nbttagcompound1);
+         }
+ 
+         if (this.noteBlockSound != null) {
+@@ -73,9 +75,10 @@
+         if (nbt.contains("SkullOwner", 10)) {
+             this.setOwner(NbtUtils.readGameProfile(nbt.getCompound("SkullOwner")));
+         } else if (nbt.contains("ExtraType", 8)) {
+-            String string = nbt.getString("ExtraType");
+-            if (!StringUtil.isNullOrEmpty(string)) {
+-                this.setOwner(new GameProfile((UUID)null, string));
++            String s = nbt.getString("ExtraType");
++
++            if (!StringUtil.isNullOrEmpty(s)) {
++                this.setOwner(new GameProfile((UUID) null, s));
+             }
+         }
+ 
+@@ -96,7 +99,7 @@
+     }
+ 
+     public float getAnimation(float tickDelta) {
+-        return this.isAnimating ? (float)this.animationTickCount + tickDelta : (float)this.animationTickCount;
++        return this.isAnimating ? (float) this.animationTickCount + tickDelta : (float) this.animationTickCount;
+     }
+ 
+     @Nullable
+@@ -120,7 +123,7 @@
+     }
+ 
+     public void setOwner(@Nullable GameProfile owner) {
+-        synchronized(this) {
++        synchronized (this) {
+             this.owner = owner;
+         }
+ 
+@@ -128,29 +131,32 @@
+     }
+ 
+     private void updateOwnerProfile() {
+-        updateGameprofile(this.owner, (owner) -> {
+-            this.owner = owner;
++        SkullBlockEntity.updateGameprofile(this.owner, (gameprofile) -> {
++            this.owner = gameprofile;
+             this.setChanged();
+         });
+     }
+ 
+     public static void updateGameprofile(@Nullable GameProfile owner, Consumer<GameProfile> callback) {
+-        if (owner != null && !StringUtil.isNullOrEmpty(owner.getName()) && (!owner.isComplete() || !owner.getProperties().containsKey("textures")) && profileCache != null && sessionService != null) {
+-            profileCache.getAsync(owner.getName(), (profile) -> {
+-                Util.backgroundExecutor().execute(() -> {
+-                    Util.ifElse(profile, (profilex) -> {
+-                        Property property = Iterables.getFirst(profilex.getProperties().get("textures"), (Property)null);
++        if (owner != null && !StringUtil.isNullOrEmpty(owner.getName()) && (!owner.isComplete() || !owner.getProperties().containsKey("textures")) && SkullBlockEntity.profileCache != null && SkullBlockEntity.sessionService != null) {
++            SkullBlockEntity.profileCache.getAsync(owner.getName(), (optional) -> {
++                Util.PROFILE_EXECUTOR.execute(() -> { // Paper - not a good idea to use BLOCKING OPERATIONS on the worldgen executor
++                    Util.ifElse(optional, (gameprofile1) -> {
++                        Property property = (Property) Iterables.getFirst(gameprofile1.getProperties().get("textures"), (Object) null);
++
+                         if (property == null) {
+-                            profilex = sessionService.fillProfileProperties(profilex, true);
++                            gameprofile1 = SkullBlockEntity.sessionService.fillProfileProperties(gameprofile1, true);
+                         }
+ 
+-                        GameProfile gameProfile = profilex;
+-                        mainThreadExecutor.execute(() -> {
+-                            profileCache.add(gameProfile);
+-                            callback.accept(gameProfile);
++                        // CraftBukkit start - decompile error
++                        final GameProfile finalgameprofile1 = gameprofile1;
++                        SkullBlockEntity.mainThreadExecutor.execute(() -> {
++                            SkullBlockEntity.profileCache.add(finalgameprofile1);
++                            callback.accept(finalgameprofile1);
++                            // CraftBukkit end
+                         });
+                     }, () -> {
+-                        mainThreadExecutor.execute(() -> {
++                        SkullBlockEntity.mainThreadExecutor.execute(() -> {
+                             callback.accept(owner);
+                         });
+                     });

@@ -39,23 +39,23 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
  * @since 4.10.0
  */
 final class InsertionTag {
-  private static final String INSERTION = "insert";
+    private static final String INSERTION = "insert";
 
-  static final TagResolver RESOLVER = SerializableResolver.claimingStyle(
-    INSERTION,
-    InsertionTag::create,
-    StyleClaim.claim(INSERTION, Style::insertion, InsertionTag::emit)
-  );
+    static final TagResolver RESOLVER = SerializableResolver.claimingStyle(
+            INSERTION,
+            InsertionTag::create,
+            StyleClaim.claim(INSERTION, Style::insertion, InsertionTag::emit)
+    );
 
-  private InsertionTag() {
-  }
+    private InsertionTag() {
+    }
 
-  static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
-    final String insertion = args.popOr("A value is required to produce an insertion component").value();
-    return Tag.styling(b -> b.insertion(insertion));
-  }
+    static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
+        final String insertion = args.popOr("A value is required to produce an insertion component").value();
+        return Tag.styling(b -> b.insertion(insertion));
+    }
 
-  static void emit(final String insertion, final TokenEmitter emitter) {
-    emitter.tag(INSERTION).argument(insertion);
-  }
+    static void emit(final String insertion, final TokenEmitter emitter) {
+        emitter.tag(INSERTION).argument(insertion);
+    }
 }

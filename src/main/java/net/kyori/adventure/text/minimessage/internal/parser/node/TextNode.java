@@ -34,28 +34,28 @@ import org.jetbrains.annotations.Nullable;
  * @since 4.10.0
  */
 public final class TextNode extends ValueNode {
-  private static boolean isEscape(final int escape) {
-    return escape == TokenParser.TAG_START || escape == TokenParser.ESCAPE;
-  }
+    /**
+     * Creates a new text node.
+     *
+     * @param parent        the parent of this node
+     * @param token         the token that created this node
+     * @param sourceMessage the source message
+     * @since 4.10.0
+     */
+    public TextNode(
+            final @Nullable ElementNode parent,
+            final @NotNull Token token,
+            final @NotNull String sourceMessage
+    ) {
+        super(parent, token, sourceMessage, TokenParser.unescape(sourceMessage, token.startIndex(), token.endIndex(), TextNode::isEscape));
+    }
 
-  /**
-   * Creates a new text node.
-   *
-   * @param parent the parent of this node
-   * @param token the token that created this node
-   * @param sourceMessage the source message
-   * @since 4.10.0
-   */
-  public TextNode(
-    final @Nullable ElementNode parent,
-    final @NotNull Token token,
-    final @NotNull String sourceMessage
-  ) {
-    super(parent, token, sourceMessage, TokenParser.unescape(sourceMessage, token.startIndex(), token.endIndex(), TextNode::isEscape));
-  }
+    private static boolean isEscape(final int escape) {
+        return escape == TokenParser.TAG_START || escape == TokenParser.ESCAPE;
+    }
 
-  @Override
-  String valueName() {
-    return "TextNode";
-  }
+    @Override
+    String valueName() {
+        return "TextNode";
+    }
 }

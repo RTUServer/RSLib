@@ -1,0 +1,121 @@
+--- a/net/minecraft/world/inventory/ItemCombinerMenu.java
++++ b/net/minecraft/world/inventory/ItemCombinerMenu.java
+@@ -9,6 +9,7 @@
+ import net.minecraft.world.level.block.state.BlockState;
+ 
+ public abstract class ItemCombinerMenu extends AbstractContainerMenu {
++
+     public static final int INPUT_SLOT = 0;
+     public static final int ADDITIONAL_SLOT = 1;
+     public static final int RESULT_SLOT = 2;
+@@ -56,14 +57,16 @@
+             }
+         });
+ 
+-        for(int i = 0; i < 3; ++i) {
+-            for(int j = 0; j < 9; ++j) {
+-                this.addSlot(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
++        int j;
++
++        for (j = 0; j < 3; ++j) {
++            for (int k = 0; k < 9; ++k) {
++                this.addSlot(new Slot(playerInventory, k + j * 9 + 9, 8 + k * 18, 84 + j * 18));
+             }
+         }
+ 
+-        for(int k = 0; k < 9; ++k) {
+-            this.addSlot(new Slot(playerInventory, k, 8 + k * 18, 142));
++        for (j = 0; j < 9; ++j) {
++            this.addSlot(new Slot(playerInventory, j, 8 + j * 18, 142));
+         }
+ 
+     }
+@@ -75,6 +78,7 @@
+         super.slotsChanged(inventory);
+         if (inventory == this.inputSlots) {
+             this.createResult();
++            org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory.callPrepareResultEvent(this, RESULT_SLOT); // Paper
+         }
+ 
+     }
+@@ -82,15 +86,16 @@
+     @Override
+     public void removed(Player player) {
+         super.removed(player);
+-        this.access.execute((world, pos) -> {
++        this.access.execute((world, blockposition) -> {
+             this.clearContainer(player, this.inputSlots);
+         });
+     }
+ 
+     @Override
+     public boolean stillValid(Player player) {
+-        return this.access.evaluate((world, pos) -> {
+-            return !this.isValidBlock(world.getBlockState(pos)) ? false : player.distanceToSqr((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D) <= 64.0D;
++        if (!this.checkReachable) return true; // CraftBukkit
++        return (Boolean) this.access.evaluate((world, blockposition) -> {
++            return !this.isValidBlock(world.getBlockState(blockposition)) ? false : player.distanceToSqr((double) blockposition.getX() + 0.5D, (double) blockposition.getY() + 0.5D, (double) blockposition.getZ() + 0.5D) <= 64.0D;
+         }, true);
+     }
+ 
+@@ -100,41 +105,44 @@
+ 
+     @Override
+     public ItemStack quickMoveStack(Player player, int slot) {
+-        ItemStack itemStack = ItemStack.EMPTY;
+-        Slot slot2 = this.slots.get(slot);
+-        if (slot2 != null && slot2.hasItem()) {
+-            ItemStack itemStack2 = slot2.getItem();
+-            itemStack = itemStack2.copy();
++        ItemStack itemstack = ItemStack.EMPTY;
++        Slot slot1 = (Slot) this.slots.get(slot);
++
++        if (slot1 != null && slot1.hasItem()) {
++            ItemStack itemstack1 = slot1.getItem();
++
++            itemstack = itemstack1.copy();
+             if (slot == 2) {
+-                if (!this.moveItemStackTo(itemStack2, 3, 39, true)) {
++                if (!this.moveItemStackTo(itemstack1, 3, 39, true)) {
+                     return ItemStack.EMPTY;
+                 }
+ 
+-                slot2.onQuickCraft(itemStack2, itemStack);
++                slot1.onQuickCraft(itemstack1, itemstack);
+             } else if (slot != 0 && slot != 1) {
+                 if (slot >= 3 && slot < 39) {
+-                    int i = this.shouldQuickMoveToAdditionalSlot(itemStack) ? 1 : 0;
+-                    if (!this.moveItemStackTo(itemStack2, i, 2, false)) {
++                    int j = this.shouldQuickMoveToAdditionalSlot(itemstack) ? 1 : 0;
++
++                    if (!this.moveItemStackTo(itemstack1, j, 2, false)) {
+                         return ItemStack.EMPTY;
+                     }
+                 }
+-            } else if (!this.moveItemStackTo(itemStack2, 3, 39, false)) {
++            } else if (!this.moveItemStackTo(itemstack1, 3, 39, false)) {
+                 return ItemStack.EMPTY;
+             }
+ 
+-            if (itemStack2.isEmpty()) {
+-                slot2.set(ItemStack.EMPTY);
++            if (itemstack1.isEmpty()) {
++                slot1.set(ItemStack.EMPTY);
+             } else {
+-                slot2.setChanged();
++                slot1.setChanged();
+             }
+ 
+-            if (itemStack2.getCount() == itemStack.getCount()) {
++            if (itemstack1.getCount() == itemstack.getCount()) {
+                 return ItemStack.EMPTY;
+             }
+ 
+-            slot2.onTake(player, itemStack2);
++            slot1.onTake(player, itemstack1);
+         }
+ 
+-        return itemStack;
++        return itemstack;
+     }
+ }

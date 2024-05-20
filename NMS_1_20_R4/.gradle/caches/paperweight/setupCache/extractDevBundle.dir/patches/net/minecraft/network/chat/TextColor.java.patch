@@ -1,0 +1,112 @@
+--- a/net/minecraft/network/chat/TextColor.java
++++ b/net/minecraft/network/chat/TextColor.java
+@@ -13,27 +13,34 @@
+ import net.minecraft.ChatFormatting;
+ 
+ public final class TextColor {
++
+     private static final String CUSTOM_COLOR_PREFIX = "#";
+     public static final Codec<TextColor> CODEC = Codec.STRING.comapFlatMap(TextColor::parseColor, TextColor::serialize);
+-    private static final Map<ChatFormatting, TextColor> LEGACY_FORMAT_TO_COLOR = Stream.of(ChatFormatting.values())
+-        .filter(ChatFormatting::isColor)
+-        .collect(ImmutableMap.toImmutableMap(Function.identity(), formatting -> new TextColor(formatting.getColor(), formatting.getName())));
+-    private static final Map<String, TextColor> NAMED_COLORS = LEGACY_FORMAT_TO_COLOR.values()
+-        .stream()
+-        .collect(ImmutableMap.toImmutableMap(textColor -> textColor.name, Function.identity()));
++    private static final Map<ChatFormatting, TextColor> LEGACY_FORMAT_TO_COLOR = (Map) Stream.of(ChatFormatting.values()).filter(ChatFormatting::isColor).collect(ImmutableMap.toImmutableMap(Function.identity(), (enumchatformat) -> {
++        return new TextColor(enumchatformat.getColor(), enumchatformat.getName(), enumchatformat); // CraftBukkit
++    }));
++    private static final Map<String, TextColor> NAMED_COLORS = (Map) TextColor.LEGACY_FORMAT_TO_COLOR.values().stream().collect(ImmutableMap.toImmutableMap((chathexcolor) -> {
++        return chathexcolor.name;
++    }, Function.identity()));
+     private final int value;
+     @Nullable
+     public final String name;
++    // CraftBukkit start
++    @Nullable
++    public final ChatFormatting format;
+ 
+-    private TextColor(int rgb, String name) {
+-        this.value = rgb & 16777215;
+-        this.name = name;
++    private TextColor(int i, String s, ChatFormatting format) {
++        this.value = i & 16777215;
++        this.name = s;
++        this.format = format;
+     }
+ 
+     private TextColor(int rgb) {
+         this.value = rgb & 16777215;
+         this.name = null;
++        this.format = null;
+     }
++    // CraftBukkit end
+ 
+     public int getValue() {
+         return this.value;
+@@ -47,31 +54,29 @@
+         return String.format(Locale.ROOT, "#%06X", this.value);
+     }
+ 
+-    @Override
+     public boolean equals(Object object) {
+         if (this == object) {
+             return true;
+         } else if (object != null && this.getClass() == object.getClass()) {
+-            TextColor textColor = (TextColor)object;
+-            return this.value == textColor.value;
++            TextColor chathexcolor = (TextColor) object;
++
++            return this.value == chathexcolor.value;
+         } else {
+             return false;
+         }
+     }
+ 
+-    @Override
+     public int hashCode() {
+-        return Objects.hash(this.value, this.name);
++        return Objects.hash(new Object[]{this.value, this.name});
+     }
+ 
+-    @Override
+     public String toString() {
+         return this.serialize();
+     }
+ 
+     @Nullable
+     public static TextColor fromLegacyFormat(ChatFormatting formatting) {
+-        return LEGACY_FORMAT_TO_COLOR.get(formatting);
++        return (TextColor) TextColor.LEGACY_FORMAT_TO_COLOR.get(formatting);
+     }
+ 
+     public static TextColor fromRgb(int rgb) {
+@@ -82,15 +87,21 @@
+         if (name.startsWith("#")) {
+             try {
+                 int i = Integer.parseInt(name.substring(1), 16);
+-                return i >= 0 && i <= 16777215
+-                    ? DataResult.success(fromRgb(i), Lifecycle.stable())
+-                    : DataResult.error(() -> "Color value out of range: " + name);
+-            } catch (NumberFormatException var2) {
+-                return DataResult.error(() -> "Invalid color value: " + name);
++
++                return i >= 0 && i <= 16777215 ? DataResult.success(TextColor.fromRgb(i), Lifecycle.stable()) : DataResult.error(() -> {
++                    return "Color value out of range: " + name;
++                });
++            } catch (NumberFormatException numberformatexception) {
++                return DataResult.error(() -> {
++                    return "Invalid color value: " + name;
++                });
+             }
+         } else {
+-            TextColor textColor = NAMED_COLORS.get(name);
+-            return textColor == null ? DataResult.error(() -> "Invalid color name: " + name) : DataResult.success(textColor, Lifecycle.stable());
++            TextColor chathexcolor = (TextColor) TextColor.NAMED_COLORS.get(name);
++
++            return chathexcolor == null ? DataResult.error(() -> {
++                return "Invalid color name: " + name;
++            }) : DataResult.success(chathexcolor, Lifecycle.stable());
+         }
+     }
+ }

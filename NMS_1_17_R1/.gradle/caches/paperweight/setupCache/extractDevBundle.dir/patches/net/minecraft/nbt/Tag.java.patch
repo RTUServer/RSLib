@@ -1,0 +1,11 @@
+--- a/net/minecraft/nbt/Tag.java
++++ b/net/minecraft/nbt/Tag.java
+@@ -33,7 +33,7 @@
+ 
+     TagType<?> getType();
+ 
+-    Tag copy();
++    public Tag copy(); // Paper - decompile fix
+ 
+     default String getAsString() {
+         return (new StringTagVisitor()).visit(this);

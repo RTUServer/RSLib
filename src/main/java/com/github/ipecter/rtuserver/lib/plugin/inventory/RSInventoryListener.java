@@ -1,7 +1,6 @@
 package com.github.ipecter.rtuserver.lib.plugin.inventory;
 
 import com.github.ipecter.rtuserver.lib.RSLib;
-import com.github.ipecter.rtuserver.lib.plugin.RSInventory;
 import com.github.ipecter.rtuserver.lib.util.common.ComponentUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

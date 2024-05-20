@@ -1,0 +1,56 @@
+--- a/net/minecraft/world/damagesource/IndirectEntityDamageSource.java
++++ b/net/minecraft/world/damagesource/IndirectEntityDamageSource.java
+@@ -7,6 +7,7 @@
+ import net.minecraft.world.item.ItemStack;
+ 
+ public class IndirectEntityDamageSource extends EntityDamageSource {
++
+     @Nullable
+     private final Entity cause;
+ 
+@@ -29,22 +30,33 @@
+ 
+     @Override
+     public Component getLocalizedDeathMessage(LivingEntity entity) {
+-        Component component = this.cause == null ? this.entity.getDisplayName() : this.cause.getDisplayName();
+-        Entity string2 = this.cause;
+-        ItemStack var10000;
+-        if (string2 instanceof LivingEntity livingEntity) {
+-            var10000 = livingEntity.getMainHandItem();
++        Component ichatbasecomponent = this.cause == null ? this.entity.getDisplayName() : this.cause.getDisplayName();
++        Entity entity1 = this.cause;
++        ItemStack itemstack;
++
++        if (entity1 instanceof LivingEntity) {
++            LivingEntity entityliving1 = (LivingEntity) entity1;
++
++            itemstack = entityliving1.getMainHandItem();
+         } else {
+-            var10000 = ItemStack.EMPTY;
++            itemstack = ItemStack.EMPTY;
+         }
+ 
+-        ItemStack itemStack = var10000;
+-        String string = "death.attack." + this.msgId;
+-        if (!itemStack.isEmpty() && itemStack.hasCustomHoverName()) {
+-            String string2 = string + ".item";
+-            return Component.translatable(string2, entity.getDisplayName(), component, itemStack.getDisplayName());
++        ItemStack itemstack1 = itemstack;
++        String s = "death.attack." + this.msgId;
++
++        if (!itemstack1.isEmpty() && itemstack1.hasCustomHoverName()) {
++            String s1 = s + ".item";
++
++            return Component.translatable(s1, entity.getDisplayName(), ichatbasecomponent, itemstack1.getDisplayName());
+         } else {
+-            return Component.translatable(string, entity.getDisplayName(), component);
++            return Component.translatable(s, entity.getDisplayName(), ichatbasecomponent);
+         }
+     }
++
++    // CraftBukkit start
++    public Entity getProximateDamageSource() {
++        return super.getEntity();
++    }
++    // CraftBukkit end
+ }

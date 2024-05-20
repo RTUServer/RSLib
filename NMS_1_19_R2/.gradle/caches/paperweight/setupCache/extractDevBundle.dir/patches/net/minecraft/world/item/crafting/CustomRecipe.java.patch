@@ -1,0 +1,22 @@
+--- a/net/minecraft/world/item/crafting/CustomRecipe.java
++++ b/net/minecraft/world/item/crafting/CustomRecipe.java
+@@ -4,6 +4,7 @@
+ import net.minecraft.world.item.ItemStack;
+ 
+ public abstract class CustomRecipe implements CraftingRecipe {
++
+     private final ResourceLocation id;
+     private final CraftingBookCategory category;
+ 
+@@ -31,4 +32,11 @@
+     public CraftingBookCategory category() {
+         return this.category;
+     }
++
++    // CraftBukkit start
++    @Override
++    public org.bukkit.inventory.Recipe toBukkitRecipe() {
++        return new org.bukkit.craftbukkit.v1_19_R2.inventory.CraftComplexRecipe(this);
++    }
++    // CraftBukkit end
+ }

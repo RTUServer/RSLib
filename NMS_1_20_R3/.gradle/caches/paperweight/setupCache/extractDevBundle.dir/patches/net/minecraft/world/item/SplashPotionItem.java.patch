@@ -1,0 +1,24 @@
+--- a/net/minecraft/world/item/SplashPotionItem.java
++++ b/net/minecraft/world/item/SplashPotionItem.java
+@@ -14,6 +14,10 @@
+ 
+     @Override
+     public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
++        // Paper start - PlayerLaunchProjectileEvent
++        InteractionResultHolder<ItemStack> wrapper = super.use(world, user, hand);
++        if (wrapper.getResult() != net.minecraft.world.InteractionResult.FAIL) {
++        // Paper end - PlayerLaunchProjectileEvent
+         world.playSound(
+             null,
+             user.getX(),
+@@ -24,6 +28,9 @@
+             0.5F,
+             0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F)
+         );
+-        return super.use(world, user, hand);
++        // Paper start - PlayerLaunchProjectileEvent
++        }
++        return wrapper;
++        // Paper end - PlayerLaunchProjectileEvent
+     }
+ }

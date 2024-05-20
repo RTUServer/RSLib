@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/damagesource/EntityDamageSource.java
++++ b/net/minecraft/world/damagesource/EntityDamageSource.java
+@@ -48,7 +48,7 @@
+ 
+     @Override
+     public boolean scalesWithDifficulty() {
+-        return this.entity instanceof LivingEntity && !(this.entity instanceof Player);
++        return super.scalesWithDifficulty() || this.entity instanceof LivingEntity && !(this.entity instanceof Player); // Paper - fix MC-258535 - respect the scalesWithDifficulty override
+     }
+ 
+     @Nullable

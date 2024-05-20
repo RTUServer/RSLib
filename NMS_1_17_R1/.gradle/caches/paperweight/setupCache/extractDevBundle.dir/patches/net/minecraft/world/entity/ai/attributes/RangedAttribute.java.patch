@@ -1,0 +1,24 @@
+--- a/net/minecraft/world/entity/ai/attributes/RangedAttribute.java
++++ b/net/minecraft/world/entity/ai/attributes/RangedAttribute.java
+@@ -3,8 +3,9 @@
+ import net.minecraft.util.Mth;
+ 
+ public class RangedAttribute extends Attribute {
++
+     private final double minValue;
+-    public final double maxValue;
++    public double maxValue; // Spigot
+ 
+     public RangedAttribute(String translationKey, double fallback, double min, double max) {
+         super(translationKey, fallback);
+@@ -29,6 +30,9 @@
+ 
+     @Override
+     public double sanitizeValue(double value) {
+-        return Mth.clamp(value, this.minValue, this.maxValue);
++        if (value != value) return getDefaultValue(); // CraftBukkit
++
++        value = Mth.clamp(value, this.minValue, this.maxValue);
++        return value;
+     }
+ }

@@ -1,0 +1,28 @@
+--- a/net/minecraft/network/protocol/game/ClientboundLoginPacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundLoginPacket.java
+@@ -19,25 +19,6 @@
+         }), buf.readWithCodec(RegistryAccess.RegistryHolder.NETWORK_CODEC), buf.readWithCodec(DimensionType.CODEC).get(), ResourceKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation()), buf.readLong(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean());
+     }
+ 
+-    public ClientboundLoginPacket(int playerEntityId, boolean bl, GameType previousGameMode, @Nullable GameType gameType, Set<ResourceKey<Level>> set, RegistryAccess.RegistryHolder registryHolder, DimensionType dimensionType, ResourceKey<Level> resourceKey, long l, int maxPlayers, int chunkLoadDistance, int i, boolean bl2, boolean bl3, boolean bl4, boolean bl5) {
+-        this.playerId = playerEntityId;
+-        this.hardcore = bl;
+-        this.gameType = previousGameMode;
+-        this.previousGameType = gameType;
+-        this.levels = set;
+-        this.registryHolder = registryHolder;
+-        this.dimensionType = dimensionType;
+-        this.dimension = resourceKey;
+-        this.seed = l;
+-        this.maxPlayers = maxPlayers;
+-        this.chunkRadius = chunkLoadDistance;
+-        this.simulationDistance = i;
+-        this.reducedDebugInfo = bl2;
+-        this.showDeathScreen = bl3;
+-        this.isDebug = bl4;
+-        this.isFlat = bl5;
+-    }
+-
+     @Override
+     public void write(FriendlyByteBuf buf) {
+         buf.writeInt(this.playerId);

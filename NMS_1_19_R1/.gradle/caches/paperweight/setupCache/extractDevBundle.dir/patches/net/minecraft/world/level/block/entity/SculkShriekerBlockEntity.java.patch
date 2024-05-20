@@ -1,0 +1,16 @@
+--- a/net/minecraft/world/level/block/entity/SculkShriekerBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/SculkShriekerBlockEntity.java
+@@ -100,6 +100,13 @@
+ 
+     @Nullable
+     public static ServerPlayer tryGetPlayer(@Nullable Entity entity) {
++        // Paper start - ensure level is the same for sculk events
++        final ServerPlayer player = tryGetPlayer0(entity);
++        return player != null && player.level == entity.level ? player : null;
++    }
++    @Nullable
++    private static ServerPlayer tryGetPlayer0(@Nullable Entity entity) {
++        // Paper end
+         if (entity instanceof ServerPlayer serverPlayer) {
+             return serverPlayer;
+         } else {

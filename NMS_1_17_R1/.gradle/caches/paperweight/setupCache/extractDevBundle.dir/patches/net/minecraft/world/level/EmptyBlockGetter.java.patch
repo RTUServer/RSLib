@@ -1,0 +1,21 @@
+--- a/net/minecraft/world/level/EmptyBlockGetter.java
++++ b/net/minecraft/world/level/EmptyBlockGetter.java
+@@ -17,6 +17,18 @@
+         return null;
+     }
+ 
++    // Paper start - If loaded util
++    @Override
++    public FluidState getFluidIfLoaded(BlockPos blockposition) {
++        return this.getFluidState(blockposition);
++    }
++
++    @Override
++    public BlockState getTypeIfLoaded(BlockPos blockposition) {
++        return this.getBlockState(blockposition);
++    }
++    // Paper end
++
+     @Override
+     public BlockState getBlockState(BlockPos pos) {
+         return Blocks.AIR.defaultBlockState();

@@ -1,0 +1,2 @@
+Command: /Users/ipecter/Library/Java/JavaVirtualMachines/temurin-17.0.10/Contents/Home/bin/java -Dpaperclip.patchonly=true -classpath /Users/ipecter/IdeaProjects/HSLib/NMS_1_20_R3/.gradle/caches/paperweight/setupCache/extractDevBundle.dir/data/paperclip-mojang+yarn.jar io.papermc.paperclip.Main
+Applying patches

@@ -1,0 +1,93 @@
+--- a/net/minecraft/world/level/block/DragonEggBlock.java
++++ b/net/minecraft/world/level/block/DragonEggBlock.java
+@@ -16,14 +16,16 @@
+ import net.minecraft.world.phys.BlockHitResult;
+ import net.minecraft.world.phys.shapes.CollisionContext;
+ import net.minecraft.world.phys.shapes.VoxelShape;
++import org.bukkit.event.block.BlockFromToEvent; // CraftBukkit
+ 
+ public class DragonEggBlock extends FallingBlock {
++
+     public static final MapCodec<DragonEggBlock> CODEC = simpleCodec(DragonEggBlock::new);
+-    protected static final VoxelShape SHAPE = Block.box(1.0, 0.0, 1.0, 15.0, 16.0, 15.0);
++    protected static final VoxelShape SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 16.0D, 15.0D);
+ 
+     @Override
+     public MapCodec<DragonEggBlock> codec() {
+-        return CODEC;
++        return DragonEggBlock.CODEC;
+     }
+ 
+     public DragonEggBlock(BlockBehaviour.Properties settings) {
+@@ -32,7 +34,7 @@
+ 
+     @Override
+     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+-        return SHAPE;
++        return DragonEggBlock.SHAPE;
+     }
+ 
+     @Override
+@@ -47,34 +49,45 @@
+     }
+ 
+     private void teleport(BlockState state, Level world, BlockPos pos) {
+-        WorldBorder worldBorder = world.getWorldBorder();
++        WorldBorder worldborder = world.getWorldBorder();
+ 
+-        for (int i = 0; i < 1000; i++) {
+-            BlockPos blockPos = pos.offset(
+-                world.random.nextInt(16) - world.random.nextInt(16),
+-                world.random.nextInt(8) - world.random.nextInt(8),
+-                world.random.nextInt(16) - world.random.nextInt(16)
+-            );
+-            if (world.getBlockState(blockPos).isAir() && worldBorder.isWithinBounds(blockPos)) {
++        for (int i = 0; i < 1000; ++i) {
++            BlockPos blockposition1 = pos.offset(world.random.nextInt(16) - world.random.nextInt(16), world.random.nextInt(8) - world.random.nextInt(8), world.random.nextInt(16) - world.random.nextInt(16));
++
++            if (world.getBlockState(blockposition1).isAir() && worldborder.isWithinBounds(blockposition1)) {
++                // CraftBukkit start
++                org.bukkit.block.Block from = world.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
++                org.bukkit.block.Block to = world.getWorld().getBlockAt(blockposition1.getX(), blockposition1.getY(), blockposition1.getZ());
++                BlockFromToEvent event = new BlockFromToEvent(from, to);
++                org.bukkit.Bukkit.getPluginManager().callEvent(event);
++
++                if (event.isCancelled()) {
++                    return;
++                }
++
++                blockposition1 = new BlockPos(event.getToBlock().getX(), event.getToBlock().getY(), event.getToBlock().getZ());
++                // CraftBukkit end
+                 if (world.isClientSide) {
+-                    for (int j = 0; j < 128; j++) {
+-                        double d = world.random.nextDouble();
++                    for (int j = 0; j < 128; ++j) {
++                        double d0 = world.random.nextDouble();
+                         float f = (world.random.nextFloat() - 0.5F) * 0.2F;
+-                        float g = (world.random.nextFloat() - 0.5F) * 0.2F;
+-                        float h = (world.random.nextFloat() - 0.5F) * 0.2F;
+-                        double e = Mth.lerp(d, (double)blockPos.getX(), (double)pos.getX()) + (world.random.nextDouble() - 0.5) + 0.5;
+-                        double k = Mth.lerp(d, (double)blockPos.getY(), (double)pos.getY()) + world.random.nextDouble() - 0.5;
+-                        double l = Mth.lerp(d, (double)blockPos.getZ(), (double)pos.getZ()) + (world.random.nextDouble() - 0.5) + 0.5;
+-                        world.addParticle(ParticleTypes.PORTAL, e, k, l, (double)f, (double)g, (double)h);
++                        float f1 = (world.random.nextFloat() - 0.5F) * 0.2F;
++                        float f2 = (world.random.nextFloat() - 0.5F) * 0.2F;
++                        double d1 = Mth.lerp(d0, (double) blockposition1.getX(), (double) pos.getX()) + (world.random.nextDouble() - 0.5D) + 0.5D;
++                        double d2 = Mth.lerp(d0, (double) blockposition1.getY(), (double) pos.getY()) + world.random.nextDouble() - 0.5D;
++                        double d3 = Mth.lerp(d0, (double) blockposition1.getZ(), (double) pos.getZ()) + (world.random.nextDouble() - 0.5D) + 0.5D;
++
++                        world.addParticle(ParticleTypes.PORTAL, d1, d2, d3, (double) f, (double) f1, (double) f2);
+                     }
+                 } else {
+-                    world.setBlock(blockPos, state, 2);
++                    world.setBlock(blockposition1, state, 2);
+                     world.removeBlock(pos, false);
+                 }
+ 
+                 return;
+             }
+         }
++
+     }
+ 
+     @Override

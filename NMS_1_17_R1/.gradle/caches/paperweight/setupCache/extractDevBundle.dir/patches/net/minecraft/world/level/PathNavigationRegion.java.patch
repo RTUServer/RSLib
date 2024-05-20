@@ -1,0 +1,40 @@
+--- a/net/minecraft/world/level/PathNavigationRegion.java
++++ b/net/minecraft/world/level/PathNavigationRegion.java
+@@ -6,6 +6,7 @@
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.SectionPos;
+ import net.minecraft.util.profiling.ProfilerFiller;
++import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.level.block.Blocks;
+ import net.minecraft.world.level.block.entity.BlockEntity;
+@@ -79,6 +80,29 @@
+         return this.getChunk(chunkX, chunkZ);
+     }
+ 
++    // Paper start - if loaded util
++    private ChunkAccess getChunkIfLoaded(int x, int z) {
++        int k = x - this.centerX;
++        int l = z - this.centerZ;
++
++        if (k >= 0 && k < this.chunks.length && l >= 0 && l < this.chunks[k].length) { // Paper - if this changes, update getChunkIfLoaded below
++            return this.chunks[k][l];
++        }
++        return null;
++    }
++    @Override
++    public FluidState getFluidIfLoaded(BlockPos blockposition) {
++        ChunkAccess chunk = getChunkIfLoaded(blockposition.getX() >> 4, blockposition.getZ() >> 4);
++        return chunk == null ? null : chunk.getFluidState(blockposition);
++    }
++
++    @Override
++    public BlockState getTypeIfLoaded(BlockPos blockposition) {
++        ChunkAccess chunk = getChunkIfLoaded(blockposition.getX() >> 4, blockposition.getZ() >> 4);
++        return chunk == null ? null : chunk.getBlockState(blockposition);
++    }
++    // Paper end
++
+     @Nullable
+     @Override
+     public BlockEntity getBlockEntity(BlockPos pos) {

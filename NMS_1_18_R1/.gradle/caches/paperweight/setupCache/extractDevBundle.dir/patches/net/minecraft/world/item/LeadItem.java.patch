@@ -1,0 +1,106 @@
+--- a/net/minecraft/world/item/LeadItem.java
++++ b/net/minecraft/world/item/LeadItem.java
+@@ -1,7 +1,10 @@
+ package net.minecraft.world.item;
+ 
++import java.util.Iterator;
++import java.util.List;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.tags.BlockTags;
++import net.minecraft.tags.Tag;
+ import net.minecraft.world.InteractionResult;
+ import net.minecraft.world.entity.Mob;
+ import net.minecraft.world.entity.decoration.LeashFenceKnotEntity;
+@@ -10,49 +13,73 @@
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.level.block.state.BlockState;
+ import net.minecraft.world.phys.AABB;
++import org.bukkit.event.hanging.HangingPlaceEvent; // CraftBukkit
+ 
+ public class LeadItem extends Item {
++
+     public LeadItem(Item.Properties settings) {
+         super(settings);
+     }
+ 
+     @Override
+     public InteractionResult useOn(UseOnContext context) {
+-        Level level = context.getLevel();
+-        BlockPos blockPos = context.getClickedPos();
+-        BlockState blockState = level.getBlockState(blockPos);
+-        if (blockState.is(BlockTags.FENCES)) {
+-            Player player = context.getPlayer();
+-            if (!level.isClientSide && player != null) {
+-                bindPlayerMobs(player, level, blockPos);
++        Level world = context.getLevel();
++        BlockPos blockposition = context.getClickedPos();
++        BlockState iblockdata = world.getBlockState(blockposition);
++
++        if (iblockdata.is((Tag) BlockTags.FENCES)) {
++            Player entityhuman = context.getPlayer();
++
++            if (!world.isClientSide && entityhuman != null) {
++                LeadItem.bindPlayerMobs(entityhuman, world, blockposition);
+             }
+ 
+-            return InteractionResult.sidedSuccess(level.isClientSide);
++            return InteractionResult.sidedSuccess(world.isClientSide);
+         } else {
+             return InteractionResult.PASS;
+         }
+     }
+ 
+     public static InteractionResult bindPlayerMobs(Player player, Level world, BlockPos pos) {
+-        LeashFenceKnotEntity leashFenceKnotEntity = null;
+-        boolean bl = false;
+-        double d = 7.0D;
++        LeashFenceKnotEntity entityleash = null;
++        boolean flag = false;
++        double d0 = 7.0D;
+         int i = pos.getX();
+         int j = pos.getY();
+         int k = pos.getZ();
++        List<Mob> list = world.getEntitiesOfClass(Mob.class, new AABB((double) i - 7.0D, (double) j - 7.0D, (double) k - 7.0D, (double) i + 7.0D, (double) j + 7.0D, (double) k + 7.0D));
++        Iterator iterator = list.iterator();
+ 
+-        for(Mob mob : world.getEntitiesOfClass(Mob.class, new AABB((double)i - 7.0D, (double)j - 7.0D, (double)k - 7.0D, (double)i + 7.0D, (double)j + 7.0D, (double)k + 7.0D))) {
+-            if (mob.getLeashHolder() == player) {
+-                if (leashFenceKnotEntity == null) {
+-                    leashFenceKnotEntity = LeashFenceKnotEntity.getOrCreateKnot(world, pos);
+-                    leashFenceKnotEntity.playPlacementSound();
++        while (iterator.hasNext()) {
++            Mob entityinsentient = (Mob) iterator.next();
++
++            if (entityinsentient.getLeashHolder() == player) {
++                if (entityleash == null) {
++                    entityleash = LeashFenceKnotEntity.getOrCreateKnot(world, pos);
++
++                    // CraftBukkit start - fire HangingPlaceEvent
++                    HangingPlaceEvent event = new HangingPlaceEvent((org.bukkit.entity.Hanging) entityleash.getBukkitEntity(), player != null ? (org.bukkit.entity.Player) player.getBukkitEntity() : null, world.getWorld().getBlockAt(i, j, k), org.bukkit.block.BlockFace.SELF);
++                    world.getCraftServer().getPluginManager().callEvent(event);
++
++                    if (event.isCancelled()) {
++                        entityleash.discard();
++                        return InteractionResult.PASS;
++                    }
++                    // CraftBukkit end
++                    entityleash.playPlacementSound();
+                 }
+ 
+-                mob.setLeashedTo(leashFenceKnotEntity, true);
+-                bl = true;
++                // CraftBukkit start
++                if (org.bukkit.craftbukkit.v1_18_R1.event.CraftEventFactory.callPlayerLeashEntityEvent(entityinsentient, entityleash, player).isCancelled()) {
++                    continue;
++                }
++                // CraftBukkit end
++
++                entityinsentient.setLeashedTo(entityleash, true);
++                flag = true;
+             }
+         }
+ 
+-        return bl ? InteractionResult.SUCCESS : InteractionResult.PASS;
++        return flag ? InteractionResult.SUCCESS : InteractionResult.PASS;
+     }
+ }

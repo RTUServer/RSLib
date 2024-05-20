@@ -1,0 +1,48 @@
+--- a/net/minecraft/util/valueproviders/IntProvider.java
++++ b/net/minecraft/util/valueproviders/IntProvider.java
+@@ -9,13 +9,44 @@
+ 
+ public abstract class IntProvider {
+     private static final Codec<Either<Integer, IntProvider>> CONSTANT_OR_DISPATCH_CODEC = Codec.either(Codec.INT, Registry.INT_PROVIDER_TYPES.dispatch(IntProvider::getType, IntProviderType::codec));
+-    public static final Codec<IntProvider> CODEC = CONSTANT_OR_DISPATCH_CODEC.xmap((either) -> {
++    public static final Codec<IntProvider> CODEC_REAL = CONSTANT_OR_DISPATCH_CODEC.xmap((either) -> { // Paper - used by CODEC below
+         return either.map(ConstantInt::of, (intProvider) -> {
+             return intProvider;
+         });
+     }, (intProvider) -> {
+         return intProvider.getType() == IntProviderType.CONSTANT ? Either.left(((ConstantInt)intProvider).getValue()) : Either.right(intProvider);
+     });
++    // Paper start
++    public static final Codec<IntProvider> CODEC = new Codec<>() {
++        @Override
++        public <T> DataResult<com.mojang.datafixers.util.Pair<IntProvider, T>> decode(com.mojang.serialization.DynamicOps<T> ops, T input) {
++            /*
++            UniformInt:
++            count -> { (old format)
++                base, spread
++            } -> {UniformInt} { (new format & type)
++                base, base + spread
++            } */
++
++
++            if (ops.get(input, "base").result().isPresent() && ops.get(input, "spread").result().isPresent()) {
++                // detected old format
++                int base = ops.getNumberValue(ops.get(input, "base").result().get()).result().get().intValue();
++                int spread = ops.getNumberValue(ops.get(input, "spread").result().get()).result().get().intValue();
++                return DataResult.success(new com.mojang.datafixers.util.Pair<>(UniformInt.of(base, base + spread), input));
++            }
++
++            // not old format, forward to real codec
++            return CODEC_REAL.decode(ops, input);
++        }
++
++        @Override
++        public <T> DataResult<T> encode(IntProvider input, com.mojang.serialization.DynamicOps<T> ops, T prefix) {
++            // forward to real codec
++            return CODEC_REAL.encode(input, ops, prefix);
++        }
++    };
++    // Paper end
+     public static final Codec<IntProvider> NON_NEGATIVE_CODEC = codec(0, Integer.MAX_VALUE);
+     public static final Codec<IntProvider> POSITIVE_CODEC = codec(1, Integer.MAX_VALUE);
+ 

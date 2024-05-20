@@ -1,0 +1,28 @@
+--- a/net/minecraft/commands/arguments/MessageArgument.java
++++ b/net/minecraft/commands/arguments/MessageArgument.java
+@@ -50,10 +50,10 @@
+     private static void resolveSignedMessage(Consumer<PlayerChatMessage> callback, CommandSourceStack source, PlayerChatMessage message) {
+         MinecraftServer minecraftServer = source.getServer();
+         CompletableFuture<FilteredText> completableFuture = filterPlainText(source, message);
+-        CompletableFuture<Component> completableFuture2 = minecraftServer.getChatDecorator().decorate(source.getPlayer(), message.decoratedContent());
++        CompletableFuture<net.minecraft.network.chat.ChatDecorator.Result> completableFuture2 = minecraftServer.getChatDecorator().decorate(source.getPlayer(), source, message.decoratedContent()); // Paper
+         source.getChatMessageChainer().append((executor) -> {
+             return CompletableFuture.allOf(completableFuture, completableFuture2).thenAcceptAsync((void_) -> {
+-                PlayerChatMessage playerChatMessage2 = message.withUnsignedContent(completableFuture2.join()).filter(completableFuture.join().mask());
++                PlayerChatMessage playerChatMessage2 = message.withUnsignedContent(completableFuture2.join().component()).filter(completableFuture.join().mask()); // Paper
+                 callback.accept(playerChatMessage2);
+             }, executor);
+         });
+@@ -61,10 +61,10 @@
+ 
+     private static void resolveDisguisedMessage(Consumer<PlayerChatMessage> callback, CommandSourceStack source, PlayerChatMessage message) {
+         MinecraftServer minecraftServer = source.getServer();
+-        CompletableFuture<Component> completableFuture = minecraftServer.getChatDecorator().decorate(source.getPlayer(), message.decoratedContent());
++        CompletableFuture<net.minecraft.network.chat.ChatDecorator.Result> completableFuture = minecraftServer.getChatDecorator().decorate(source.getPlayer(), source, message.decoratedContent()); // Paper
+         source.getChatMessageChainer().append((executor) -> {
+             return completableFuture.thenAcceptAsync((content) -> {
+-                callback.accept(message.withUnsignedContent(content));
++                callback.accept(message.withUnsignedContent(content.component())); // Paper
+             }, executor);
+         });
+     }

@@ -34,14 +34,14 @@ import java.util.Map;
  * @since 4.10.0
  */
 interface MappableResolver {
-  /**
-   * Contribute entries.
-   *
-   * <p>Returning false from this method should leave the input {@code map} unmodified,
-   * and lead to handling as if this resolver did not implement {@code MappableResolver}.</p>
-   *
-   * @param map the map to add to
-   * @return whether the set of values was actually known
-   */
-  boolean contributeToMap(final @NotNull Map<String, Tag> map);
+    /**
+     * Contribute entries.
+     *
+     * <p>Returning false from this method should leave the input {@code map} unmodified,
+     * and lead to handling as if this resolver did not implement {@code MappableResolver}.</p>
+     *
+     * @param map the map to add to
+     * @return whether the set of values was actually known
+     */
+    boolean contributeToMap(final @NotNull Map<String, Tag> map);
 }

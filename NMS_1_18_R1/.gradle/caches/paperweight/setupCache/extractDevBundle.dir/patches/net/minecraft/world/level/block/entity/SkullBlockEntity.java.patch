@@ -1,0 +1,58 @@
+--- a/net/minecraft/world/level/block/entity/SkullBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/SkullBlockEntity.java
+@@ -11,6 +11,7 @@
+ import net.minecraft.Util;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.nbt.CompoundTag;
++import net.minecraft.nbt.ListTag;
+ import net.minecraft.nbt.NbtUtils;
+ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+ import net.minecraft.server.players.GameProfileCache;
+@@ -93,9 +94,37 @@
+ 
+     @Override
+     public ClientboundBlockEntityDataPacket getUpdatePacket() {
+-        return ClientboundBlockEntityDataPacket.create(this);
++        return ClientboundBlockEntityDataPacket.create(this, e -> sanitizeTileEntityUUID(e.getUpdateTag())); // Paper
+     }
+ 
++    // Paper start
++    public static CompoundTag sanitizeTileEntityUUID(CompoundTag cmp) {
++        CompoundTag owner = cmp.getCompound("Owner");
++        if (!owner.isEmpty()) {
++            sanitizeUUID(owner);
++        }
++        return cmp;
++    }
++
++    public static void sanitizeUUID(CompoundTag owner) {
++        CompoundTag properties = owner.getCompound("Properties");
++        ListTag list = null;
++        if (!properties.isEmpty()) {
++            list = properties.getList("textures", 10);
++        }
++
++        if (list != null && !list.isEmpty()) {
++            String textures = ((CompoundTag)list.get(0)).getString("Value");
++            if (textures != null && textures.length() > 3) {
++                UUID uuid = UUID.nameUUIDFromBytes(textures.getBytes());
++                owner.putUUID("Id", uuid);
++                return;
++            }
++        }
++        owner.putUUID("Id", UUID.randomUUID());
++    }
++    // Paper end
++
+     @Override
+     public CompoundTag getUpdateTag() {
+         return this.saveWithoutMetadata();
+@@ -119,7 +148,7 @@
+     public static void updateGameprofile(@Nullable GameProfile owner, Consumer<GameProfile> callback) {
+         if (owner != null && !StringUtil.isNullOrEmpty(owner.getName()) && (!owner.isComplete() || !owner.getProperties().containsKey("textures")) && profileCache != null && sessionService != null) {
+             profileCache.getAsync(owner.getName(), (profile) -> {
+-                Util.backgroundExecutor().execute(() -> {
++                Util.PROFILE_EXECUTOR.execute(() -> { // Paper - not a good idea to use BLOCKING OPERATIONS on the worldgen executor
+                     Util.ifElse(profile, (profilex) -> {
+                         Property property = Iterables.getFirst(profilex.getProperties().get("textures"), (Property)null);
+                         if (property == null) {

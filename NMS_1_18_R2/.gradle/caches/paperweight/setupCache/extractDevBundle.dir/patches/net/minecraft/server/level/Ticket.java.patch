@@ -1,0 +1,35 @@
+--- a/net/minecraft/server/level/Ticket.java
++++ b/net/minecraft/server/level/Ticket.java
+@@ -7,11 +7,14 @@
+     private final int ticketLevel;
+     public final T key;
+     public long createdTick;
++    public long delayUnloadBy; // Paper
++    public int priority; // Paper - Chunk priority
+ 
+     protected Ticket(TicketType<T> type, int level, T argument) {
+         this.type = type;
+         this.ticketLevel = level;
+         this.key = argument;
++        this.delayUnloadBy = type.timeout; // Paper
+     }
+ 
+     @Override
+@@ -21,7 +24,7 @@
+             return i;
+         } else {
+             int j = Integer.compare(System.identityHashCode(this.type), System.identityHashCode(ticket.type));
+-            return j != 0 ? j : this.type.getComparator().compare(this.key, ticket.key);
++            return j != 0 ? j : this.type.getComparator().compare(this.key, (T)ticket.key); // Paper - decompile fix
+         }
+     }
+ 
+@@ -60,7 +63,7 @@
+     }
+ 
+     protected boolean timedOut(long currentTick) {
+-        long l = this.type.timeout();
++        long l = delayUnloadBy; // Paper
+         return l != 0L && currentTick - this.createdTick > l;
+     }
+ }

@@ -1,7 +1,8 @@
 package com.github.ipecter.rtuserver.lib.util.common;
 
 import com.github.ipecter.rtuserver.lib.RSLib;
-import com.github.ipecter.rtuserver.lib.managers.ConfigManager;
+import com.github.ipecter.rtuserver.lib.plugin.config.Configurations;
+import com.github.ipecter.rtuserver.lib.plugin.config.MessageConfiguration;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.entity.Player;
 
@@ -9,6 +10,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class TextUtil {
+
+    private static final Configurations configurations = RSLib.getInstance().getConfigurations();
+    private static final MessageConfiguration message = configurations.getMessage();
 
     public static DataNameType checkType(List<String> list, String name) {
         if (name.matches("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9_]*$")) {
@@ -26,15 +30,14 @@ public class TextUtil {
     }
 
     public static DataNameType checkType(Player player, List<String> list, String name) {
-        Audience audience = RSLib.getPlugin().getAdventure().player(player);
-        ConfigManager config = RSLib.getInstance().getConfigManager();
+        Audience audience = RSLib.getInstance().getAdventure().player(player);
         DataNameType dataNameType = checkType(list, name);
         switch (dataNameType) {
-            case ALL -> audience.sendMessage(ComponentUtil.formatted(config.getTranslation("dataNameType.all")));
-            case WRONG -> audience.sendMessage(ComponentUtil.formatted(config.getTranslation("dataNameType.wrong")));
-            case LONG -> audience.sendMessage(ComponentUtil.formatted(config.getTranslation("dataNameType.long")));
-            case EXIST -> audience.sendMessage(ComponentUtil.formatted(config.getTranslation("dataNameType.exist")));
-            default -> audience.sendMessage(ComponentUtil.formatted(config.getTranslation("")));
+            case ALL -> audience.sendMessage(ComponentUtil.formatted(message.getTranslation("dataNameType.all")));
+            case WRONG -> audience.sendMessage(ComponentUtil.formatted(message.getTranslation("dataNameType.wrong")));
+            case LONG -> audience.sendMessage(ComponentUtil.formatted(message.getTranslation("dataNameType.long")));
+            case EXIST -> audience.sendMessage(ComponentUtil.formatted(message.getTranslation("dataNameType.exist")));
+            default -> audience.sendMessage(ComponentUtil.formatted(message.getTranslation("")));
         }
         return dataNameType;
     }

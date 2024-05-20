@@ -6,6 +6,7 @@ import io.th0rgal.oraxen.api.OraxenItems;
 import io.th0rgal.oraxen.items.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,17 @@ public class ItemUtil {
                     return customStack != null ? customStack.getItemStack() : null;
                 } else return null;
             }
+            case "custom" -> {
+                if (split.length != 3) return null;
+                Material material = Material.getMaterial(split[1].toUpperCase());
+                if (material == null) return null;
+                ItemStack itemStack = new ItemStack(material);
+                ItemMeta itemMeta = itemStack.getItemMeta();
+                if (itemMeta == null) return null;
+                itemMeta.setCustomModelData(Integer.valueOf(split[2]));
+                itemStack.setItemMeta(itemMeta);
+                return itemStack;
+            }
             default -> {
                 String id = split.length > 1 ? split[1] : split[0];
                 Material material = Material.getMaterial(id.toUpperCase());
@@ -42,6 +54,7 @@ public class ItemUtil {
             }
         }
     }
+
 
     public static String fromItemStack(@NotNull ItemStack itemStack) {
         if (RSLib.getInstance().isEnabledDependency("Oraxen")) {
@@ -52,7 +65,11 @@ public class ItemUtil {
             CustomStack itemsAdder = CustomStack.byItemStack(itemStack);
             if (itemsAdder != null) return "itemsadder:" + itemsAdder.getNamespacedID();
         }
-        return "minecraft:" + itemStack.getType().toString().toLowerCase();
+        String result = "minecraft:" + itemStack.getType().toString().toLowerCase();
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null) return result;
+        if (!itemMeta.hasCustomModelData()) return result;
+        return "custom:" + itemStack.getType().toString().toLowerCase() + itemMeta.getCustomModelData();
     }
 
     public static boolean isSimilar(ItemStack stack1, ItemStack stack2) {

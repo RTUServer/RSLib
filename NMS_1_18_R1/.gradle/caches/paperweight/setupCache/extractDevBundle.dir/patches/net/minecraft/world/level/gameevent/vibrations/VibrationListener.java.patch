@@ -1,0 +1,93 @@
+--- a/net/minecraft/world/level/gameevent/vibrations/VibrationListener.java
++++ b/net/minecraft/world/level/gameevent/vibrations/VibrationListener.java
+@@ -3,9 +3,12 @@
+ import java.util.Optional;
+ import javax.annotation.Nullable;
+ import net.minecraft.core.BlockPos;
++import net.minecraft.core.Registry;
++import net.minecraft.core.Vec3i;
+ import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.tags.BlockTags;
+ import net.minecraft.tags.GameEventTags;
++import net.minecraft.tags.Tag;
+ import net.minecraft.util.Mth;
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.level.ClipBlockStateContext;
+@@ -15,8 +18,13 @@
+ import net.minecraft.world.level.gameevent.PositionSource;
+ import net.minecraft.world.phys.HitResult;
+ import net.minecraft.world.phys.Vec3;
++import org.bukkit.craftbukkit.v1_18_R1.block.CraftBlock;
++import org.bukkit.craftbukkit.v1_18_R1.util.CraftNamespacedKey;
++import org.bukkit.event.block.BlockReceiveGameEvent;
++// CraftBukkit end
+ 
+ public class VibrationListener implements GameEventListener {
++
+     protected final PositionSource listenerSource;
+     public int listenerRange;
+     protected final VibrationListener.VibrationListenerConfig config;
+@@ -35,7 +43,7 @@
+             --this.travelTimeInTicks;
+             if (this.travelTimeInTicks <= 0) {
+                 this.travelTimeInTicks = 0;
+-                this.config.onSignalReceive(world, this, this.receivingEvent.get(), this.receivingDistance);
++                this.config.onSignalReceive(world, this, (GameEvent) this.receivingEvent.get(), this.receivingDistance);
+                 this.receivingEvent = Optional.empty();
+             }
+         }
+@@ -58,16 +66,24 @@
+             return false;
+         } else {
+             Optional<BlockPos> optional = this.listenerSource.getPosition(world);
++
+             if (!optional.isPresent()) {
+                 return false;
+             } else {
+-                BlockPos blockPos = optional.get();
+-                if (!this.config.shouldListen(world, this, pos, event, entity)) {
++                BlockPos blockposition1 = (BlockPos) optional.get();
++
++                // CraftBukkit start
++                boolean defaultCancel = !this.config.shouldListen(world, this, pos, event, entity);
++                BlockReceiveGameEvent event1 = new BlockReceiveGameEvent(org.bukkit.GameEvent.getByKey(CraftNamespacedKey.fromMinecraft(Registry.GAME_EVENT.getKey(event))), CraftBlock.at(world, blockposition1), (entity == null) ? null : entity.getBukkitEntity());
++                event1.setCancelled(defaultCancel);
++                world.getCraftServer().getPluginManager().callEvent(event1);
++                if (event1.isCancelled()) {
++                    // CraftBukkit end
+                     return false;
+-                } else if (this.isOccluded(world, pos, blockPos)) {
++                } else if (this.isOccluded(world, pos, blockposition1)) {
+                     return false;
+                 } else {
+-                    this.sendSignal(world, event, pos, blockPos);
++                    this.sendSignal(world, event, pos, blockposition1);
+                     return true;
+                 }
+             }
+@@ -97,20 +113,21 @@
+     private void sendSignal(Level world, GameEvent event, BlockPos pos, BlockPos sourcePos) {
+         this.receivingEvent = Optional.of(event);
+         if (world instanceof ServerLevel) {
+-            this.receivingDistance = Mth.floor(Math.sqrt(pos.distSqr(sourcePos, false)));
++            this.receivingDistance = Mth.floor(Math.sqrt(pos.distSqr((Vec3i) sourcePos, false)));
+             this.travelTimeInTicks = this.receivingDistance;
+-            ((ServerLevel)world).sendVibrationParticle(new VibrationPath(pos, this.listenerSource, this.travelTimeInTicks));
++            ((ServerLevel) world).sendVibrationParticle(new VibrationPath(pos, this.listenerSource, this.travelTimeInTicks));
+         }
+ 
+     }
+ 
+     private boolean isOccluded(Level world, BlockPos pos, BlockPos sourcePos) {
+-        return world.isBlockInLine(new ClipBlockStateContext(Vec3.atCenterOf(pos), Vec3.atCenterOf(sourcePos), (state) -> {
+-            return state.is(BlockTags.OCCLUDES_VIBRATION_SIGNALS);
++        return world.isBlockInLine(new ClipBlockStateContext(Vec3.atCenterOf(pos), Vec3.atCenterOf(sourcePos), (iblockdata) -> {
++            return iblockdata.is((Tag) BlockTags.OCCLUDES_VIBRATION_SIGNALS);
+         })).getType() == HitResult.Type.BLOCK;
+     }
+ 
+     public interface VibrationListenerConfig {
++
+         boolean shouldListen(Level world, GameEventListener listener, BlockPos pos, GameEvent event, @Nullable Entity entity);
+ 
+         void onSignalReceive(Level world, GameEventListener listener, GameEvent event, int distance);

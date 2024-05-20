@@ -1,0 +1,19 @@
+--- a/net/minecraft/world/item/HangingSignItem.java
++++ b/net/minecraft/world/item/HangingSignItem.java
+@@ -33,11 +33,14 @@
+     protected boolean updateCustomBlockEntityTag(BlockPos pos, Level world, @Nullable Player player, ItemStack stack, BlockState state) {
+         boolean bl = super.updateCustomBlockEntityTag(pos, world, player, stack, state);
+         if (!world.isClientSide && !bl && player != null) {
+-            BlockEntity var8 = world.getBlockEntity(pos);
++            // Paper start - moved in ItemStack use handler for events cancellation
++            /*BlockEntity var8 = world.getBlockEntity(pos);
+             if (var8 instanceof SignBlockEntity) {
+                 SignBlockEntity signBlockEntity = (SignBlockEntity)var8;
+                 player.openTextEdit(signBlockEntity);
+-            }
++            }*/
++            SignItem.openSign = pos;
++            // Paper end
+         }
+ 
+         return bl;

@@ -44,116 +44,114 @@ import java.util.stream.Stream;
  * @since 4.10.0
  */
 public final class TransitionTag implements Inserting, Examinable {
-  public static final String TRANSITION = "transition";
+    public static final String TRANSITION = "transition";
+    static final TagResolver RESOLVER = TagResolver.resolver(TransitionTag.TRANSITION, TransitionTag::create);
+    private final TextColor[] colors;
+    private final float phase;
+    private final boolean negativePhase;
 
-  private final TextColor[] colors;
-  private final float phase;
-  private final boolean negativePhase;
+    private TransitionTag(final float phase, final List<TextColor> colors) {
+        if (phase < 0) {
+            this.negativePhase = true;
+            this.phase = 1 + phase;
+            Collections.reverse(colors);
+        } else {
+            this.negativePhase = false;
+            this.phase = phase;
+        }
 
-  static final TagResolver RESOLVER = TagResolver.resolver(TransitionTag.TRANSITION, TransitionTag::create);
+        if (colors.isEmpty()) {
+            this.colors = new TextColor[]{TextColor.color(0xffffff), TextColor.color(0x000000)};
+        } else {
+            this.colors = colors.toArray(new TextColor[0]);
+        }
+    }
 
-  static Tag create(final ArgumentQueue args, final Context ctx) {
-    float phase = 0;
-    final List<TextColor> textColors;
-    if (args.hasNext()) {
-      textColors = new ArrayList<>();
-      while (args.hasNext()) {
-        final Argument arg = args.pop();
-        // last argument? maybe this is the phase?
-        if (!args.hasNext()) {
-          final OptionalDouble possiblePhase = arg.asDouble();
-          if (possiblePhase.isPresent()) {
-            phase = (float) possiblePhase.getAsDouble();
-            if (phase < -1f || phase > 1f) {
-              throw ctx.newException(String.format("Gradient phase is out of range (%s). Must be in the range [-1.0f, 1.0f] (inclusive).", phase), args);
+    static Tag create(final ArgumentQueue args, final Context ctx) {
+        float phase = 0;
+        final List<TextColor> textColors;
+        if (args.hasNext()) {
+            textColors = new ArrayList<>();
+            while (args.hasNext()) {
+                final Argument arg = args.pop();
+                // last argument? maybe this is the phase?
+                if (!args.hasNext()) {
+                    final OptionalDouble possiblePhase = arg.asDouble();
+                    if (possiblePhase.isPresent()) {
+                        phase = (float) possiblePhase.getAsDouble();
+                        if (phase < -1f || phase > 1f) {
+                            throw ctx.newException(String.format("Gradient phase is out of range (%s). Must be in the range [-1.0f, 1.0f] (inclusive).", phase), args);
+                        }
+                        break;
+                    }
+                }
+
+                final String argValue = arg.value();
+                final TextColor parsedColor;
+                if (argValue.charAt(0) == TextColor.HEX_CHARACTER) {
+                    parsedColor = TextColor.fromHexString(argValue);
+                } else {
+                    parsedColor = NamedTextColor.NAMES.value(arg.lowerValue());
+                }
+                if (parsedColor == null) {
+                    throw ctx.newException(String.format("Unable to parse a color from '%s'. Please use named colors or hex (#RRGGBB) colors.", argValue), args);
+                }
+                textColors.add(parsedColor);
             }
-            break;
-          }
-        }
 
-        final String argValue = arg.value();
-        final TextColor parsedColor;
-        if (argValue.charAt(0) == TextColor.HEX_CHARACTER) {
-          parsedColor = TextColor.fromHexString(argValue);
+            if (textColors.size() < 2) {
+                throw ctx.newException("Invalid transition, not enough colors. Transitions must have at least two colors.", args);
+            }
         } else {
-          parsedColor = NamedTextColor.NAMES.value(arg.lowerValue());
+            textColors = Collections.emptyList();
         }
-        if (parsedColor == null) {
-          throw ctx.newException(String.format("Unable to parse a color from '%s'. Please use named colors or hex (#RRGGBB) colors.", argValue), args);
+
+        return new TransitionTag(phase, textColors);
+    }
+
+    @Override
+    public @NotNull Component value() {
+        return Component.text("", this.color());
+    }
+
+    private TextColor color() {
+        final float steps = 1f / (this.colors.length - 1);
+        for (int colorIndex = 1; colorIndex < this.colors.length; colorIndex++) {
+            final float val = colorIndex * steps;
+            if (val >= this.phase) {
+                final float factor = 1 + (this.phase - val) * (this.colors.length - 1);
+
+                if (this.negativePhase) {
+                    // flip the gradient segment for to allow for looping phase -1 through 1
+                    return TextColor.lerp(1 - factor, this.colors[colorIndex], this.colors[colorIndex - 1]);
+                } else {
+                    return TextColor.lerp(factor, this.colors[colorIndex - 1], this.colors[colorIndex]);
+                }
+            }
         }
-        textColors.add(parsedColor);
-      }
-
-      if (textColors.size() < 2) {
-        throw ctx.newException("Invalid transition, not enough colors. Transitions must have at least two colors.", args);
-      }
-    } else {
-      textColors = Collections.emptyList();
+        return this.colors[0];
     }
 
-    return new TransitionTag(phase, textColors);
-  }
-
-  private TransitionTag(final float phase, final List<TextColor> colors) {
-    if (phase < 0) {
-      this.negativePhase = true;
-      this.phase = 1 + phase;
-      Collections.reverse(colors);
-    } else {
-      this.negativePhase = false;
-      this.phase = phase;
+    @Override
+    public @NotNull Stream<? extends ExaminableProperty> examinableProperties() {
+        return Stream.of(
+                ExaminableProperty.of("phase", this.phase),
+                ExaminableProperty.of("colors", this.colors)
+        );
     }
 
-    if (colors.isEmpty()) {
-      this.colors = new TextColor[]{TextColor.color(0xffffff), TextColor.color(0x000000)};
-    } else {
-      this.colors = colors.toArray(new TextColor[0]);
+    @Override
+    public boolean equals(final Object other) {
+        if (this == other) return true;
+        if (other == null || this.getClass() != other.getClass()) return false;
+        final TransitionTag that = (TransitionTag) other;
+        return this.phase == that.phase && Arrays.equals(this.colors, that.colors);
     }
-  }
 
-  @Override
-  public @NotNull Component value() {
-    return Component.text("", this.color());
-  }
-
-  private TextColor color() {
-    final float steps = 1f / (this.colors.length - 1);
-    for (int colorIndex = 1; colorIndex < this.colors.length; colorIndex++) {
-      final float val = colorIndex * steps;
-      if (val >= this.phase) {
-        final float factor = 1 + (this.phase - val) * (this.colors.length - 1);
-
-        if (this.negativePhase) {
-          // flip the gradient segment for to allow for looping phase -1 through 1
-          return TextColor.lerp(1 - factor, this.colors[colorIndex], this.colors[colorIndex - 1]);
-        } else {
-          return TextColor.lerp(factor, this.colors[colorIndex - 1], this.colors[colorIndex]);
-        }
-      }
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(this.phase);
+        result = 31 * result + Arrays.hashCode(this.colors);
+        return result;
     }
-    return this.colors[0];
-  }
-
-  @Override
-  public @NotNull Stream<? extends ExaminableProperty> examinableProperties() {
-    return Stream.of(
-      ExaminableProperty.of("phase", this.phase),
-      ExaminableProperty.of("colors", this.colors)
-    );
-  }
-
-  @Override
-  public boolean equals(final Object other) {
-    if (this == other) return true;
-    if (other == null || this.getClass() != other.getClass()) return false;
-    final TransitionTag that = (TransitionTag) other;
-    return this.phase == that.phase && Arrays.equals(this.colors, that.colors);
-  }
-
-  @Override
-  public int hashCode() {
-    int result = Objects.hash(this.phase);
-    result = 31 * result + Arrays.hashCode(this.colors);
-    return result;
-  }
 }

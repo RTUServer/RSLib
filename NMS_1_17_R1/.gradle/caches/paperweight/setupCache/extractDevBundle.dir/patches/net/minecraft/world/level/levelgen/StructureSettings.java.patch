@@ -1,0 +1,96 @@
+--- a/net/minecraft/world/level/levelgen/StructureSettings.java
++++ b/net/minecraft/world/level/levelgen/StructureSettings.java
+@@ -1,9 +1,11 @@
++// mc-dev import
+ package net.minecraft.world.level.levelgen;
+ 
+ import com.google.common.collect.ImmutableMap;
+ import com.google.common.collect.Maps;
+ import com.mojang.serialization.Codec;
+ import com.mojang.serialization.codecs.RecordCodecBuilder;
++import java.util.Iterator;
+ import java.util.Map;
+ import java.util.Optional;
+ import javax.annotation.Nullable;
+@@ -13,13 +15,15 @@
+ import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
+ 
+ public class StructureSettings {
++
+     public static final Codec<StructureSettings> CODEC = RecordCodecBuilder.create((instance) -> {
+-        return instance.group(StrongholdConfiguration.CODEC.optionalFieldOf("stronghold").forGetter((config) -> {
+-            return Optional.ofNullable(config.stronghold);
+-        }), Codec.simpleMap(Registry.STRUCTURE_FEATURE, StructureFeatureConfiguration.CODEC, Registry.STRUCTURE_FEATURE).fieldOf("structures").forGetter((config) -> {
+-            return config.structureConfig;
++        return instance.group(StrongholdConfiguration.CODEC.optionalFieldOf("stronghold").forGetter((structuresettings) -> {
++            return Optional.ofNullable(structuresettings.stronghold);
++        }), Codec.simpleMap(Registry.STRUCTURE_FEATURE, StructureFeatureConfiguration.CODEC, Registry.STRUCTURE_FEATURE).fieldOf("structures").forGetter((structuresettings) -> {
++            return structuresettings.structureConfig;
+         })).apply(instance, StructureSettings::new);
+     });
++    // CraftBukkit - decompile error
+     public static final ImmutableMap<StructureFeature<?>, StructureFeatureConfiguration> DEFAULTS = ImmutableMap.<StructureFeature<?>, StructureFeatureConfiguration>builder().put(StructureFeature.VILLAGE, new StructureFeatureConfiguration(32, 8, 10387312)).put(StructureFeature.DESERT_PYRAMID, new StructureFeatureConfiguration(32, 8, 14357617)).put(StructureFeature.IGLOO, new StructureFeatureConfiguration(32, 8, 14357618)).put(StructureFeature.JUNGLE_TEMPLE, new StructureFeatureConfiguration(32, 8, 14357619)).put(StructureFeature.SWAMP_HUT, new StructureFeatureConfiguration(32, 8, 14357620)).put(StructureFeature.PILLAGER_OUTPOST, new StructureFeatureConfiguration(32, 8, 165745296)).put(StructureFeature.STRONGHOLD, new StructureFeatureConfiguration(1, 0, 0)).put(StructureFeature.OCEAN_MONUMENT, new StructureFeatureConfiguration(32, 5, 10387313)).put(StructureFeature.END_CITY, new StructureFeatureConfiguration(20, 11, 10387313)).put(StructureFeature.WOODLAND_MANSION, new StructureFeatureConfiguration(80, 20, 10387319)).put(StructureFeature.BURIED_TREASURE, new StructureFeatureConfiguration(1, 0, 0)).put(StructureFeature.MINESHAFT, new StructureFeatureConfiguration(1, 0, 0)).put(StructureFeature.RUINED_PORTAL, new StructureFeatureConfiguration(40, 15, 34222645)).put(StructureFeature.SHIPWRECK, new StructureFeatureConfiguration(24, 4, 165745295)).put(StructureFeature.OCEAN_RUIN, new StructureFeatureConfiguration(20, 8, 14357621)).put(StructureFeature.BASTION_REMNANT, new StructureFeatureConfiguration(27, 4, 30084232)).put(StructureFeature.NETHER_BRIDGE, new StructureFeatureConfiguration(27, 4, 30084232)).put(StructureFeature.NETHER_FOSSIL, new StructureFeatureConfiguration(2, 1, 14357921)).build();
+     public static final StrongholdConfiguration DEFAULT_STRONGHOLD;
+     private final Map<StructureFeature<?>, StructureFeatureConfiguration> structureConfig;
+@@ -27,13 +31,13 @@
+     private final StrongholdConfiguration stronghold;
+ 
+     public StructureSettings(Optional<StrongholdConfiguration> stronghold, Map<StructureFeature<?>, StructureFeatureConfiguration> structures) {
+-        this.stronghold = stronghold.orElse((StrongholdConfiguration)null);
+-        this.structureConfig = structures;
++        this.stronghold = (StrongholdConfiguration) stronghold.orElse(null); // CraftBukkit - decompile error
++        this.structureConfig = Maps.newHashMap(structures); // Spigot
+     }
+ 
+     public StructureSettings(boolean withStronghold) {
+-        this.structureConfig = Maps.newHashMap(DEFAULTS);
+-        this.stronghold = withStronghold ? DEFAULT_STRONGHOLD : null;
++        this.structureConfig = Maps.newHashMap(StructureSettings.DEFAULTS);
++        this.stronghold = withStronghold ? StructureSettings.DEFAULT_STRONGHOLD : null;
+     }
+ 
+     public Map<StructureFeature<?>, StructureFeatureConfiguration> structureConfig() {
+@@ -42,7 +46,7 @@
+ 
+     @Nullable
+     public StructureFeatureConfiguration getConfig(StructureFeature<?> structureType) {
+-        return this.structureConfig.get(structureType);
++        return (StructureFeatureConfiguration) this.structureConfig.get(structureType);
+     }
+ 
+     @Nullable
+@@ -51,12 +55,30 @@
+     }
+ 
+     static {
+-        for(StructureFeature<?> structureFeature : Registry.STRUCTURE_FEATURE) {
+-            if (!DEFAULTS.containsKey(structureFeature)) {
+-                throw new IllegalStateException("Structure feature without default settings: " + Registry.STRUCTURE_FEATURE.getKey(structureFeature));
++        // CraftBukkit - decompile error start
++        DEFAULT_STRONGHOLD = new StrongholdConfiguration(32, 3, 128);
++
++        for (StructureFeature<?> structuregenerator : Registry.STRUCTURE_FEATURE) {
++            if (!StructureSettings.DEFAULTS.containsKey(structuregenerator)) {
++                throw new IllegalStateException("Structure feature without default settings: " + Registry.STRUCTURE_FEATURE.getKey(structuregenerator));
+             }
+         }
++        /*
++        Iterator iterator = IRegistry.STRUCTURE_FEATURE.iterator();
+ 
+-        DEFAULT_STRONGHOLD = new StrongholdConfiguration(32, 3, 128);
++        StructureGenerator structuregenerator;
++
++        do {
++            if (!iterator.hasNext()) {
++                DEFAULT_STRONGHOLD = new StructureSettingsStronghold(32, 3, 128);
++                return;
++            }
++
++            structuregenerator = (StructureGenerator) iterator.next();
++        } while (StructureSettings.DEFAULTS.containsKey(structuregenerator));
++
++        throw new IllegalStateException("Structure feature without default settings: " + IRegistry.STRUCTURE_FEATURE.getKey(structuregenerator));
++         */
++        // CraftBukkit - decompile error end
+     }
+ }

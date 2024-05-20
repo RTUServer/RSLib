@@ -1,0 +1,40 @@
+--- a/net/minecraft/world/entity/animal/frog/Frog.java
++++ b/net/minecraft/world/entity/animal/frog/Frog.java
+@@ -106,7 +106,7 @@
+ 
+     @Override
+     public Brain<Frog> getBrain() {
+-        return super.getBrain();
++        return (Brain<Frog>) super.getBrain(); // Paper - decompile fix
+     }
+ 
+     @Override
+@@ -265,6 +265,17 @@
+             serverPlayer = other.getLoveCause();
+         }
+ 
++        // Paper start
++        int experience = this.getRandom().nextInt(7) + 1;
++        io.papermc.paper.event.entity.EntityFertilizeEggEvent event = new io.papermc.paper.event.entity.EntityFertilizeEggEvent((org.bukkit.entity.LivingEntity) this.getBukkitEntity(), (org.bukkit.entity.LivingEntity) other.getBukkitEntity(), serverPlayer == null ? null : serverPlayer.getBukkitEntity(), this.breedItem == null ? null : org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack.asCraftMirror(this.breedItem).clone(), experience);
++        if (!event.callEvent()) {
++            resetLove();
++            other.resetLove(); // stop the pathfinding to avoid infinite loop
++            return;
++        }
++        experience = event.getExperience();
++        // Paper end
++
+         if (serverPlayer != null) {
+             serverPlayer.awardStat(Stats.ANIMALS_BRED);
+             CriteriaTriggers.BRED_ANIMALS.trigger(serverPlayer, this, other, (AgeableMob)null);
+@@ -276,8 +287,8 @@
+         other.resetLove();
+         this.getBrain().setMemory(MemoryModuleType.IS_PREGNANT, Unit.INSTANCE);
+         world.broadcastEntityEvent(this, (byte)18);
+-        if (world.getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT)) {
+-            world.addFreshEntity(new ExperienceOrb(world, this.getX(), this.getY(), this.getZ(), this.getRandom().nextInt(7) + 1));
++        if (experience > 0 && world.getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT)) { // Paper
++            world.addFreshEntity(new ExperienceOrb(world, this.getX(), this.getY(), this.getZ(), experience, org.bukkit.entity.ExperienceOrb.SpawnReason.BREED, serverPlayer)); // Paper
+         }
+ 
+     }

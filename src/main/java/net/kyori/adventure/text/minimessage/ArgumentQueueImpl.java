@@ -34,58 +34,58 @@ import java.util.function.Supplier;
 import static java.util.Objects.requireNonNull;
 
 final class ArgumentQueueImpl<T extends Tag.Argument> implements ArgumentQueue {
-  private final Context context;
-  final List<T> args;
-  private int ptr = 0;
+    final List<T> args;
+    private final Context context;
+    private int ptr = 0;
 
-  ArgumentQueueImpl(final Context context, final List<T> args) {
-    this.context = context;
-    this.args = args;
-  }
-
-  @Override
-  public @NotNull T pop() {
-    if (!this.hasNext()) {
-      throw this.context.newException("Missing argument for this tag!", this);
+    ArgumentQueueImpl(final Context context, final List<T> args) {
+        this.context = context;
+        this.args = args;
     }
-    return this.args.get(this.ptr++);
-  }
 
-  @Override
-  public @NotNull T popOr(final @NotNull String errorMessage) {
-    requireNonNull(errorMessage, "errorMessage");
-    if (!this.hasNext()) {
-      throw this.context.newException(errorMessage, this);
+    @Override
+    public @NotNull T pop() {
+        if (!this.hasNext()) {
+            throw this.context.newException("Missing argument for this tag!", this);
+        }
+        return this.args.get(this.ptr++);
     }
-    return this.args.get(this.ptr++);
-  }
 
-  @Override
-  public @NotNull T popOr(final @NotNull Supplier<String> errorMessage) {
-    requireNonNull(errorMessage, "errorMessage");
-    if (!this.hasNext()) {
-      throw this.context.newException(requireNonNull(errorMessage.get(), "errorMessage.get()"), this);
+    @Override
+    public @NotNull T popOr(final @NotNull String errorMessage) {
+        requireNonNull(errorMessage, "errorMessage");
+        if (!this.hasNext()) {
+            throw this.context.newException(errorMessage, this);
+        }
+        return this.args.get(this.ptr++);
     }
-    return this.args.get(this.ptr++);
-  }
 
-  @Override
-  public @Nullable T peek() {
-    return this.hasNext() ? this.args.get(this.ptr) : null;
-  }
+    @Override
+    public @NotNull T popOr(final @NotNull Supplier<String> errorMessage) {
+        requireNonNull(errorMessage, "errorMessage");
+        if (!this.hasNext()) {
+            throw this.context.newException(requireNonNull(errorMessage.get(), "errorMessage.get()"), this);
+        }
+        return this.args.get(this.ptr++);
+    }
 
-  @Override
-  public boolean hasNext() {
-    return this.ptr < this.args.size();
-  }
+    @Override
+    public @Nullable T peek() {
+        return this.hasNext() ? this.args.get(this.ptr) : null;
+    }
 
-  @Override
-  public void reset() {
-    this.ptr = 0;
-  }
+    @Override
+    public boolean hasNext() {
+        return this.ptr < this.args.size();
+    }
 
-  @Override
-  public String toString() {
-    return this.args.toString();
-  }
+    @Override
+    public void reset() {
+        this.ptr = 0;
+    }
+
+    @Override
+    public String toString() {
+        return this.args.toString();
+    }
 }

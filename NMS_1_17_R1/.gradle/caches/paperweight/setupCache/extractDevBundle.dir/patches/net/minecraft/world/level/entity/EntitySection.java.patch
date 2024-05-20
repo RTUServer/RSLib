@@ -1,0 +1,47 @@
+--- a/net/minecraft/world/level/entity/EntitySection.java
++++ b/net/minecraft/world/level/entity/EntitySection.java
+@@ -12,6 +12,10 @@
+     protected static final Logger LOGGER = LogManager.getLogger();
+     private final ClassInstanceMultiMap<T> storage;
+     private Visibility chunkStatus;
++    // Paper start - track number of items and minecarts
++    public int itemCount;
++    public int inventoryEntityCount;
++    // Paper end
+ 
+     public EntitySection(Class<T> entityClass, Visibility status) {
+         this.chunkStatus = status;
+@@ -19,10 +23,24 @@
+     }
+ 
+     public void add(T obj) {
++        // Paper start
++        if (obj instanceof net.minecraft.world.entity.item.ItemEntity) {
++            this.itemCount++;
++        } else if (obj instanceof net.minecraft.world.Container) {
++            this.inventoryEntityCount++;
++        }
++        // Paper end
+         this.storage.add(obj);
+     }
+ 
+     public boolean remove(T obj) {
++        // Paper start
++        if (obj instanceof net.minecraft.world.entity.item.ItemEntity) {
++            this.itemCount--;
++        } else if (obj instanceof net.minecraft.world.Container) {
++            this.inventoryEntityCount--;
++        }
++        // Paper end
+         return this.storage.remove(obj);
+     }
+ 
+@@ -39,7 +57,7 @@
+         for(T object : this.storage.find(type.getBaseClass())) {
+             U object2 = (U)type.tryCast(object);
+             if (object2 != null && filter.test(object2)) {
+-                action.accept((T)object2);
++                action.accept(object2); // Paper - decompile fix
+             }
+         }
+ 

@@ -50,229 +50,227 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 final class MiniMessageParser {
-  final TagResolver tagResolver;
+    final TagResolver tagResolver;
 
-  MiniMessageParser() {
-    this.tagResolver = TagResolver.standard();
-  }
-
-  MiniMessageParser(final TagResolver tagResolver) {
-    this.tagResolver = tagResolver;
-  }
-
-  @NotNull String escapeTokens(final @NotNull ContextImpl context) {
-    final StringBuilder sb = new StringBuilder(context.message().length());
-    this.escapeTokens(sb, context);
-    return sb.toString();
-  }
-
-  void escapeTokens(final StringBuilder sb, final @NotNull ContextImpl context) {
-    this.escapeTokens(sb, context.message(), context);
-  }
-
-  private void escapeTokens(final StringBuilder sb, final String richMessage, final ContextImpl context) {
-    this.processTokens(sb, richMessage, context, (token, builder) -> {
-      builder.append('\\').append(TokenParser.TAG_START);
-      if (token.type() == TokenType.CLOSE_TAG) {
-        builder.append(TokenParser.CLOSE_TAG);
-      }
-      final List<Token> childTokens = token.childTokens();
-      for (int i = 0; i < childTokens.size(); i++) {
-        if (i != 0) {
-          builder.append(TokenParser.SEPARATOR);
-        }
-        this.escapeTokens(builder, childTokens.get(i).get(richMessage).toString(), context); // todo: do we need to unwrap quotes on this?
-      }
-      builder.append(TokenParser.TAG_END);
-    });
-  }
-
-  @NotNull String stripTokens(final @NotNull ContextImpl context) {
-    final StringBuilder sb = new StringBuilder(context.message().length());
-    this.processTokens(sb, context, (token, builder) -> {});
-    return sb.toString();
-  }
-
-  private void processTokens(final @NotNull StringBuilder sb, final @NotNull ContextImpl context, final BiConsumer<Token, StringBuilder> tagHandler) {
-    this.processTokens(sb, context.message(), context, tagHandler);
-  }
-
-  private void processTokens(final @NotNull StringBuilder sb, final @NotNull String richMessage, final @NotNull ContextImpl context, final BiConsumer<Token, StringBuilder> tagHandler) {
-    final TagResolver combinedResolver = TagResolver.resolver(this.tagResolver, context.extraTags());
-    final List<Token> root = TokenParser.tokenize(richMessage, true);
-    for (final Token token : root) {
-      switch (token.type()) {
-        case TEXT:
-          sb.append(richMessage, token.startIndex(), token.endIndex());
-          break;
-        case OPEN_TAG:
-        case CLOSE_TAG:
-        case OPEN_CLOSE_TAG:
-          // extract tag name
-          if (token.childTokens().isEmpty()) {
-            sb.append(richMessage, token.startIndex(), token.endIndex());
-            continue;
-          }
-          final String sanitized = TokenParser.TagProvider.sanitizePlaceholderName(token.childTokens().get(0).get(richMessage).toString());
-          if (combinedResolver.has(sanitized)) {
-            tagHandler.accept(token, sb);
-          } else {
-            sb.append(richMessage, token.startIndex(), token.endIndex());
-          }
-          break;
-        default:
-          throw new IllegalArgumentException("Unsupported token type " + token.type());
-      }
-    }
-  }
-
-  @NotNull RootNode parseToTree(final @NotNull ContextImpl context) {
-    final TagResolver combinedResolver = TagResolver.resolver(this.tagResolver, context.extraTags());
-    final String processedMessage = context.preProcessor().apply(context.message());
-    final Consumer<String> debug = context.debugOutput();
-    if (debug != null) {
-      debug.accept("Beginning parsing message ");
-      debug.accept(processedMessage);
-      debug.accept("\n");
+    MiniMessageParser() {
+        this.tagResolver = TagResolver.standard();
     }
 
-    final TokenParser.TagProvider transformationFactory;
-    if (debug != null) {
-      transformationFactory = (name, args, token) -> {
-        try {
-          debug.accept("Attempting to match node '");
-          debug.accept(name);
-          debug.accept("'");
-          if (token != null) {
-            debug.accept(" at column ");
-            debug.accept(String.valueOf(token.startIndex()));
-          }
-          debug.accept("\n");
+    MiniMessageParser(final TagResolver tagResolver) {
+        this.tagResolver = tagResolver;
+    }
 
-          final @Nullable Tag transformation = combinedResolver.resolve(name, new ArgumentQueueImpl<>(context, args), context);
+    @NotNull String escapeTokens(final @NotNull ContextImpl context) {
+        final StringBuilder sb = new StringBuilder(context.message().length());
+        this.escapeTokens(sb, context);
+        return sb.toString();
+    }
 
-          if (transformation == null) {
-            debug.accept("Could not match node '");
-            debug.accept(name);
-            debug.accept("'\n");
-          } else {
-            debug.accept("Successfully matched node '");
-            debug.accept(name);
-            debug.accept("' to tag ");
-            debug.accept(transformation instanceof Examinable ? ((Examinable) transformation).examinableName() : transformation.getClass().getName());
-            debug.accept("\n");
-          }
+    void escapeTokens(final StringBuilder sb, final @NotNull ContextImpl context) {
+        this.escapeTokens(sb, context.message(), context);
+    }
 
-          return transformation;
-        } catch (final ParsingException e) {
-          if (token != null && e instanceof ParsingExceptionImpl) {
-            final ParsingExceptionImpl impl = (ParsingExceptionImpl) e;
-            if (impl.tokens().length == 0) {
-              impl.tokens(new Token[] {token});
+    private void escapeTokens(final StringBuilder sb, final String richMessage, final ContextImpl context) {
+        this.processTokens(sb, richMessage, context, (token, builder) -> {
+            builder.append('\\').append(TokenParser.TAG_START);
+            if (token.type() == TokenType.CLOSE_TAG) {
+                builder.append(TokenParser.CLOSE_TAG);
             }
-          }
-          debug.accept("Could not match node '");
-          debug.accept(name);
-          debug.accept("' - ");
-          debug.accept(e.getMessage());
-          debug.accept("\n");
-          return null;
+            final List<Token> childTokens = token.childTokens();
+            for (int i = 0; i < childTokens.size(); i++) {
+                if (i != 0) {
+                    builder.append(TokenParser.SEPARATOR);
+                }
+                this.escapeTokens(builder, childTokens.get(i).get(richMessage).toString(), context); // todo: do we need to unwrap quotes on this?
+            }
+            builder.append(TokenParser.TAG_END);
+        });
+    }
+
+    @NotNull String stripTokens(final @NotNull ContextImpl context) {
+        final StringBuilder sb = new StringBuilder(context.message().length());
+        this.processTokens(sb, context, (token, builder) -> {
+        });
+        return sb.toString();
+    }
+
+    private void processTokens(final @NotNull StringBuilder sb, final @NotNull ContextImpl context, final BiConsumer<Token, StringBuilder> tagHandler) {
+        this.processTokens(sb, context.message(), context, tagHandler);
+    }
+
+    private void processTokens(final @NotNull StringBuilder sb, final @NotNull String richMessage, final @NotNull ContextImpl context, final BiConsumer<Token, StringBuilder> tagHandler) {
+        final TagResolver combinedResolver = TagResolver.resolver(this.tagResolver, context.extraTags());
+        final List<Token> root = TokenParser.tokenize(richMessage, true);
+        for (final Token token : root) {
+            switch (token.type()) {
+                case TEXT:
+                    sb.append(richMessage, token.startIndex(), token.endIndex());
+                    break;
+                case OPEN_TAG:
+                case CLOSE_TAG:
+                case OPEN_CLOSE_TAG:
+                    // extract tag name
+                    if (token.childTokens().isEmpty()) {
+                        sb.append(richMessage, token.startIndex(), token.endIndex());
+                        continue;
+                    }
+                    final String sanitized = TokenParser.TagProvider.sanitizePlaceholderName(token.childTokens().get(0).get(richMessage).toString());
+                    if (combinedResolver.has(sanitized)) {
+                        tagHandler.accept(token, sb);
+                    } else {
+                        sb.append(richMessage, token.startIndex(), token.endIndex());
+                    }
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unsupported token type " + token.type());
+            }
         }
-      };
-    } else {
-      transformationFactory = (name, args, token) -> {
-        try {
-          return combinedResolver.resolve(name, new ArgumentQueueImpl<>(context, args), context);
-        } catch (final ParsingException ignored) {
-          return null;
+    }
+
+    @NotNull RootNode parseToTree(final @NotNull ContextImpl context) {
+        final TagResolver combinedResolver = TagResolver.resolver(this.tagResolver, context.extraTags());
+        final String processedMessage = context.preProcessor().apply(context.message());
+        final Consumer<String> debug = context.debugOutput();
+        if (debug != null) {
+            debug.accept("Beginning parsing message ");
+            debug.accept(processedMessage);
+            debug.accept("\n");
         }
-      };
-    }
-    final Predicate<String> tagNameChecker = name -> {
-      final String sanitized = TokenParser.TagProvider.sanitizePlaceholderName(name);
-      return combinedResolver.has(sanitized);
-    };
 
-    final String preProcessed = TokenParser.resolvePreProcessTags(processedMessage, transformationFactory);
-    context.message(preProcessed);
-    // Then, once MiniMessage placeholders have been inserted, we can do the real parse
-    final RootNode root = TokenParser.parse(transformationFactory, tagNameChecker, preProcessed, processedMessage, context.strict());
+        final TokenParser.TagProvider transformationFactory;
+        if (debug != null) {
+            transformationFactory = (name, args, token) -> {
+                try {
+                    debug.accept("Attempting to match node '");
+                    debug.accept(name);
+                    debug.accept("'");
+                    if (token != null) {
+                        debug.accept(" at column ");
+                        debug.accept(String.valueOf(token.startIndex()));
+                    }
+                    debug.accept("\n");
 
-    if (debug != null) {
-      debug.accept("Text parsed into element tree:\n");
-      debug.accept(root.toString());
-    }
+                    final @Nullable Tag transformation = combinedResolver.resolve(name, new ArgumentQueueImpl<>(context, args), context);
 
-    return root;
-  }
+                    if (transformation == null) {
+                        debug.accept("Could not match node '");
+                        debug.accept(name);
+                        debug.accept("'\n");
+                    } else {
+                        debug.accept("Successfully matched node '");
+                        debug.accept(name);
+                        debug.accept("' to tag ");
+                        debug.accept(transformation instanceof Examinable ? ((Examinable) transformation).examinableName() : transformation.getClass().getName());
+                        debug.accept("\n");
+                    }
 
-  @NotNull Component parseFormat(final @NotNull ContextImpl context) {
-    final ElementNode root = this.parseToTree(context);
-    return Objects.requireNonNull(context.postProcessor().apply(this.treeToComponent(root, context)), "Post-processor must not return null");
-  }
+                    return transformation;
+                } catch (final ParsingException e) {
+                    if (token != null && e instanceof ParsingExceptionImpl impl) {
+                        if (impl.tokens().length == 0) {
+                            impl.tokens(new Token[]{token});
+                        }
+                    }
+                    debug.accept("Could not match node '");
+                    debug.accept(name);
+                    debug.accept("' - ");
+                    debug.accept(e.getMessage());
+                    debug.accept("\n");
+                    return null;
+                }
+            };
+        } else {
+            transformationFactory = (name, args, token) -> {
+                try {
+                    return combinedResolver.resolve(name, new ArgumentQueueImpl<>(context, args), context);
+                } catch (final ParsingException ignored) {
+                    return null;
+                }
+            };
+        }
+        final Predicate<String> tagNameChecker = name -> {
+            final String sanitized = TokenParser.TagProvider.sanitizePlaceholderName(name);
+            return combinedResolver.has(sanitized);
+        };
 
-  @NotNull Component treeToComponent(final @NotNull ElementNode node, final @NotNull ContextImpl context) {
-    Component comp = Component.empty();
-    Tag tag = null;
-    if (node instanceof ValueNode) {
-      comp = Component.text(((ValueNode) node).value());
-    } else if (node instanceof TagNode) {
-      final TagNode tagNode = (TagNode) node;
+        final String preProcessed = TokenParser.resolvePreProcessTags(processedMessage, transformationFactory);
+        context.message(preProcessed);
+        // Then, once MiniMessage placeholders have been inserted, we can do the real parse
+        final RootNode root = TokenParser.parse(transformationFactory, tagNameChecker, preProcessed, processedMessage, context.strict());
 
-      tag = tagNode.tag();
+        if (debug != null) {
+            debug.accept("Text parsed into element tree:\n");
+            debug.accept(root.toString());
+        }
 
-      // special case for gradient and stuff
-      if (tag instanceof Modifying) {
-        final Modifying modTransformation = (Modifying) tag;
-
-        // first walk the tree
-        this.visitModifying(modTransformation, tagNode, 0);
-        modTransformation.postVisit();
-      }
-
-      if (tag instanceof Inserting) {
-        comp = ((Inserting) tag).value();
-      }
-    }
-
-    if (!node.unsafeChildren().isEmpty()) {
-      final List<Component> children = new ArrayList<>(comp.children().size() + node.children().size());
-      children.addAll(comp.children());
-      for (final ElementNode child : node.unsafeChildren()) {
-        children.add(this.treeToComponent(child, context));
-      }
-      comp = comp.children(children);
-    }
-
-    // special case for gradient and stuff
-    if (tag instanceof Modifying) {
-      comp = this.handleModifying((Modifying) tag, comp, 0);
-    }
-
-    final Consumer<String> debug = context.debugOutput();
-    if (debug != null) {
-      debug.accept("==========\ntreeToComponent \n");
-      debug.accept(node.toString());
-      debug.accept("\n");
-      debug.accept(comp.examine(MultiLineStringExaminer.simpleEscaping()).collect(Collectors.joining("\n")));
-      debug.accept("\n==========\n");
+        return root;
     }
 
-    return comp;
-  }
-
-  private void visitModifying(final Modifying modTransformation, final ElementNode node, final int depth) {
-    modTransformation.visit(node, depth);
-    for (final ElementNode child : node.unsafeChildren()) {
-      this.visitModifying(modTransformation, child, depth + 1);
+    @NotNull Component parseFormat(final @NotNull ContextImpl context) {
+        final ElementNode root = this.parseToTree(context);
+        return Objects.requireNonNull(context.postProcessor().apply(this.treeToComponent(root, context)), "Post-processor must not return null");
     }
-  }
 
-  private Component handleModifying(final Modifying modTransformation, final Component current, final int depth) {
-    Component newComp = modTransformation.apply(current, depth);
-    for (final Component child : current.children()) {
-      newComp = newComp.append(this.handleModifying(modTransformation, child, depth + 1));
+    @NotNull Component treeToComponent(final @NotNull ElementNode node, final @NotNull ContextImpl context) {
+        Component comp = Component.empty();
+        Tag tag = null;
+        if (node instanceof ValueNode) {
+            comp = Component.text(((ValueNode) node).value());
+        } else if (node instanceof TagNode tagNode) {
+
+            tag = tagNode.tag();
+
+            // special case for gradient and stuff
+            if (tag instanceof Modifying modTransformation) {
+
+                // first walk the tree
+                this.visitModifying(modTransformation, tagNode, 0);
+                modTransformation.postVisit();
+            }
+
+            if (tag instanceof Inserting) {
+                comp = ((Inserting) tag).value();
+            }
+        }
+
+        if (!node.unsafeChildren().isEmpty()) {
+            final List<Component> children = new ArrayList<>(comp.children().size() + node.children().size());
+            children.addAll(comp.children());
+            for (final ElementNode child : node.unsafeChildren()) {
+                children.add(this.treeToComponent(child, context));
+            }
+            comp = comp.children(children);
+        }
+
+        // special case for gradient and stuff
+        if (tag instanceof Modifying) {
+            comp = this.handleModifying((Modifying) tag, comp, 0);
+        }
+
+        final Consumer<String> debug = context.debugOutput();
+        if (debug != null) {
+            debug.accept("==========\ntreeToComponent \n");
+            debug.accept(node.toString());
+            debug.accept("\n");
+            debug.accept(comp.examine(MultiLineStringExaminer.simpleEscaping()).collect(Collectors.joining("\n")));
+            debug.accept("\n==========\n");
+        }
+
+        return comp;
     }
-    return newComp;
-  }
+
+    private void visitModifying(final Modifying modTransformation, final ElementNode node, final int depth) {
+        modTransformation.visit(node, depth);
+        for (final ElementNode child : node.unsafeChildren()) {
+            this.visitModifying(modTransformation, child, depth + 1);
+        }
+    }
+
+    private Component handleModifying(final Modifying modTransformation, final Component current, final int depth) {
+        Component newComp = modTransformation.apply(current, depth);
+        for (final Component child : current.children()) {
+            newComp = newComp.append(this.handleModifying(modTransformation, child, depth + 1));
+        }
+        return newComp;
+    }
 }

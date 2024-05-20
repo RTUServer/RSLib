@@ -1,0 +1,24 @@
+--- a/net/minecraft/network/Varint21FrameDecoder.java
++++ b/net/minecraft/network/Varint21FrameDecoder.java
+@@ -8,9 +8,20 @@
+ import java.util.List;
+ 
+ public class Varint21FrameDecoder extends ByteToMessageDecoder {
++    private final byte[] lenBuf = new byte[3]; // Paper
++    @Override
+     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
++        // Paper start - if channel is not active just discard the packet
++        if (!channelHandlerContext.channel().isActive()) {
++            byteBuf.skipBytes(byteBuf.readableBytes());
++            return;
++        }
++        // Paper end
+         byteBuf.markReaderIndex();
+-        byte[] bs = new byte[3];
++        // Paper start - reuse temporary length buffer
++        byte[] bs = lenBuf;
++        java.util.Arrays.fill(bs, (byte) 0);
++        // Paper end
+ 
+         for(int i = 0; i < bs.length; ++i) {
+             if (!byteBuf.isReadable()) {

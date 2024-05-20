@@ -1,0 +1,189 @@
+{
+  "minecraftVersion": "1.17.1",
+  "mappedServerCoordinates": "io.papermc.paper:paper-server:1.17.1-R0.1-SNAPSHOT",
+  "apiCoordinates": "io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT",
+  "mojangApiCoordinates": "io.papermc.paper:paper-mojangapi:1.17.1-R0.1-SNAPSHOT",
+  "buildData": {
+    "paramMappings": {
+      "url": "https://papermc.io/repo/repository/maven-public/",
+      "coordinates": [
+        "net.fabricmc:yarn:1.17.1+build.65:mergedv2"
+      ]
+    },
+    "reobfMappingsFile": "data/mojang+yarn-spigot-reobf.tiny",
+    "accessTransformFile": "data/transform.at",
+    "mojangMappedPaperclipFile": "data/paperclip-mojang+yarn.jar",
+    "vanillaJarIncludes": [
+      "/*.class",
+      "/net/minecraft/**",
+      "/com/mojang/math/**"
+    ],
+    "vanillaServerLibraries": [
+      "com.github.oshi:oshi-core:5.7.5",
+      "com.google.code.gson:gson:2.8.0",
+      "com.google.guava:guava:21.0",
+      "com.mojang:authlib:2.3.31",
+      "com.mojang:brigadier:1.0.18",
+      "com.mojang:datafixerupper:4.0.26",
+      "com.mojang:javabridge:1.1.23",
+      "commons-codec:commons-codec:1.10",
+      "commons-io:commons-io:2.5",
+      "io.netty:netty-all:4.1.25.Final",
+      "it.unimi.dsi:fastutil:8.2.1",
+      "net.java.dev.jna:jna-platform:5.8.0",
+      "net.java.dev.jna:jna:5.8.0",
+      "net.sf.jopt-simple:jopt-simple:5.0.3",
+      "org.apache.commons:commons-lang3:3.5",
+      "org.apache.logging.log4j:log4j-api:2.14.1",
+      "org.apache.logging.log4j:log4j-core:2.14.1",
+      "org.apache.logging.log4j:log4j-slf4j18-impl:2.14.1",
+      "org.slf4j:slf4j-api:1.8.0-beta4"
+    ],
+    "libraryDependencies": [
+      "com.github.oshi:oshi-core:5.7.5",
+      "com.google.code.gson:gson:2.8.0",
+      "com.google.guava:guava:21.0",
+      "com.mojang:authlib:2.3.31",
+      "com.mojang:brigadier:1.0.18",
+      "com.mojang:datafixerupper:4.0.26",
+      "com.mojang:javabridge:1.1.23",
+      "io.netty:netty-all:4.1.25.Final",
+      "it.unimi.dsi:fastutil:8.2.1",
+      "net.java.dev.jna:jna-platform:5.8.0",
+      "net.java.dev.jna:jna:5.8.0",
+      "net.sf.jopt-simple:jopt-simple:5.0.3",
+      "org.apache.logging.log4j:log4j-api:2.14.1",
+      "org.apache.logging.log4j:log4j-core:2.14.1",
+      "org.apache.logging.log4j:log4j-slf4j18-impl:2.14.1",
+      "org.slf4j:slf4j-api:1.8.0-beta4",
+      "net.minecrell:terminalconsoleappender:1.3.0",
+      "org.apache.logging.log4j:log4j-core:2.17.1",
+      "org.apache.logging.log4j:log4j-iostreams:2.17.1",
+      "org.apache.logging.log4j:log4j-slf4j18-impl:2.17.1",
+      "org.apache.logging.log4j:log4j-api:2.17.1",
+      "com.googlecode.json-simple:json-simple:1.1.1",
+      "io.netty:netty-all:4.1.65.Final",
+      "com.velocitypowered:velocity-native:1.1.0-SNAPSHOT"
+    ],
+    "libraryRepositories": [
+      "https://repo.maven.apache.org/maven2/",
+      "https://papermc.io/repo/repository/maven-public/"
+    ],
+    "relocations": [
+      {
+        "fromPackage": "org.bukkit.craftbukkit",
+        "toPackage": "org.bukkit.craftbukkit.v1_17_R1",
+        "excludes": [
+          "org.bukkit.craftbukkit.Main*"
+        ]
+      },
+      {
+        "owningLibraryCoordinates": "org.jline:jline-terminal-jansi",
+        "fromPackage": "org.jline",
+        "toPackage": "org.bukkit.craftbukkit.libs.jline",
+        "excludes": []
+      },
+      {
+        "owningLibraryCoordinates": "net.fabricmc:mapping-io",
+        "fromPackage": "net.fabricmc.mappingio",
+        "toPackage": "org.bukkit.craftbukkit.libs.net.fabricmc.mappingio",
+        "excludes": []
+      },
+      {
+        "owningLibraryCoordinates": "commons-codec:commons-codec",
+        "fromPackage": "org.apache.commons.codec",
+        "toPackage": "org.bukkit.craftbukkit.libs.org.apache.commons.codec",
+        "excludes": []
+      },
+      {
+        "owningLibraryCoordinates": "commons-io:commons-io",
+        "fromPackage": "org.apache.commons.io",
+        "toPackage": "org.bukkit.craftbukkit.libs.org.apache.commons.io",
+        "excludes": []
+      },
+      {
+        "owningLibraryCoordinates": "org.apache.commons:commons-lang3",
+        "fromPackage": "org.apache.commons.lang3",
+        "toPackage": "org.bukkit.craftbukkit.libs.org.apache.commons.lang3",
+        "excludes": []
+      },
+      {
+        "owningLibraryCoordinates": "org.ow2.asm:asm",
+        "fromPackage": "org.objectweb.asm",
+        "toPackage": "org.bukkit.craftbukkit.libs.org.objectweb.asm",
+        "excludes": []
+      },
+      {
+        "fromPackage": "org.apache.http",
+        "toPackage": "org.bukkit.craftbukkit.libs.org.apache.http",
+        "excludes": []
+      },
+      {
+        "fromPackage": "org.apache.maven",
+        "toPackage": "org.bukkit.craftbukkit.libs.org.apache.maven",
+        "excludes": []
+      },
+      {
+        "fromPackage": "org.codehaus.plexus",
+        "toPackage": "org.bukkit.craftbukkit.libs.org.codehaus.plexus",
+        "excludes": []
+      },
+      {
+        "fromPackage": "org.eclipse.aether",
+        "toPackage": "org.bukkit.craftbukkit.libs.org.eclipse.aether",
+        "excludes": []
+      },
+      {
+        "fromPackage": "org.eclipse.sisu",
+        "toPackage": "org.bukkit.craftbukkit.libs.org.eclipse.sisu",
+        "excludes": []
+      }
+    ]
+  },
+  "decompile": {
+    "dep": {
+      "url": "https://papermc.io/repo/repository/maven-public/",
+      "coordinates": [
+        "net.minecraftforge:forgeflower:1.5.498.12"
+      ]
+    },
+    "args": [
+      "-ind=    ",
+      "-din=1",
+      "-rbr=1",
+      "-dgs=1",
+      "-asc=1",
+      "-rsy=1",
+      "-iec=1",
+      "-jvn=0",
+      "-isl=0",
+      "-iib=1",
+      "-log=TRACE",
+      "-cfg",
+      "{libraries}",
+      "{input}",
+      "{output}"
+    ]
+  },
+  "remap": {
+    "dep": {
+      "url": "https://papermc.io/repo/repository/maven-public/",
+      "coordinates": [
+        "net.fabricmc:tiny-remapper:0.6.0:fat"
+      ]
+    },
+    "args": [
+      "{input}",
+      "{output}",
+      "{mappings}",
+      "{from}",
+      "{to}",
+      "{classpath}",
+      "--fixpackageaccess",
+      "--renameinvalidlocals",
+      "--threads=1",
+      "--rebuildsourcefilenames"
+    ]
+  },
+  "patchDir": "patches"
+}

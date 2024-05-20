@@ -37,30 +37,30 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 class ComponentClaimingResolverImpl implements TagResolver, SerializableResolver.Single {
-  private final @NotNull Set<String> names;
-  private final @NotNull BiFunction<ArgumentQueue, Context, Tag> handler;
-  private final @NotNull Function<Component, @Nullable Emitable> componentClaim;
+    private final @NotNull Set<String> names;
+    private final @NotNull BiFunction<ArgumentQueue, Context, Tag> handler;
+    private final @NotNull Function<Component, @Nullable Emitable> componentClaim;
 
-  ComponentClaimingResolverImpl(final Set<String> names, final BiFunction<ArgumentQueue, Context, Tag> handler, final Function<Component, @Nullable Emitable> componentClaim) {
-    this.names = names;
-    this.handler = handler;
-    this.componentClaim = componentClaim;
-  }
+    ComponentClaimingResolverImpl(final Set<String> names, final BiFunction<ArgumentQueue, Context, Tag> handler, final Function<Component, @Nullable Emitable> componentClaim) {
+        this.names = names;
+        this.handler = handler;
+        this.componentClaim = componentClaim;
+    }
 
-  @Override
-  public @Nullable Tag resolve(final @NotNull String name, final @NotNull ArgumentQueue arguments, final @NotNull Context ctx) throws ParsingException {
-    if (!this.names.contains(name)) return null;
+    @Override
+    public @Nullable Tag resolve(final @NotNull String name, final @NotNull ArgumentQueue arguments, final @NotNull Context ctx) throws ParsingException {
+        if (!this.names.contains(name)) return null;
 
-    return this.handler.apply(arguments, ctx);
-  }
+        return this.handler.apply(arguments, ctx);
+    }
 
-  @Override
-  public boolean has(final @NotNull String name) {
-    return this.names.contains(name);
-  }
+    @Override
+    public boolean has(final @NotNull String name) {
+        return this.names.contains(name);
+    }
 
-  @Override
-  public @Nullable Emitable claimComponent(final @NotNull Component component) {
-    return this.componentClaim.apply(component);
-  }
+    @Override
+    public @Nullable Emitable claimComponent(final @NotNull Component component) {
+        return this.componentClaim.apply(component);
+    }
 }

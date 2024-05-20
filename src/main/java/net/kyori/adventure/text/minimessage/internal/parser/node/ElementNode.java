@@ -40,128 +40,128 @@ import java.util.List;
  * @since 4.10.0
  */
 public class ElementNode implements Node {
-  private final @Nullable ElementNode parent;
-  private final @Nullable Token token;
-  private final String sourceMessage;
-  private final List<ElementNode> children = new ArrayList<>();
+    private final @Nullable ElementNode parent;
+    private final @Nullable Token token;
+    private final String sourceMessage;
+    private final List<ElementNode> children = new ArrayList<>();
 
-  /**
-   * Creates a new element node.
-   *
-   * @param parent the parent of this node
-   * @param token the token that created this node
-   * @param sourceMessage the source message
-   * @since 4.10.0
-   */
-  ElementNode(final @Nullable ElementNode parent, final @Nullable Token token, final @NotNull String sourceMessage) {
-    this.parent = parent;
-    this.token = token;
-    this.sourceMessage = sourceMessage;
-  }
-
-  /**
-   * Returns the parent of this node, if present.
-   *
-   * @return the parent or null
-   * @since 4.10.0
-   */
-  @Override
-  public @Nullable ElementNode parent() {
-    return this.parent;
-  }
-
-  /**
-   * Returns the token that lead to the creation of this token.
-   *
-   * @return the token
-   * @since 4.10.0
-   */
-  public @Nullable Token token() {
-    return this.token;
-  }
-
-  /**
-   * Returns the source message of this node.
-   *
-   * @return the source message
-   * @since 4.10.0
-   */
-  public @NotNull String sourceMessage() {
-    return this.sourceMessage;
-  }
-
-  /**
-   * Returns the children of this node.
-   *
-   * @return the children of this node
-   * @since 4.10.0
-   */
-  @Override
-  public @NotNull List<ElementNode> children() {
-    return Collections.unmodifiableList(this.children);
-  }
-
-  /**
-   * Returns an unsafe view of the children of this node.
-   *
-   * @return the children of this node
-   * @since 4.10.0
-   */
-  public @NotNull List<ElementNode> unsafeChildren() {
-    return this.children;
-  }
-
-  /**
-   * Adds a child to this node.
-   *
-   * <p>This method will attempt to join text tokens together if possible.</p>
-   *
-   * @param childNode the child node to add.
-   * @since 4.10.0
-   */
-  public void addChild(final @NotNull ElementNode childNode) {
-    final int last = this.children.size() - 1;
-    if (!(childNode instanceof TextNode) || this.children.isEmpty() || !(this.children.get(last) instanceof TextNode)) {
-      this.children.add(childNode);
-    } else {
-      final TextNode lastNode = (TextNode) this.children.remove(last);
-      if (lastNode.token().endIndex() == childNode.token().startIndex()) {
-        final Token replace = new Token(lastNode.token().startIndex(), childNode.token().endIndex(), TokenType.TEXT);
-        this.children.add(new TextNode(this, replace, lastNode.sourceMessage()));
-      } else {
-        // These nodes aren't adjacent in the string, so put the last one back
-        this.children.add(lastNode);
-        this.children.add(childNode);
-      }
+    /**
+     * Creates a new element node.
+     *
+     * @param parent        the parent of this node
+     * @param token         the token that created this node
+     * @param sourceMessage the source message
+     * @since 4.10.0
+     */
+    ElementNode(final @Nullable ElementNode parent, final @Nullable Token token, final @NotNull String sourceMessage) {
+        this.parent = parent;
+        this.token = token;
+        this.sourceMessage = sourceMessage;
     }
-  }
 
-  /**
-   * Serializes this node to a string.
-   *
-   * @param sb the string builder to serialize into
-   * @param indent the current indent level
-   * @return the passed string builder, for chaining
-   * @since 4.10.0
-   */
-  public @NotNull StringBuilder buildToString(final @NotNull StringBuilder sb, final int indent) {
-    final char[] in = this.ident(indent);
-    sb.append(in).append("Node {\n");
-    for (final ElementNode child : this.children) {
-      child.buildToString(sb, indent + 1);
+    /**
+     * Returns the parent of this node, if present.
+     *
+     * @return the parent or null
+     * @since 4.10.0
+     */
+    @Override
+    public @Nullable ElementNode parent() {
+        return this.parent;
     }
-    sb.append(in).append("}\n");
-    return sb;
-  }
 
-  char @NotNull [] ident(final int indent) {
-    final char[] c = new char[indent * 2];
-    Arrays.fill(c, ' ');
-    return c;
-  }
+    /**
+     * Returns the token that lead to the creation of this token.
+     *
+     * @return the token
+     * @since 4.10.0
+     */
+    public @Nullable Token token() {
+        return this.token;
+    }
 
-  @Override
-  public @NotNull String toString() {
-    return this.buildToString(new StringBuilder(), 0).toString();
-  }
+    /**
+     * Returns the source message of this node.
+     *
+     * @return the source message
+     * @since 4.10.0
+     */
+    public @NotNull String sourceMessage() {
+        return this.sourceMessage;
+    }
+
+    /**
+     * Returns the children of this node.
+     *
+     * @return the children of this node
+     * @since 4.10.0
+     */
+    @Override
+    public @NotNull List<ElementNode> children() {
+        return Collections.unmodifiableList(this.children);
+    }
+
+    /**
+     * Returns an unsafe view of the children of this node.
+     *
+     * @return the children of this node
+     * @since 4.10.0
+     */
+    public @NotNull List<ElementNode> unsafeChildren() {
+        return this.children;
+    }
+
+    /**
+     * Adds a child to this node.
+     *
+     * <p>This method will attempt to join text tokens together if possible.</p>
+     *
+     * @param childNode the child node to add.
+     * @since 4.10.0
+     */
+    public void addChild(final @NotNull ElementNode childNode) {
+        final int last = this.children.size() - 1;
+        if (!(childNode instanceof TextNode) || this.children.isEmpty() || !(this.children.get(last) instanceof TextNode)) {
+            this.children.add(childNode);
+        } else {
+            final TextNode lastNode = (TextNode) this.children.remove(last);
+            if (lastNode.token().endIndex() == childNode.token().startIndex()) {
+                final Token replace = new Token(lastNode.token().startIndex(), childNode.token().endIndex(), TokenType.TEXT);
+                this.children.add(new TextNode(this, replace, lastNode.sourceMessage()));
+            } else {
+                // These nodes aren't adjacent in the string, so put the last one back
+                this.children.add(lastNode);
+                this.children.add(childNode);
+            }
+        }
+    }
+
+    /**
+     * Serializes this node to a string.
+     *
+     * @param sb     the string builder to serialize into
+     * @param indent the current indent level
+     * @return the passed string builder, for chaining
+     * @since 4.10.0
+     */
+    public @NotNull StringBuilder buildToString(final @NotNull StringBuilder sb, final int indent) {
+        final char[] in = this.ident(indent);
+        sb.append(in).append("Node {\n");
+        for (final ElementNode child : this.children) {
+            child.buildToString(sb, indent + 1);
+        }
+        sb.append(in).append("}\n");
+        return sb;
+    }
+
+    char @NotNull [] ident(final int indent) {
+        final char[] c = new char[indent * 2];
+        Arrays.fill(c, ' ');
+        return c;
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return this.buildToString(new StringBuilder(), 0).toString();
+    }
 }

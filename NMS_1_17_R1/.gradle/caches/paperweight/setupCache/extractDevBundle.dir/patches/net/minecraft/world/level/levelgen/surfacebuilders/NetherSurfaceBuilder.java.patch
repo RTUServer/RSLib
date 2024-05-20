@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/level/levelgen/surfacebuilders/NetherSurfaceBuilder.java
++++ b/net/minecraft/world/level/levelgen/surfacebuilders/NetherSurfaceBuilder.java
+@@ -36,7 +36,7 @@
+         BlockState blockState = surfaceBuilderBaseConfiguration.getTopMaterial();
+         BlockState blockState2 = surfaceBuilderBaseConfiguration.getUnderMaterial();
+ 
+-        for(int p = 127; p >= i; --p) {
++        for(int p = height; p >= i; --p) { // Paper - fix MC-187716 - use configured height
+             mutableBlockPos.set(k, p, m);
+             BlockState blockState3 = chunk.getBlockState(mutableBlockPos);
+             if (blockState3.isAir()) {

@@ -38,111 +38,110 @@ import java.util.stream.Stream;
  * @since 4.10.0
  */
 public final class Token implements Examinable {
-  private final int startIndex;
-  private final int endIndex;
-  private final TokenType type;
+    private final int startIndex;
+    private final int endIndex;
+    private final TokenType type;
 
-  private List<Token> childTokens = null;
+    private List<Token> childTokens = null;
 
-  /**
-   * Creates a new token.
-   *
-   * @param startIndex the start index of the token
-   * @param endIndex the end index of the token
-   * @param type the type of the token
-   * @since 4.10.0
-   */
-  public Token(final int startIndex, final int endIndex, final TokenType type) {
-    this.startIndex = startIndex;
-    this.endIndex = endIndex;
-    this.type = type;
-  }
+    /**
+     * Creates a new token.
+     *
+     * @param startIndex the start index of the token
+     * @param endIndex   the end index of the token
+     * @param type       the type of the token
+     * @since 4.10.0
+     */
+    public Token(final int startIndex, final int endIndex, final TokenType type) {
+        this.startIndex = startIndex;
+        this.endIndex = endIndex;
+        this.type = type;
+    }
 
-  /**
-   * Returns the start index of this token.
-   *
-   * @return the start index
-   * @since 4.10.0
-   */
-  public int startIndex() {
-    return this.startIndex;
-  }
+    /**
+     * Returns the start index of this token.
+     *
+     * @return the start index
+     * @since 4.10.0
+     */
+    public int startIndex() {
+        return this.startIndex;
+    }
 
-  /**
-   * Returns the end index of this token.
-   *
-   * @return the end index
-   * @since 4.10.0
-   */
-  public int endIndex() {
-    return this.endIndex;
-  }
+    /**
+     * Returns the end index of this token.
+     *
+     * @return the end index
+     * @since 4.10.0
+     */
+    public int endIndex() {
+        return this.endIndex;
+    }
 
-  /**
-   * Returns the type of this token.
-   *
-   * @return the type
-   * @since 4.10.0
-   */
-  public TokenType type() {
-    return this.type;
-  }
+    /**
+     * Returns the type of this token.
+     *
+     * @return the type
+     * @since 4.10.0
+     */
+    public TokenType type() {
+        return this.type;
+    }
 
-  /**
-   * Returns the children of this token.
-   *
-   * @return the child tokens
-   * @since 4.10.0
-   */
-  public List<Token> childTokens() {
-    return this.childTokens;
-  }
+    /**
+     * Returns the children of this token.
+     *
+     * @return the child tokens
+     * @since 4.10.0
+     */
+    public List<Token> childTokens() {
+        return this.childTokens;
+    }
 
-  /**
-   * Sets the children of this token.
-   *
-   * @param childTokens the new children
-   * @since 4.10.0
-   */
-  public void childTokens(final List<Token> childTokens) {
-    this.childTokens = childTokens;
-  }
+    /**
+     * Sets the children of this token.
+     *
+     * @param childTokens the new children
+     * @since 4.10.0
+     */
+    public void childTokens(final List<Token> childTokens) {
+        this.childTokens = childTokens;
+    }
 
-  /**
-   * Get the value of this token from the complete message.
-   *
-   * @param message the message to read
-   * @return the value of this token
-   * @since 4.10.0
-   */
-  public CharSequence get(final CharSequence message) {
-    return message.subSequence(this.startIndex, this.endIndex);
-  }
+    /**
+     * Get the value of this token from the complete message.
+     *
+     * @param message the message to read
+     * @return the value of this token
+     * @since 4.10.0
+     */
+    public CharSequence get(final CharSequence message) {
+        return message.subSequence(this.startIndex, this.endIndex);
+    }
 
-  @Override
-  public @NotNull Stream<? extends ExaminableProperty> examinableProperties() {
-    return Stream.of(
-      ExaminableProperty.of("startIndex", this.startIndex),
-      ExaminableProperty.of("endIndex", this.endIndex),
-      ExaminableProperty.of("type", this.type)
-    );
-  }
+    @Override
+    public @NotNull Stream<? extends ExaminableProperty> examinableProperties() {
+        return Stream.of(
+                ExaminableProperty.of("startIndex", this.startIndex),
+                ExaminableProperty.of("endIndex", this.endIndex),
+                ExaminableProperty.of("type", this.type)
+        );
+    }
 
-  @Override
-  public boolean equals(final Object other) {
-    if (this == other) return true;
-    if (!(other instanceof Token)) return false;
-    final Token that = (Token) other;
-    return this.startIndex == that.startIndex && this.endIndex == that.endIndex && this.type == that.type;
-  }
+    @Override
+    public boolean equals(final Object other) {
+        if (this == other) return true;
+        if (!(other instanceof Token that)) return false;
+        return this.startIndex == that.startIndex && this.endIndex == that.endIndex && this.type == that.type;
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.startIndex, this.endIndex, this.type);
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.startIndex, this.endIndex, this.type);
+    }
 
-  @Override
-  public String toString() {
-    return Internals.toString(this);
-  }
+    @Override
+    public String toString() {
+        return Internals.toString(this);
+    }
 }

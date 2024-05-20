@@ -1,0 +1,378 @@
+--- a/net/minecraft/network/syncher/SynchedEntityData.java
++++ b/net/minecraft/network/syncher/SynchedEntityData.java
+@@ -7,7 +7,9 @@
+ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+ import it.unimi.dsi.fastutil.objects.Object2IntMap;
+ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
++import it.unimi.dsi.fastutil.objects.ObjectIterator;
+ import java.util.ArrayList;
++import java.util.Iterator;
+ import java.util.List;
+ import java.util.Locale;
+ import java.util.Objects;
+@@ -15,20 +17,22 @@
+ import java.util.concurrent.locks.ReentrantReadWriteLock;
+ import javax.annotation.Nullable;
+ import net.minecraft.CrashReport;
+-import net.minecraft.CrashReportCategory;
+ import net.minecraft.ReportedException;
+ import net.minecraft.network.FriendlyByteBuf;
++import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
++import net.minecraft.server.level.ServerPlayer;
+ import net.minecraft.world.entity.Entity;
+ import org.apache.commons.lang3.ObjectUtils;
+ import org.slf4j.Logger;
+ 
+ public class SynchedEntityData {
++
+     private static final Logger LOGGER = LogUtils.getLogger();
+-    private static final Object2IntMap<Class<? extends Entity>> ENTITY_ID_POOL = new Object2IntOpenHashMap<>();
++    private static final Object2IntMap<Class<? extends Entity>> ENTITY_ID_POOL = new Object2IntOpenHashMap();
+     private static final int MAX_ID_VALUE = 254;
+     private final Entity entity;
+-    private final Int2ObjectMap<SynchedEntityData.DataItem<?>> itemsById = new Int2ObjectOpenHashMap<>();
+-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
++    private final Int2ObjectMap<SynchedEntityData.DataItem<?>> itemsById = new Int2ObjectOpenHashMap();
++    // private final ReadWriteLock lock = new ReentrantReadWriteLock(); // Spigot - not required
+     private boolean isDirty;
+ 
+     public SynchedEntityData(Entity trackedEntity) {
+@@ -36,27 +40,30 @@
+     }
+ 
+     public static <T> EntityDataAccessor<T> defineId(Class<? extends Entity> entityClass, EntityDataSerializer<T> dataHandler) {
+-        if (LOGGER.isDebugEnabled()) {
++        if (SynchedEntityData.LOGGER.isDebugEnabled()) {
+             try {
+-                Class<?> class_ = Class.forName(Thread.currentThread().getStackTrace()[2].getClassName());
+-                if (!class_.equals(entityClass)) {
+-                    LOGGER.debug("defineId called for: {} from {}", entityClass, class_, new RuntimeException());
++                Class<?> oclass1 = Class.forName(Thread.currentThread().getStackTrace()[2].getClassName());
++
++                if (!oclass1.equals(entityClass)) {
++                    SynchedEntityData.LOGGER.debug("defineId called for: {} from {}", new Object[]{entityClass, oclass1, new RuntimeException()});
+                 }
+-            } catch (ClassNotFoundException var5) {
++            } catch (ClassNotFoundException classnotfoundexception) {
++                ;
+             }
+         }
+ 
+         int i;
+-        if (ENTITY_ID_POOL.containsKey(entityClass)) {
+-            i = ENTITY_ID_POOL.getInt(entityClass) + 1;
++
++        if (SynchedEntityData.ENTITY_ID_POOL.containsKey(entityClass)) {
++            i = SynchedEntityData.ENTITY_ID_POOL.getInt(entityClass) + 1;
+         } else {
+             int j = 0;
+-            Class<?> class2 = entityClass;
++            Class oclass2 = entityClass;
+ 
+-            while(class2 != Entity.class) {
+-                class2 = class2.getSuperclass();
+-                if (ENTITY_ID_POOL.containsKey(class2)) {
+-                    j = ENTITY_ID_POOL.getInt(class2) + 1;
++            while (oclass2 != Entity.class) {
++                oclass2 = oclass2.getSuperclass();
++                if (SynchedEntityData.ENTITY_ID_POOL.containsKey(oclass2)) {
++                    j = SynchedEntityData.ENTITY_ID_POOL.getInt(oclass2) + 1;
+                     break;
+                 }
+             }
+@@ -67,47 +74,60 @@
+         if (i > 254) {
+             throw new IllegalArgumentException("Data value id is too big with " + i + "! (Max is 254)");
+         } else {
+-            ENTITY_ID_POOL.put(entityClass, i);
++            SynchedEntityData.ENTITY_ID_POOL.put(entityClass, i);
+             return dataHandler.createAccessor(i);
+         }
+     }
+ 
++    public boolean registrationLocked; // Spigot
+     public <T> void define(EntityDataAccessor<T> key, T initialValue) {
++        if (this.registrationLocked) throw new IllegalStateException("Registering datawatcher object after entity initialization"); // Spigot
+         int i = key.getId();
++
+         if (i > 254) {
+             throw new IllegalArgumentException("Data value id is too big with " + i + "! (Max is 254)");
+         } else if (this.itemsById.containsKey(i)) {
+             throw new IllegalArgumentException("Duplicate id value for " + i + "!");
+         } else if (EntityDataSerializers.getSerializedId(key.getSerializer()) < 0) {
+-            throw new IllegalArgumentException("Unregistered serializer " + key.getSerializer() + " for " + i + "!");
++            EntityDataSerializer datawatcherserializer = key.getSerializer();
++
++            throw new IllegalArgumentException("Unregistered serializer " + datawatcherserializer + " for " + i + "!");
+         } else {
+             this.createDataItem(key, initialValue);
+         }
+     }
+ 
+     private <T> void createDataItem(EntityDataAccessor<T> key, T value) {
+-        SynchedEntityData.DataItem<T> dataItem = new SynchedEntityData.DataItem<>(key, value);
+-        this.lock.writeLock().lock();
+-        this.itemsById.put(key.getId(), dataItem);
+-        this.lock.writeLock().unlock();
++        SynchedEntityData.DataItem<T> datawatcher_item = new SynchedEntityData.DataItem<>(key, value);
++
++        // this.lock.writeLock().lock(); // Spigot - not required
++        this.itemsById.put(key.getId(), datawatcher_item);
++        // this.lock.writeLock().unlock(); // Spigot - not required
+     }
+ 
+     private <T> SynchedEntityData.DataItem<T> getItem(EntityDataAccessor<T> key) {
++        // Spigot start
++        /*
+         this.lock.readLock().lock();
+ 
+-        SynchedEntityData.DataItem<T> dataItem;
++        DataWatcher.Item datawatcher_item;
++
+         try {
+-            dataItem = this.itemsById.get(key.getId());
+-        } catch (Throwable var9) {
+-            CrashReport crashReport = CrashReport.forThrowable(var9, "Getting synched entity data");
+-            CrashReportCategory crashReportCategory = crashReport.addCategory("Synched entity data");
+-            crashReportCategory.setDetail("Data ID", key);
+-            throw new ReportedException(crashReport);
++            datawatcher_item = (DataWatcher.Item) this.itemsById.get(datawatcherobject.getId());
++        } catch (Throwable throwable) {
++            CrashReport crashreport = CrashReport.forThrowable(throwable, "Getting synched entity data");
++            CrashReportSystemDetails crashreportsystemdetails = crashreport.addCategory("Synched entity data");
++
++            crashreportsystemdetails.setDetail("Data ID", (Object) datawatcherobject);
++            throw new ReportedException(crashreport);
+         } finally {
+             this.lock.readLock().unlock();
+         }
+ 
+-        return dataItem;
++        return datawatcher_item;
++        */
++        return (SynchedEntityData.DataItem) this.itemsById.get(key.getId());
++        // Spigot end
+     }
+ 
+     public <T> T get(EntityDataAccessor<T> data) {
+@@ -115,16 +135,24 @@
+     }
+ 
+     public <T> void set(EntityDataAccessor<T> key, T value) {
+-        SynchedEntityData.DataItem<T> dataItem = this.getItem(key);
+-        if (ObjectUtils.notEqual(value, dataItem.getValue())) {
+-            dataItem.setValue(value);
++        SynchedEntityData.DataItem<T> datawatcher_item = this.getItem(key);
++
++        if (ObjectUtils.notEqual(value, datawatcher_item.getValue())) {
++            datawatcher_item.setValue(value);
+             this.entity.onSyncedDataUpdated(key);
+-            dataItem.setDirty(true);
++            datawatcher_item.setDirty(true);
+             this.isDirty = true;
+         }
+ 
+     }
+ 
++    // CraftBukkit start - add method from above
++    public <T> void markDirty(EntityDataAccessor<T> datawatcherobject) {
++        this.getItem(datawatcherobject).setDirty(true);
++        this.isDirty = true;
++    }
++    // CraftBukkit end
++
+     public boolean isDirty() {
+         return this.isDirty;
+     }
+@@ -132,21 +160,25 @@
+     @Nullable
+     public List<SynchedEntityData.DataValue<?>> packDirty() {
+         List<SynchedEntityData.DataValue<?>> list = null;
++
+         if (this.isDirty) {
+-            this.lock.readLock().lock();
++            // this.lock.readLock().lock(); // Spigot - not required
++            ObjectIterator objectiterator = this.itemsById.values().iterator();
+ 
+-            for(SynchedEntityData.DataItem<?> dataItem : this.itemsById.values()) {
+-                if (dataItem.isDirty()) {
+-                    dataItem.setDirty(false);
++            while (objectiterator.hasNext()) {
++                SynchedEntityData.DataItem<?> datawatcher_item = (SynchedEntityData.DataItem) objectiterator.next();
++
++                if (datawatcher_item.isDirty()) {
++                    datawatcher_item.setDirty(false);
+                     if (list == null) {
+-                        list = new ArrayList<>();
++                        list = new ArrayList();
+                     }
+ 
+-                    list.add(dataItem.value());
++                    list.add(datawatcher_item.value());
+                 }
+             }
+ 
+-            this.lock.readLock().unlock();
++            // this.lock.readLock().unlock(); // Spigot - not required
+         }
+ 
+         this.isDirty = false;
+@@ -156,35 +188,43 @@
+     @Nullable
+     public List<SynchedEntityData.DataValue<?>> getNonDefaultValues() {
+         List<SynchedEntityData.DataValue<?>> list = null;
+-        this.lock.readLock().lock();
+ 
+-        for(SynchedEntityData.DataItem<?> dataItem : this.itemsById.values()) {
+-            if (!dataItem.isSetToDefault()) {
++        // this.lock.readLock().lock(); // Spigot - not required
++        ObjectIterator objectiterator = this.itemsById.values().iterator();
++
++        while (objectiterator.hasNext()) {
++            SynchedEntityData.DataItem<?> datawatcher_item = (SynchedEntityData.DataItem) objectiterator.next();
++
++            if (!datawatcher_item.isSetToDefault()) {
+                 if (list == null) {
+-                    list = new ArrayList<>();
++                    list = new ArrayList();
+                 }
+ 
+-                list.add(dataItem.value());
++                list.add(datawatcher_item.value());
+             }
+         }
+ 
+-        this.lock.readLock().unlock();
++        // this.lock.readLock().unlock(); // Spigot - not required
+         return list;
+     }
+ 
+     public void assignValues(List<SynchedEntityData.DataValue<?>> entries) {
+-        this.lock.writeLock().lock();
++        // this.lock.writeLock().lock(); // Spigot - not required
+ 
+         try {
+-            for(SynchedEntityData.DataValue<?> dataValue : entries) {
+-                SynchedEntityData.DataItem<?> dataItem = this.itemsById.get(dataValue.id);
+-                if (dataItem != null) {
+-                    this.assignValue(dataItem, dataValue);
+-                    this.entity.onSyncedDataUpdated(dataItem.getAccessor());
++            Iterator iterator = entries.iterator();
++
++            while (iterator.hasNext()) {
++                SynchedEntityData.DataValue<?> datawatcher_b = (SynchedEntityData.DataValue) iterator.next();
++                SynchedEntityData.DataItem<?> datawatcher_item = (SynchedEntityData.DataItem) this.itemsById.get(datawatcher_b.id);
++
++                if (datawatcher_item != null) {
++                    this.assignValue(datawatcher_item, datawatcher_b);
++                    this.entity.onSyncedDataUpdated(datawatcher_item.getAccessor());
+                 }
+             }
+         } finally {
+-            this.lock.writeLock().unlock();
++            // this.lock.writeLock().unlock(); // Spigot - not required
+         }
+ 
+     }
+@@ -193,7 +233,7 @@
+         if (!Objects.equals(from.serializer(), to.accessor.getSerializer())) {
+             throw new IllegalStateException(String.format(Locale.ROOT, "Invalid entity data item type for field %d on entity %s: old=%s(%s), new=%s(%s)", to.accessor.getId(), this.entity, to.value, to.value.getClass(), from.value, from.value.getClass()));
+         } else {
+-            to.setValue(from.value);
++            to.setValue((T) from.value); // CraftBukkit - decompile error
+         }
+     }
+ 
+@@ -201,7 +241,52 @@
+         return this.itemsById.isEmpty();
+     }
+ 
++    // CraftBukkit start
++    public void refresh(ServerPlayer to) {
++        if (!this.isEmpty()) {
++            List<SynchedEntityData.DataValue<?>> list = this.packAll(); // Paper - Update EVERYTHING not just not default
++
++            if (list != null) {
++                if (to.getBukkitEntity().canSee(this.entity.getBukkitEntity())) { // Paper
++                to.connection.send(new ClientboundSetEntityDataPacket(this.entity.getId(), list));
++                } // Paper
++            }
++        }
++    }
++    // CraftBukkit end
++    // Paper start
++    // We need to pack all as we cannot rely on "non default values" or "dirty" ones.
++    // Because these values can possibly be desynced on the client.
++    @Nullable
++    private List<SynchedEntityData.DataValue<?>> packAll() {
++        if (this.isEmpty()) {
++            return null;
++        }
++
++        List<SynchedEntityData.DataValue<?>> list = new ArrayList<>();
++        for (DataItem<?> dataItem : this.itemsById.values()) {
++            list.add(dataItem.value());
++        }
++
++        return list;
++    }
++
++    // This method should only be used if the data of an entity could have became desynced
++    // due to interactions on the client.
++    public void resendPossiblyDesyncedEntity(ServerPlayer player) {
++        if (this.entity.tracker == null) {
++            return;
++        }
++
++        net.minecraft.server.level.ServerEntity serverEntity = this.entity.tracker.serverEntity;
++        if (player.getBukkitEntity().canSee(entity.getBukkitEntity())) {
++            serverEntity.sendPairingData(player.connection::send, player);
++        }
++    }
++    // Paper end
++
+     public static class DataItem<T> {
++
+         final EntityDataAccessor<T> accessor;
+         T value;
+         private final T initialValue;
+@@ -242,14 +327,17 @@
+         }
+     }
+ 
+-    public static record DataValue<T>(int id, EntityDataSerializer<T> serializer, T value) {
++    public static record DataValue<T>(int id, EntityDataSerializer<T> serializer, T value) { // CraftBukkit - decompile error
++
+         public static <T> SynchedEntityData.DataValue<T> create(EntityDataAccessor<T> data, T value) {
+-            EntityDataSerializer<T> entityDataSerializer = data.getSerializer();
+-            return new SynchedEntityData.DataValue<>(data.getId(), entityDataSerializer, entityDataSerializer.copy(value));
++            EntityDataSerializer<T> datawatcherserializer = data.getSerializer();
++
++            return new SynchedEntityData.DataValue<>(data.getId(), datawatcherserializer, datawatcherserializer.copy(value));
+         }
+ 
+         public void write(FriendlyByteBuf buf) {
+             int i = EntityDataSerializers.getSerializedId(this.serializer);
++
+             if (i < 0) {
+                 throw new EncoderException("Unknown serializer type " + this.serializer);
+             } else {
+@@ -260,12 +348,13 @@
+         }
+ 
+         public static SynchedEntityData.DataValue<?> read(FriendlyByteBuf buf, int id) {
+-            int i = buf.readVarInt();
+-            EntityDataSerializer<?> entityDataSerializer = EntityDataSerializers.getSerializer(i);
+-            if (entityDataSerializer == null) {
+-                throw new DecoderException("Unknown serializer type " + i);
++            int j = buf.readVarInt();
++            EntityDataSerializer<?> datawatcherserializer = EntityDataSerializers.getSerializer(j);
++
++            if (datawatcherserializer == null) {
++                throw new DecoderException("Unknown serializer type " + j);
+             } else {
+-                return read(buf, id, entityDataSerializer);
++                return read(buf, id, datawatcherserializer);
+             }
+         }
+ 

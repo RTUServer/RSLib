@@ -1,0 +1,16 @@
+--- a/net/minecraft/network/protocol/game/ClientboundMoveEntityPacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundMoveEntityPacket.java
+@@ -21,11 +21,11 @@
+     protected final boolean hasPos;
+ 
+     public static long entityToPacket(double coord) {
+-        return Mth.lfloor(coord * 4096.0D);
++        return Mth.lfloor(coord * 4096.0D); // Paper - check ItemEntity#setPosRaw on update
+     }
+ 
+     public static double packetToEntity(long coord) {
+-        return (double)coord / 4096.0D;
++        return (double)coord / 4096.0D; // Paper - check ItemEntity#setPosRaw on update
+     }
+ 
+     public Vec3 updateEntityPosition(Vec3 orig) {

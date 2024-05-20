@@ -1,0 +1,14 @@
+--- a/net/minecraft/server/dedicated/DedicatedPlayerList.java
++++ b/net/minecraft/server/dedicated/DedicatedPlayerList.java
+@@ -16,6 +16,11 @@
+         DedicatedServerProperties dedicatedServerProperties = server.getProperties();
+         this.setViewDistance(dedicatedServerProperties.viewDistance);
+         super.setUsingWhiteList(dedicatedServerProperties.whiteList.get());
++        // Paper start - moved from constructor
++    }
++    @Override
++    public void loadAndSaveFiles() {
++        // Paper end
+         this.loadUserBanList();
+         this.saveUserBanList();
+         this.loadIpBanList();

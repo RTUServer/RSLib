@@ -1,0 +1,39 @@
+--- a/net/minecraft/world/level/entity/EntityLookup.java
++++ b/net/minecraft/world/level/entity/EntityLookup.java
+@@ -20,7 +20,7 @@
+         for(T entityAccess : this.byId.values()) {
+             U entityAccess2 = (U)((EntityAccess)filter.tryCast(entityAccess));
+             if (entityAccess2 != null) {
+-                action.accept((T)entityAccess2);
++                action.accept(entityAccess2); // Paper - decompile fix
+             }
+         }
+ 
+@@ -34,6 +34,27 @@
+         UUID uUID = entity.getUUID();
+         if (this.byUuid.containsKey(uUID)) {
+             LOGGER.warn("Duplicate entity UUID {}: {}", uUID, entity);
++            // Paper start - extra debug info
++            if (entity instanceof net.minecraft.world.entity.Entity) {
++                if (net.minecraft.server.level.ServerLevel.DEBUG_ENTITIES) {
++                    ((net.minecraft.world.entity.Entity) entity).addedToWorldStack = net.minecraft.server.level.ServerLevel.getAddToWorldStackTrace((net.minecraft.world.entity.Entity) entity);
++                }
++
++                T old = this.byUuid.get(entity.getUUID());
++                if (old instanceof net.minecraft.world.entity.Entity && old != null && old.getId() != entity.getId() && ((net.minecraft.world.entity.Entity) old).valid) {
++                    Logger logger = LogManager.getLogger();
++                    logger.error("Overwrote an existing entity " + old + " with " + entity);
++                    if (net.minecraft.server.level.ServerLevel.DEBUG_ENTITIES) {
++                        if (((net.minecraft.world.entity.Entity) old).addedToWorldStack != null) {
++                            ((net.minecraft.world.entity.Entity) old).addedToWorldStack.printStackTrace();
++                        } else {
++                            logger.error("Oddly, the old entity was not added to the world in the normal way. Plugins?");
++                        }
++                        ((net.minecraft.world.entity.Entity) entity).addedToWorldStack.printStackTrace();
++                    }
++                }
++            }
++            // Paper end
+         } else {
+             this.byUuid.put(uUID, entity);
+             this.byId.put(entity.getId(), entity);

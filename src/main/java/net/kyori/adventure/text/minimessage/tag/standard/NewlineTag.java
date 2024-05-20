@@ -39,27 +39,27 @@ import org.jetbrains.annotations.Nullable;
  * @since 4.10.0
  */
 final class NewlineTag {
-  private static final String BR = "br";
-  private static final String NEWLINE = "newline";
+    private static final String BR = "br";
+    private static final String NEWLINE = "newline";
 
-  static final TagResolver RESOLVER = SerializableResolver.claimingComponent(
-    StandardTags.names(NEWLINE, BR),
-    NewlineTag::create,
-    NewlineTag::claimComponent
-  );
+    static final TagResolver RESOLVER = SerializableResolver.claimingComponent(
+            StandardTags.names(NEWLINE, BR),
+            NewlineTag::create,
+            NewlineTag::claimComponent
+    );
 
-  private NewlineTag() {
-  }
-
-  static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
-    return Tag.selfClosingInserting(Component.newline());
-  }
-
-  static @Nullable Emitable claimComponent(final Component input) {
-    if (Component.newline().equals(input)) {
-      return emit -> emit.selfClosingTag(BR);
-    } else {
-      return null;
+    private NewlineTag() {
     }
-  }
+
+    static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
+        return Tag.selfClosingInserting(Component.newline());
+    }
+
+    static @Nullable Emitable claimComponent(final Component input) {
+        if (Component.newline().equals(input)) {
+            return emit -> emit.selfClosingTag(BR);
+        } else {
+            return null;
+        }
+    }
 }

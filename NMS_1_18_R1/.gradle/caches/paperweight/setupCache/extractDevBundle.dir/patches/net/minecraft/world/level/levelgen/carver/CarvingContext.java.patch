@@ -1,0 +1,13 @@
+--- a/net/minecraft/world/level/levelgen/carver/CarvingContext.java
++++ b/net/minecraft/world/level/levelgen/carver/CarvingContext.java
+@@ -17,8 +17,8 @@
+     private final RegistryAccess registryAccess;
+     private final NoiseChunk noiseChunk;
+ 
+-    public CarvingContext(NoiseBasedChunkGenerator chunkGenerator, RegistryAccess registryManager, LevelHeightAccessor heightLimitView, NoiseChunk chunkNoiseSampler) {
+-        super(chunkGenerator, heightLimitView);
++    public CarvingContext(NoiseBasedChunkGenerator chunkGenerator, RegistryAccess registryManager, LevelHeightAccessor heightLimitView, NoiseChunk chunkNoiseSampler, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level level) { // Paper
++        super(chunkGenerator, heightLimitView, level); // Paper
+         this.generator = chunkGenerator;
+         this.registryAccess = registryManager;
+         this.noiseChunk = chunkNoiseSampler;

@@ -33,32 +33,31 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 final class CallbackStylingTagImpl extends AbstractTag implements Inserting {
-  private final Consumer<Style.Builder> styles;
+    private final Consumer<Style.Builder> styles;
 
-  CallbackStylingTagImpl(final Consumer<Style.Builder> styles) {
-    this.styles = styles;
-  }
+    CallbackStylingTagImpl(final Consumer<Style.Builder> styles) {
+        this.styles = styles;
+    }
 
-  @Override
-  public @NotNull Component value() {
-    return Component.text("", Style.style(this.styles));
-  }
+    @Override
+    public @NotNull Component value() {
+        return Component.text("", Style.style(this.styles));
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.styles);
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.styles);
+    }
 
-  @Override
-  public boolean equals(final Object other) {
-    if (this == other) return true;
-    if (!(other instanceof CallbackStylingTagImpl)) return false;
-    final CallbackStylingTagImpl that = (CallbackStylingTagImpl) other;
-    return Objects.equals(this.styles, that.styles);
-  }
+    @Override
+    public boolean equals(final Object other) {
+        if (this == other) return true;
+        if (!(other instanceof CallbackStylingTagImpl that)) return false;
+        return Objects.equals(this.styles, that.styles);
+    }
 
-  @Override
-  public @NotNull Stream<? extends ExaminableProperty> examinableProperties() {
-    return Stream.of(ExaminableProperty.of("styles", this.styles));
-  }
+    @Override
+    public @NotNull Stream<? extends ExaminableProperty> examinableProperties() {
+        return Stream.of(ExaminableProperty.of("styles", this.styles));
+    }
 }

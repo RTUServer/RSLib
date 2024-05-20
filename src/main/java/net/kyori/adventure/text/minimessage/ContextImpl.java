@@ -47,126 +47,126 @@ import static java.util.Objects.requireNonNull;
  * @since 4.10.0
  */
 class ContextImpl implements Context {
-  private static final Token[] EMPTY_TOKEN_ARRAY = new Token[0];
+    private static final Token[] EMPTY_TOKEN_ARRAY = new Token[0];
 
-  private final boolean strict;
-  private final Consumer<String> debugOutput;
-  private String message;
-  private final MiniMessage miniMessage;
-  private final @Nullable Pointered target;
-  private final TagResolver tagResolver;
-  private final UnaryOperator<String> preProcessor;
-  private final UnaryOperator<Component> postProcessor;
+    private final boolean strict;
+    private final Consumer<String> debugOutput;
+    private final MiniMessage miniMessage;
+    private final @Nullable Pointered target;
+    private final TagResolver tagResolver;
+    private final UnaryOperator<String> preProcessor;
+    private final UnaryOperator<Component> postProcessor;
+    private String message;
 
-  ContextImpl(
-    final boolean strict,
-    final Consumer<String> debugOutput,
-    final String message,
-    final MiniMessage miniMessage,
-    final @Nullable Pointered target,
-    final @Nullable TagResolver extraTags,
-    final @Nullable UnaryOperator<String> preProcessor,
-    final @Nullable UnaryOperator<Component> postProcessor
-  ) {
-    this.strict = strict;
-    this.debugOutput = debugOutput;
-    this.message = message;
-    this.miniMessage = miniMessage;
-    this.target = target;
-    this.tagResolver = extraTags == null ? TagResolver.empty() : extraTags;
-    this.preProcessor = preProcessor == null ? UnaryOperator.identity() : preProcessor;
-    this.postProcessor = postProcessor == null ? UnaryOperator.identity() : postProcessor;
-  }
-
-  public boolean strict() {
-    return this.strict;
-  }
-
-  public Consumer<String> debugOutput() {
-    return this.debugOutput;
-  }
-
-  public @NotNull String message() {
-    return this.message;
-  }
-
-  void message(final @NotNull String message) {
-    this.message = message;
-  }
-
-  public @NotNull TagResolver extraTags() {
-    return this.tagResolver;
-  }
-
-  public UnaryOperator<Component> postProcessor() {
-    return this.postProcessor;
-  }
-
-  public UnaryOperator<String> preProcessor() {
-    return this.preProcessor;
-  }
-
-  @Override
-  public @Nullable Pointered target() {
-    return this.target;
-  }
-
-  @Override
-  public @NotNull Pointered targetOrThrow() {
-    if (this.target == null) {
-      throw this.newException("A target is required for this deserialization attempt");
-    } else {
-      return this.target;
+    ContextImpl(
+            final boolean strict,
+            final Consumer<String> debugOutput,
+            final String message,
+            final MiniMessage miniMessage,
+            final @Nullable Pointered target,
+            final @Nullable TagResolver extraTags,
+            final @Nullable UnaryOperator<String> preProcessor,
+            final @Nullable UnaryOperator<Component> postProcessor
+    ) {
+        this.strict = strict;
+        this.debugOutput = debugOutput;
+        this.message = message;
+        this.miniMessage = miniMessage;
+        this.target = target;
+        this.tagResolver = extraTags == null ? TagResolver.empty() : extraTags;
+        this.preProcessor = preProcessor == null ? UnaryOperator.identity() : preProcessor;
+        this.postProcessor = postProcessor == null ? UnaryOperator.identity() : postProcessor;
     }
-  }
 
-  @Override
-  public <T extends Pointered> @NotNull T targetAsType(final @NotNull Class<T> targetClass) {
-    if (requireNonNull(targetClass, "targetClass").isInstance(this.target)) {
-      return targetClass.cast(this.target);
-    } else {
-      throw this.newException("A target with type " + targetClass.getSimpleName() + " is required for this deserialization attempt");
+    private static Token[] tagsToTokens(final List<? extends Tag.Argument> tags) {
+        final Token[] tokens = new Token[tags.size()];
+        for (int i = 0, length = tokens.length; i < length; i++) {
+            tokens[i] = ((TagPart) tags.get(i)).token();
+        }
+        return tokens;
     }
-  }
 
-  @Override
-  public @NotNull Component deserialize(final @NotNull String message) {
-    return this.miniMessage.deserialize(requireNonNull(message, "message"), this.tagResolver);
-  }
-
-  @Override
-  public @NotNull Component deserialize(final @NotNull String message, final @NotNull TagResolver resolver) {
-    return this.miniMessage.deserialize(requireNonNull(message, "message"),
-      TagResolver.builder().resolver(this.tagResolver).resolver(requireNonNull(resolver, "resolver")).build());
-  }
-
-  @Override
-  public @NotNull Component deserialize(final @NotNull String message, final @NotNull TagResolver@NotNull... resolvers) {
-    return this.miniMessage.deserialize(requireNonNull(message, "message"),
-      TagResolver.builder().resolver(this.tagResolver).resolvers(requireNonNull(resolvers, "resolvers")).build());
-  }
-
-  @Override
-  public @NotNull ParsingException newException(final @NotNull String message) {
-    return new ParsingExceptionImpl(message, this.message, null, false, EMPTY_TOKEN_ARRAY);
-  }
-
-  @Override
-  public @NotNull ParsingException newException(final @NotNull String message, final @NotNull ArgumentQueue tags) {
-    return new ParsingExceptionImpl(message, this.message, null, false, tagsToTokens(((ArgumentQueueImpl<?>) tags).args));
-  }
-
-  @Override
-  public @NotNull ParsingException newException(final @NotNull String message, final @Nullable Throwable cause, final @NotNull ArgumentQueue tags) {
-    return new ParsingExceptionImpl(message, this.message, cause, false, tagsToTokens(((ArgumentQueueImpl<?>) tags).args));
-  }
-
-  private static Token[] tagsToTokens(final List<? extends Tag.Argument> tags) {
-    final Token[] tokens = new Token[tags.size()];
-    for (int i = 0, length = tokens.length; i < length; i++) {
-      tokens[i] = ((TagPart) tags.get(i)).token();
+    public boolean strict() {
+        return this.strict;
     }
-    return tokens;
-  }
+
+    public Consumer<String> debugOutput() {
+        return this.debugOutput;
+    }
+
+    public @NotNull String message() {
+        return this.message;
+    }
+
+    void message(final @NotNull String message) {
+        this.message = message;
+    }
+
+    public @NotNull TagResolver extraTags() {
+        return this.tagResolver;
+    }
+
+    public UnaryOperator<Component> postProcessor() {
+        return this.postProcessor;
+    }
+
+    public UnaryOperator<String> preProcessor() {
+        return this.preProcessor;
+    }
+
+    @Override
+    public @Nullable Pointered target() {
+        return this.target;
+    }
+
+    @Override
+    public @NotNull Pointered targetOrThrow() {
+        if (this.target == null) {
+            throw this.newException("A target is required for this deserialization attempt");
+        } else {
+            return this.target;
+        }
+    }
+
+    @Override
+    public <T extends Pointered> @NotNull T targetAsType(final @NotNull Class<T> targetClass) {
+        if (requireNonNull(targetClass, "targetClass").isInstance(this.target)) {
+            return targetClass.cast(this.target);
+        } else {
+            throw this.newException("A target with type " + targetClass.getSimpleName() + " is required for this deserialization attempt");
+        }
+    }
+
+    @Override
+    public @NotNull Component deserialize(final @NotNull String message) {
+        return this.miniMessage.deserialize(requireNonNull(message, "message"), this.tagResolver);
+    }
+
+    @Override
+    public @NotNull Component deserialize(final @NotNull String message, final @NotNull TagResolver resolver) {
+        return this.miniMessage.deserialize(requireNonNull(message, "message"),
+                TagResolver.builder().resolver(this.tagResolver).resolver(requireNonNull(resolver, "resolver")).build());
+    }
+
+    @Override
+    public @NotNull Component deserialize(final @NotNull String message, final @NotNull TagResolver @NotNull ... resolvers) {
+        return this.miniMessage.deserialize(requireNonNull(message, "message"),
+                TagResolver.builder().resolver(this.tagResolver).resolvers(requireNonNull(resolvers, "resolvers")).build());
+    }
+
+    @Override
+    public @NotNull ParsingException newException(final @NotNull String message) {
+        return new ParsingExceptionImpl(message, this.message, null, false, EMPTY_TOKEN_ARRAY);
+    }
+
+    @Override
+    public @NotNull ParsingException newException(final @NotNull String message, final @NotNull ArgumentQueue tags) {
+        return new ParsingExceptionImpl(message, this.message, null, false, tagsToTokens(((ArgumentQueueImpl<?>) tags).args));
+    }
+
+    @Override
+    public @NotNull ParsingException newException(final @NotNull String message, final @Nullable Throwable cause, final @NotNull ArgumentQueue tags) {
+        return new ParsingExceptionImpl(message, this.message, cause, false, tagsToTokens(((ArgumentQueueImpl<?>) tags).args));
+    }
 
 }

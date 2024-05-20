@@ -40,114 +40,114 @@ import java.util.Objects;
  * @since 4.10.0
  */
 public final class TagNode extends ElementNode {
-  private final List<TagPart> parts;
-  private @Nullable Tag tag = null;
+    private final List<TagPart> parts;
+    private @Nullable Tag tag = null;
 
-  /**
-   * Creates a new element node.
-   *
-   * @param parent the parent of this node
-   * @param token the token that created this node
-   * @param sourceMessage the source message
-   * @param tagProvider the tag provider
-   * @since 4.10.0
-   */
-  public TagNode(
-      final @NotNull ElementNode parent,
-      final @NotNull Token token,
-      final @NotNull String sourceMessage,
-      final TokenParser.@NotNull TagProvider tagProvider
-  ) {
-    super(parent, token, sourceMessage);
-    this.parts = genParts(token, sourceMessage, tagProvider);
+    /**
+     * Creates a new element node.
+     *
+     * @param parent        the parent of this node
+     * @param token         the token that created this node
+     * @param sourceMessage the source message
+     * @param tagProvider   the tag provider
+     * @since 4.10.0
+     */
+    public TagNode(
+            final @NotNull ElementNode parent,
+            final @NotNull Token token,
+            final @NotNull String sourceMessage,
+            final TokenParser.@NotNull TagProvider tagProvider
+    ) {
+        super(parent, token, sourceMessage);
+        this.parts = genParts(token, sourceMessage, tagProvider);
 
-    // Assert the tag node has parts.
-    if (this.parts.isEmpty()) {
-      throw new ParsingExceptionImpl("Tag has no parts? " + this, this.sourceMessage(), this.token());
-    }
-  }
-
-  private static @NotNull List<TagPart> genParts(
-    final @NotNull Token token,
-    final @NotNull String sourceMessage,
-    final TokenParser.@NotNull TagProvider tagProvider
-  ) {
-    final ArrayList<TagPart> parts = new ArrayList<>();
-
-    if (token.childTokens() != null) {
-      for (final Token childToken : token.childTokens()) {
-        parts.add(new TagPart(sourceMessage, childToken, tagProvider));
-      }
+        // Assert the tag node has parts.
+        if (this.parts.isEmpty()) {
+            throw new ParsingExceptionImpl("Tag has no parts? " + this, this.sourceMessage(), this.token());
+        }
     }
 
-    return parts;
-  }
+    private static @NotNull List<TagPart> genParts(
+            final @NotNull Token token,
+            final @NotNull String sourceMessage,
+            final TokenParser.@NotNull TagProvider tagProvider
+    ) {
+        final ArrayList<TagPart> parts = new ArrayList<>();
 
-  /**
-   * Returns the parts of this tag.
-   *
-   * @return the parts
-   * @since 4.10.0
-   */
-  public @NotNull List<TagPart> parts() {
-    return this.parts;
-  }
+        if (token.childTokens() != null) {
+            for (final Token childToken : token.childTokens()) {
+                parts.add(new TagPart(sourceMessage, childToken, tagProvider));
+            }
+        }
 
-  /**
-   * Returns the name of this tag.
-   *
-   * @return the name
-   * @since 4.10.0
-   */
-  public @NotNull String name() {
-    return this.parts.get(0).value();
-  }
-
-  @Override
-  public @NotNull Token token() {
-    return Objects.requireNonNull(super.token(), "token is not set");
-  }
-
-  /**
-   * Gets the tag attached to this tag node.
-   *
-   * @return the tag for this tag node
-   * @since 4.10.0
-   */
-  public @NotNull Tag tag() {
-    return Objects.requireNonNull(this.tag, "no tag set");
-  }
-
-  /**
-   * Sets the tag logic that is represented by this tag node.
-   *
-   * @param tag the tag logic
-   * @since 4.10.0
-   */
-  public void tag(final @NotNull Tag tag) {
-    this.tag = tag;
-  }
-
-  @Override
-  public @NotNull StringBuilder buildToString(final @NotNull StringBuilder sb, final int indent) {
-    final char[] in = this.ident(indent);
-    sb.append(in).append("TagNode(");
-
-    final int size = this.parts.size();
-    for (int i = 0; i < size; i++) {
-      final TagPart part = this.parts.get(i);
-      sb.append('\'').append(part.value()).append('\'');
-      if (i != size - 1) {
-        sb.append(", ");
-      }
+        return parts;
     }
 
-    sb.append(") {\n");
-
-    for (final ElementNode child : this.children()) {
-      child.buildToString(sb, indent + 1);
+    /**
+     * Returns the parts of this tag.
+     *
+     * @return the parts
+     * @since 4.10.0
+     */
+    public @NotNull List<TagPart> parts() {
+        return this.parts;
     }
-    sb.append(in).append("}\n");
-    return sb;
-  }
+
+    /**
+     * Returns the name of this tag.
+     *
+     * @return the name
+     * @since 4.10.0
+     */
+    public @NotNull String name() {
+        return this.parts.get(0).value();
+    }
+
+    @Override
+    public @NotNull Token token() {
+        return Objects.requireNonNull(super.token(), "token is not set");
+    }
+
+    /**
+     * Gets the tag attached to this tag node.
+     *
+     * @return the tag for this tag node
+     * @since 4.10.0
+     */
+    public @NotNull Tag tag() {
+        return Objects.requireNonNull(this.tag, "no tag set");
+    }
+
+    /**
+     * Sets the tag logic that is represented by this tag node.
+     *
+     * @param tag the tag logic
+     * @since 4.10.0
+     */
+    public void tag(final @NotNull Tag tag) {
+        this.tag = tag;
+    }
+
+    @Override
+    public @NotNull StringBuilder buildToString(final @NotNull StringBuilder sb, final int indent) {
+        final char[] in = this.ident(indent);
+        sb.append(in).append("TagNode(");
+
+        final int size = this.parts.size();
+        for (int i = 0; i < size; i++) {
+            final TagPart part = this.parts.get(i);
+            sb.append('\'').append(part.value()).append('\'');
+            if (i != size - 1) {
+                sb.append(", ");
+            }
+        }
+
+        sb.append(") {\n");
+
+        for (final ElementNode child : this.children()) {
+            child.buildToString(sb, indent + 1);
+        }
+        sb.append(in).append("}\n");
+        return sb;
+    }
 }

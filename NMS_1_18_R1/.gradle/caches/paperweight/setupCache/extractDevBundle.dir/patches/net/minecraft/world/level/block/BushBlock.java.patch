@@ -1,0 +1,48 @@
+--- a/net/minecraft/world/level/block/BushBlock.java
++++ b/net/minecraft/world/level/block/BushBlock.java
+@@ -3,6 +3,8 @@
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Direction;
+ import net.minecraft.tags.BlockTags;
++import net.minecraft.tags.Tag;
++import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.world.level.BlockGetter;
+ import net.minecraft.world.level.LevelAccessor;
+ import net.minecraft.world.level.LevelReader;
+@@ -11,23 +13,32 @@
+ import net.minecraft.world.level.pathfinder.PathComputationType;
+ 
+ public class BushBlock extends Block {
++
+     protected BushBlock(BlockBehaviour.Properties settings) {
+         super(settings);
+     }
+ 
+     protected boolean mayPlaceOn(BlockState floor, BlockGetter world, BlockPos pos) {
+-        return floor.is(BlockTags.DIRT) || floor.is(Blocks.FARMLAND);
++        return floor.is((Tag) BlockTags.DIRT) || floor.is(Blocks.FARMLAND);
+     }
+ 
+     @Override
+     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+-        return !state.canSurvive(world, pos) ? Blocks.AIR.defaultBlockState() : super.updateShape(state, direction, neighborState, world, pos, neighborPos);
++        // CraftBukkit start
++        if (!state.canSurvive(world, pos)) {
++            if (!(world instanceof ServerLevel && ((ServerLevel) world).hasPhysicsEvent) || !org.bukkit.craftbukkit.v1_18_R1.event.CraftEventFactory.callBlockPhysicsEvent(world, pos).isCancelled()) { // Paper
++                return Blocks.AIR.defaultBlockState();
++            }
++        }
++        return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
++        // CraftBukkit end
+     }
+ 
+     @Override
+     public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
+-        BlockPos blockPos = pos.below();
+-        return this.mayPlaceOn(world.getBlockState(blockPos), world, blockPos);
++        BlockPos blockposition1 = pos.below();
++
++        return this.mayPlaceOn(world.getBlockState(blockposition1), world, blockposition1);
+     }
+ 
+     @Override

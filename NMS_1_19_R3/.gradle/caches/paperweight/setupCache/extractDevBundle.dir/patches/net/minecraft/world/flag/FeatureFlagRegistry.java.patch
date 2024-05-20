@@ -1,0 +1,135 @@
+--- a/net/minecraft/world/flag/FeatureFlagRegistry.java
++++ b/net/minecraft/world/flag/FeatureFlagRegistry.java
+@@ -6,18 +6,21 @@
+ import com.mojang.serialization.DataResult;
+ import java.util.Arrays;
+ import java.util.HashSet;
++import java.util.Iterator;
+ import java.util.LinkedHashMap;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Set;
+ import java.util.function.Consumer;
+ import net.minecraft.resources.ResourceLocation;
+ import org.slf4j.Logger;
+ 
+ public class FeatureFlagRegistry {
++
+     private static final Logger LOGGER = LogUtils.getLogger();
+     private final FeatureFlagUniverse universe;
+-    private final Map<ResourceLocation, FeatureFlag> names;
++    public final Map<ResourceLocation, FeatureFlag> names; // PAIL public
+     private final FeatureFlagSet allFlags;
+ 
+     FeatureFlagRegistry(FeatureFlagUniverse universe, FeatureFlagSet featureSet, Map<ResourceLocation, FeatureFlag> featureFlags) {
+@@ -35,8 +38,8 @@
+     }
+ 
+     public FeatureFlagSet fromNames(Iterable<ResourceLocation> features) {
+-        return this.fromNames(features, (feature) -> {
+-            LOGGER.warn("Unknown feature flag: {}", (Object)feature);
++        return this.fromNames(features, (minecraftkey) -> {
++            FeatureFlagRegistry.LOGGER.warn("Unknown feature flag: {}", minecraftkey);
+         });
+     }
+ 
+@@ -46,13 +49,16 @@
+ 
+     public FeatureFlagSet fromNames(Iterable<ResourceLocation> features, Consumer<ResourceLocation> unknownFlagConsumer) {
+         Set<FeatureFlag> set = Sets.newIdentityHashSet();
++        Iterator iterator = features.iterator();
+ 
+-        for(ResourceLocation resourceLocation : features) {
+-            FeatureFlag featureFlag = this.names.get(resourceLocation);
+-            if (featureFlag == null) {
+-                unknownFlagConsumer.accept(resourceLocation);
++        while (iterator.hasNext()) {
++            ResourceLocation minecraftkey = (ResourceLocation) iterator.next();
++            FeatureFlag featureflag = (FeatureFlag) this.names.get(minecraftkey);
++
++            if (featureflag == null) {
++                unknownFlagConsumer.accept(minecraftkey);
+             } else {
+-                set.add(featureFlag);
++                set.add(featureflag);
+             }
+         }
+ 
+@@ -60,10 +66,11 @@
+     }
+ 
+     public Set<ResourceLocation> toNames(FeatureFlagSet features) {
+-        Set<ResourceLocation> set = new HashSet<>();
+-        this.names.forEach((identifier, featureFlag) -> {
+-            if (features.contains(featureFlag)) {
+-                set.add(identifier);
++        Set<ResourceLocation> set = new HashSet();
++
++        this.names.forEach((minecraftkey, featureflag) -> {
++            if (features.contains(featureflag)) {
++                set.add(minecraftkey);
+             }
+ 
+         });
+@@ -71,21 +78,25 @@
+     }
+ 
+     public Codec<FeatureFlagSet> codec() {
+-        return ResourceLocation.CODEC.listOf().comapFlatMap((featureIds) -> {
+-            Set<ResourceLocation> set = new HashSet<>();
+-            FeatureFlagSet featureFlagSet = this.fromNames(featureIds, set::add);
++        return ResourceLocation.CODEC.listOf().comapFlatMap((list) -> {
++            Set<ResourceLocation> set = new HashSet();
++
++            Objects.requireNonNull(set);
++            FeatureFlagSet featureflagset = this.fromNames(list, set::add);
++
+             return !set.isEmpty() ? DataResult.error(() -> {
+                 return "Unknown feature ids: " + set;
+-            }, featureFlagSet) : DataResult.success(featureFlagSet);
+-        }, (features) -> {
+-            return List.copyOf(this.toNames(features));
++            }, featureflagset) : DataResult.success(featureflagset);
++        }, (featureflagset) -> {
++            return List.copyOf(this.toNames(featureflagset));
+         });
+     }
+ 
+     public static class Builder {
++
+         private final FeatureFlagUniverse universe;
+         private int id;
+-        private final Map<ResourceLocation, FeatureFlag> flags = new LinkedHashMap<>();
++        private final Map<ResourceLocation, FeatureFlag> flags = new LinkedHashMap();
+ 
+         public Builder(String universe) {
+             this.universe = new FeatureFlagUniverse(universe);
+@@ -99,19 +110,21 @@
+             if (this.id >= 64) {
+                 throw new IllegalStateException("Too many feature flags");
+             } else {
+-                FeatureFlag featureFlag = new FeatureFlag(this.universe, this.id++);
+-                FeatureFlag featureFlag2 = this.flags.put(feature, featureFlag);
+-                if (featureFlag2 != null) {
++                FeatureFlag featureflag = new FeatureFlag(this.universe, this.id++);
++                FeatureFlag featureflag1 = (FeatureFlag) this.flags.put(feature, featureflag);
++
++                if (featureflag1 != null) {
+                     throw new IllegalStateException("Duplicate feature flag " + feature);
+                 } else {
+-                    return featureFlag;
++                    return featureflag;
+                 }
+             }
+         }
+ 
+         public FeatureFlagRegistry build() {
+-            FeatureFlagSet featureFlagSet = FeatureFlagSet.create(this.universe, this.flags.values());
+-            return new FeatureFlagRegistry(this.universe, featureFlagSet, Map.copyOf(this.flags));
++            FeatureFlagSet featureflagset = FeatureFlagSet.create(this.universe, this.flags.values());
++
++            return new FeatureFlagRegistry(this.universe, featureflagset, Map.copyOf(this.flags));
+         }
+     }
+ }

@@ -27,8 +27,8 @@ import net.kyori.adventure.internal.Internals;
 import net.kyori.examination.Examinable;
 
 abstract /* non-sealed */ class AbstractTag implements Tag, Examinable {
-  @Override
-  public final String toString() {
-    return Internals.toString(this);
-  }
+    @Override
+    public final String toString() {
+        return Internals.toString(this);
+    }
 }

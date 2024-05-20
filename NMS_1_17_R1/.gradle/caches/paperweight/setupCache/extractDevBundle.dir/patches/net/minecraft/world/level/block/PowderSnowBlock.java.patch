@@ -1,0 +1,106 @@
+--- a/net/minecraft/world/level/block/PowderSnowBlock.java
++++ b/net/minecraft/world/level/block/PowderSnowBlock.java
+@@ -8,6 +8,7 @@
+ import net.minecraft.sounds.SoundEvent;
+ import net.minecraft.sounds.SoundEvents;
+ import net.minecraft.tags.EntityTypeTags;
++import net.minecraft.tags.Tag;
+ import net.minecraft.util.Mth;
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.entity.EquipmentSlot;
+@@ -30,11 +31,12 @@
+ import net.minecraft.world.phys.shapes.VoxelShape;
+ 
+ public class PowderSnowBlock extends Block implements BucketPickup {
++
+     private static final float HORIZONTAL_PARTICLE_MOMENTUM_FACTOR = 0.083333336F;
+     private static final float IN_BLOCK_HORIZONTAL_SPEED_MULTIPLIER = 0.9F;
+     private static final float IN_BLOCK_VERTICAL_SPEED_MULTIPLIER = 1.5F;
+     private static final float NUM_BLOCKS_TO_FALL_INTO_BLOCK = 2.5F;
+-    private static final VoxelShape FALLING_COLLISION_SHAPE = Shapes.box(0.0D, 0.0D, 0.0D, 1.0D, (double)0.9F, 1.0D);
++    private static final VoxelShape FALLING_COLLISION_SHAPE = Shapes.box(0.0D, 0.0D, 0.0D, 1.0D, 0.8999999761581421D, 1.0D);
+ 
+     public PowderSnowBlock(BlockBehaviour.Properties settings) {
+         super(settings);
+@@ -42,7 +44,7 @@
+ 
+     @Override
+     public boolean skipRendering(BlockState state, BlockState stateFrom, Direction direction) {
+-        return stateFrom.is(this) ? true : super.skipRendering(state, stateFrom, direction);
++        return stateFrom.is((Block) this) ? true : super.skipRendering(state, stateFrom, direction);
+     }
+ 
+     @Override
+@@ -52,20 +54,27 @@
+ 
+     @Override
+     public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
+-        if (!(entity instanceof LivingEntity) || entity.getFeetBlockState().is(this)) {
+-            entity.makeStuckInBlock(state, new Vec3((double)0.9F, 1.5D, (double)0.9F));
++        if (!new io.papermc.paper.event.entity.EntityInsideBlockEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock.at(world, pos)).callEvent()) { return; } // Paper
++        if (!(entity instanceof LivingEntity) || entity.getFeetBlockState().is((Block) this)) {
++            entity.makeStuckInBlock(state, new Vec3(0.8999999761581421D, 1.5D, 0.8999999761581421D));
+             if (world.isClientSide) {
+                 Random random = world.getRandom();
+-                boolean bl = entity.xOld != entity.getX() || entity.zOld != entity.getZ();
+-                if (bl && random.nextBoolean()) {
+-                    world.addParticle(ParticleTypes.SNOWFLAKE, entity.getX(), (double)(pos.getY() + 1), entity.getZ(), (double)(Mth.randomBetween(random, -1.0F, 1.0F) * 0.083333336F), (double)0.05F, (double)(Mth.randomBetween(random, -1.0F, 1.0F) * 0.083333336F));
++                boolean flag = entity.xOld != entity.getX() || entity.zOld != entity.getZ();
++
++                if (flag && random.nextBoolean()) {
++                    world.addParticle(ParticleTypes.SNOWFLAKE, entity.getX(), (double) (pos.getY() + 1), entity.getZ(), (double) (Mth.randomBetween(random, -1.0F, 1.0F) * 0.083333336F), 0.05000000074505806D, (double) (Mth.randomBetween(random, -1.0F, 1.0F) * 0.083333336F));
+                 }
+             }
+         }
+ 
+         entity.setIsInPowderSnow(true);
+         if (!world.isClientSide) {
+-            if (entity.isOnFire() && (world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) || entity instanceof Player) && entity.mayInteract(world, pos)) {
++            // CraftBukkit start
++            if (entity.isOnFire() && entity.mayInteract(world, pos)) {
++                if (org.bukkit.craftbukkit.v1_17_R1.event.CraftEventFactory.callEntityChangeBlockEvent(entity, pos, Blocks.AIR.defaultBlockState(), !(world.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) || entity instanceof Player)).isCancelled()) {
++                    return;
++                }
++                // CraftBukkit end
+                 world.destroyBlock(pos, false);
+             }
+ 
+@@ -77,16 +86,19 @@
+     @Override
+     public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+         if (context instanceof EntityCollisionContext) {
+-            EntityCollisionContext entityCollisionContext = (EntityCollisionContext)context;
+-            Optional<Entity> optional = entityCollisionContext.getEntity();
++            EntityCollisionContext voxelshapecollisionentity = (EntityCollisionContext) context;
++            Optional<Entity> optional = voxelshapecollisionentity.getEntity();
++
+             if (optional.isPresent()) {
+-                Entity entity = optional.get();
++                Entity entity = (Entity) optional.get();
++
+                 if (entity.fallDistance > 2.5F) {
+-                    return FALLING_COLLISION_SHAPE;
++                    return PowderSnowBlock.FALLING_COLLISION_SHAPE;
+                 }
+ 
+-                boolean bl = entity instanceof FallingBlockEntity;
+-                if (bl || canEntityWalkOnPowderSnow(entity) && context.isAbove(Shapes.block(), pos, false) && !context.isDescending()) {
++                boolean flag = entity instanceof FallingBlockEntity;
++
++                if (flag || PowderSnowBlock.canEntityWalkOnPowderSnow(entity) && context.isAbove(Shapes.block(), pos, false) && !context.isDescending()) {
+                     return super.getCollisionShape(state, world, pos, context);
+                 }
+             }
+@@ -101,11 +113,7 @@
+     }
+ 
+     public static boolean canEntityWalkOnPowderSnow(Entity entity) {
+-        if (entity.getType().is(EntityTypeTags.POWDER_SNOW_WALKABLE_MOBS)) {
+-            return true;
+-        } else {
+-            return entity instanceof LivingEntity ? ((LivingEntity)entity).getItemBySlot(EquipmentSlot.FEET).is(Items.LEATHER_BOOTS) : false;
+-        }
++        return entity.getType().is((Tag) EntityTypeTags.POWDER_SNOW_WALKABLE_MOBS) ? true : (entity instanceof LivingEntity ? ((LivingEntity) entity).getItemBySlot(EquipmentSlot.FEET).is(Items.LEATHER_BOOTS) : false);
+     }
+ 
+     @Override

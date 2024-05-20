@@ -1,0 +1,128 @@
+--- a/net/minecraft/world/level/chunk/ChunkBiomeContainer.java
++++ b/net/minecraft/world/level/chunk/ChunkBiomeContainer.java
+@@ -15,10 +15,11 @@
+ import org.apache.logging.log4j.Logger;
+ 
+ public class ChunkBiomeContainer implements BiomeManager.NoiseBiomeSource {
++
+     private static final Logger LOGGER = LogManager.getLogger();
+     private static final int WIDTH_BITS = Mth.ceillog2(16) - 2;
+-    private static final int HORIZONTAL_MASK = (1 << WIDTH_BITS) - 1;
+-    public static final int MAX_SIZE = 1 << WIDTH_BITS + WIDTH_BITS + DimensionType.BITS_FOR_Y - 2;
++    private static final int HORIZONTAL_MASK = (1 << ChunkBiomeContainer.WIDTH_BITS) - 1;
++    public static final int MAX_SIZE = 1 << ChunkBiomeContainer.WIDTH_BITS + ChunkBiomeContainer.WIDTH_BITS + DimensionType.BITS_FOR_Y - 2;
+     public final IdMap<Biome> biomeRegistry;
+     private final Biome[] biomes;
+     private final int quartMinY;
+@@ -35,43 +36,44 @@
+         this(biomes, world, new Biome[ids.length]);
+         int i = -1;
+ 
+-        for(int j = 0; j < this.biomes.length; ++j) {
++        for (int j = 0; j < this.biomes.length; ++j) {
+             int k = ids[j];
+-            Biome biome = biomes.byId(k);
+-            if (biome == null) {
++            Biome biomebase = (Biome) biomes.byId(k);
++
++            if (biomebase == null) {
+                 if (i == -1) {
+                     i = j;
+                 }
+ 
+-                this.biomes[j] = biomes.byId(0);
++                this.biomes[j] = (Biome) biomes.byId(0);
+             } else {
+-                this.biomes[j] = biome;
++                this.biomes[j] = biomebase;
+             }
+         }
+ 
+         if (i != -1) {
+-            LOGGER.warn("Invalid biome data received, starting from {}: {}", i, Arrays.toString(ids));
++            ChunkBiomeContainer.LOGGER.warn("Invalid biome data received, starting from {}: {}", i, Arrays.toString(ids));
+         }
+ 
+     }
+ 
+     public ChunkBiomeContainer(IdMap<Biome> biomes, LevelHeightAccessor world, ChunkPos chunkPos, BiomeSource biomeSource) {
+-        this(biomes, world, chunkPos, biomeSource, (int[])null);
++        this(biomes, world, chunkPos, biomeSource, (int[]) null);
+     }
+ 
+-    public ChunkBiomeContainer(IdMap<Biome> biomes, LevelHeightAccessor world, ChunkPos chunkPos, BiomeSource biomeSource, @Nullable int[] is) {
+-        this(biomes, world, new Biome[(1 << WIDTH_BITS + WIDTH_BITS) * ceilDiv(world.getHeight(), 4)]);
++    public ChunkBiomeContainer(IdMap<Biome> biomes, LevelHeightAccessor world, ChunkPos chunkPos, BiomeSource biomeSource, @Nullable int[] aint) {
++        this(biomes, world, new Biome[(1 << ChunkBiomeContainer.WIDTH_BITS + ChunkBiomeContainer.WIDTH_BITS) * ChunkBiomeContainer.ceilDiv(world.getHeight(), 4)]);
+         int i = QuartPos.fromBlock(chunkPos.getMinBlockX());
+         int j = this.quartMinY;
+         int k = QuartPos.fromBlock(chunkPos.getMinBlockZ());
+ 
+-        for(int l = 0; l < this.biomes.length; ++l) {
+-            if (is != null && l < is.length) {
+-                this.biomes[l] = biomes.byId(is[l]);
++        for (int l = 0; l < this.biomes.length; ++l) {
++            if (aint != null && l < aint.length) {
++                this.biomes[l] = (Biome) biomes.byId(aint[l]);
+             }
+ 
+             if (this.biomes[l] == null) {
+-                this.biomes[l] = generateBiomeForIndex(biomeSource, i, j, k, l);
++                this.biomes[l] = ChunkBiomeContainer.generateBiomeForIndex(biomeSource, i, j, k, l);
+             }
+         }
+ 
+@@ -81,28 +83,40 @@
+         return (i + j - 1) / j;
+     }
+ 
+-    private static Biome generateBiomeForIndex(BiomeSource biomeSource, int i, int j, int k, int l) {
+-        int m = l & HORIZONTAL_MASK;
+-        int n = l >> WIDTH_BITS + WIDTH_BITS;
+-        int o = l >> WIDTH_BITS & HORIZONTAL_MASK;
+-        return biomeSource.getNoiseBiome(i + m, j + n, k + o);
++    private static Biome generateBiomeForIndex(BiomeSource worldchunkmanager, int i, int j, int k, int l) {
++        int i1 = l & ChunkBiomeContainer.HORIZONTAL_MASK;
++        int j1 = l >> ChunkBiomeContainer.WIDTH_BITS + ChunkBiomeContainer.WIDTH_BITS;
++        int k1 = l >> ChunkBiomeContainer.WIDTH_BITS & ChunkBiomeContainer.HORIZONTAL_MASK;
++
++        return worldchunkmanager.getNoiseBiome(i + i1, j + j1, k + k1);
+     }
+ 
+     public int[] writeBiomes() {
+-        int[] is = new int[this.biomes.length];
++        int[] aint = new int[this.biomes.length];
+ 
+-        for(int i = 0; i < this.biomes.length; ++i) {
+-            is[i] = this.biomeRegistry.getId(this.biomes[i]);
++        for (int i = 0; i < this.biomes.length; ++i) {
++            aint[i] = this.biomeRegistry.getId(this.biomes[i]);
+         }
+ 
+-        return is;
++        return aint;
+     }
+ 
+     @Override
+     public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ) {
+-        int i = biomeX & HORIZONTAL_MASK;
+-        int j = Mth.clamp(biomeY - this.quartMinY, 0, this.quartHeight);
+-        int k = biomeZ & HORIZONTAL_MASK;
+-        return this.biomes[j << WIDTH_BITS + WIDTH_BITS | k << WIDTH_BITS | i];
++        int l = biomeX & ChunkBiomeContainer.HORIZONTAL_MASK;
++        int i1 = Mth.clamp(biomeY - this.quartMinY, 0, this.quartHeight);
++        int j1 = biomeZ & ChunkBiomeContainer.HORIZONTAL_MASK;
++
++        return this.biomes[i1 << ChunkBiomeContainer.WIDTH_BITS + ChunkBiomeContainer.WIDTH_BITS | j1 << ChunkBiomeContainer.WIDTH_BITS | l];
+     }
++
++    // CraftBukkit start
++    public void setBiome(int i, int j, int k, Biome biome) {
++        int l = i & ChunkBiomeContainer.HORIZONTAL_MASK;
++        int i1 = Mth.clamp(j - this.quartMinY, 0, this.quartHeight);
++        int j1 = k & ChunkBiomeContainer.HORIZONTAL_MASK;
++
++        this.biomes[i1 << ChunkBiomeContainer.WIDTH_BITS + ChunkBiomeContainer.WIDTH_BITS | j1 << ChunkBiomeContainer.WIDTH_BITS | l] = biome;
++    }
++    // CraftBukkit end
+ }

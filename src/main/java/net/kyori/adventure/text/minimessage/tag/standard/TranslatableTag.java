@@ -45,44 +45,44 @@ import java.util.List;
  * @since 4.10.0
  */
 final class TranslatableTag {
-  private static final String TR = "tr";
-  private static final String TRANSLATE = "translate";
-  private static final String LANG = "lang";
+    private static final String TR = "tr";
+    private static final String TRANSLATE = "translate";
+    private static final String LANG = "lang";
 
-  static final TagResolver RESOLVER = SerializableResolver.claimingComponent(
-    StandardTags.names(LANG, TRANSLATE, TR),
-    TranslatableTag::create,
-    TranslatableTag::claim
-  );
+    static final TagResolver RESOLVER = SerializableResolver.claimingComponent(
+            StandardTags.names(LANG, TRANSLATE, TR),
+            TranslatableTag::create,
+            TranslatableTag::claim
+    );
 
-  private TranslatableTag() {
-  }
-
-  static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
-    final String key = args.popOr("A translation key is required").value();
-    final List<Component> with;
-    if (args.hasNext()) {
-      with = new ArrayList<>();
-      while (args.hasNext()) {
-        with.add(ctx.deserialize(args.pop().value()));
-      }
-    } else {
-      with = Collections.emptyList();
+    private TranslatableTag() {
     }
 
-    return Tag.inserting(Component.translatable(key, with));
-  }
+    static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
+        final String key = args.popOr("A translation key is required").value();
+        final List<Component> with;
+        if (args.hasNext()) {
+            with = new ArrayList<>();
+            while (args.hasNext()) {
+                with.add(ctx.deserialize(args.pop().value()));
+            }
+        } else {
+            with = Collections.emptyList();
+        }
 
-  static @Nullable Emitable claim(final Component input) {
-    if (!(input instanceof TranslatableComponent) || ((TranslatableComponent) input).fallback() != null) return null;
+        return Tag.inserting(Component.translatable(key, with));
+    }
 
-    final TranslatableComponent tr = (TranslatableComponent) input;
-    return emit -> {
-      emit.tag(LANG);
-      emit.argument(tr.key());
-      for (final TranslationArgument with : tr.arguments()) {
-        emit.argument(with.asComponent());
-      }
-    };
-  }
+    static @Nullable Emitable claim(final Component input) {
+        if (!(input instanceof TranslatableComponent tr) || ((TranslatableComponent) input).fallback() != null)
+            return null;
+
+        return emit -> {
+            emit.tag(LANG);
+            emit.argument(tr.key());
+            for (final TranslationArgument with : tr.arguments()) {
+                emit.argument(with.asComponent());
+            }
+        };
+    }
 }

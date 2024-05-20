@@ -1,0 +1,237 @@
+--- a/net/minecraft/world/level/levelgen/NoiseSampler.java
++++ b/net/minecraft/world/level/levelgen/NoiseSampler.java
+@@ -11,12 +11,14 @@
+ import net.minecraft.world.level.levelgen.synth.SimplexNoise;
+ 
+ public class NoiseSampler {
++
+     private static final int OLD_CELL_COUNT_Y = 32;
+-    private static final float[] BIOME_WEIGHTS = Util.make(new float[25], (array) -> {
+-        for(int i = -2; i <= 2; ++i) {
+-            for(int j = -2; j <= 2; ++j) {
+-                float f = 10.0F / Mth.sqrt((float)(i * i + j * j) + 0.2F);
+-                array[i + 2 + (j + 2) * 5] = f;
++    private static final float[] BIOME_WEIGHTS = (float[]) Util.make((new float[25]), (afloat) -> { // CraftBukkit - decompile error
++        for (int i = -2; i <= 2; ++i) {
++            for (int j = -2; j <= 2; ++j) {
++                float f = 10.0F / Mth.sqrt((float) (i * i + j * j) + 0.2F);
++
++                afloat[i + 2 + (j + 2) * 5] = f;
+             }
+         }
+ 
+@@ -40,7 +42,7 @@
+     private final double dimensionDensityOffset;
+     private final NoiseModifier caveNoiseModifier;
+ 
+-    public NoiseSampler(BiomeSource biomeSource, int horizontalNoiseResolution, int verticalNoiseResolution, int noiseSizeY, NoiseSettings config, BlendedNoise noise, @Nullable SimplexNoise islandNoise, PerlinNoise densityNoise, NoiseModifier noiseModifier) {
++    public NoiseSampler(BiomeSource biomeSource, int horizontalNoiseResolution, int verticalNoiseResolution, int noiseSizeY, NoiseSettings config, BlendedNoise noise, @Nullable SimplexNoise islandNoise, PerlinNoise densityNoise, NoiseModifier noisemodifier) {
+         this.cellWidth = horizontalNoiseResolution;
+         this.cellHeight = verticalNoiseResolution;
+         this.biomeSource = biomeSource;
+@@ -49,116 +51,134 @@
+         this.blendedNoise = noise;
+         this.islandNoise = islandNoise;
+         this.depthNoise = densityNoise;
+-        this.topSlideTarget = (double)config.topSlideSettings().target();
+-        this.topSlideSize = (double)config.topSlideSettings().size();
+-        this.topSlideOffset = (double)config.topSlideSettings().offset();
+-        this.bottomSlideTarget = (double)config.bottomSlideSettings().target();
+-        this.bottomSlideSize = (double)config.bottomSlideSettings().size();
+-        this.bottomSlideOffset = (double)config.bottomSlideSettings().offset();
++        this.topSlideTarget = (double) config.topSlideSettings().target();
++        this.topSlideSize = (double) config.topSlideSettings().size();
++        this.topSlideOffset = (double) config.topSlideSettings().offset();
++        this.bottomSlideTarget = (double) config.bottomSlideSettings().target();
++        this.bottomSlideSize = (double) config.bottomSlideSettings().size();
++        this.bottomSlideOffset = (double) config.bottomSlideSettings().offset();
+         this.dimensionDensityFactor = config.densityFactor();
+         this.dimensionDensityOffset = config.densityOffset();
+-        this.caveNoiseModifier = noiseModifier;
++        this.caveNoiseModifier = noisemodifier;
+     }
+ 
+     public void fillNoiseColumn(double[] buffer, int x, int z, NoiseSettings config, int seaLevel, int minY, int noiseSizeY) {
+-        double d;
+-        double e;
++        double d0;
++        double d1;
++        double d2;
++
+         if (this.islandNoise != null) {
+-            d = (double)(TheEndBiomeSource.getHeightValue(this.islandNoise, x, z) - 8.0F);
+-            if (d > 0.0D) {
+-                e = 0.25D;
++            d0 = (double) (TheEndBiomeSource.getHeightValue(this.islandNoise, x, z) - 8.0F);
++            if (d0 > 0.0D) {
++                d1 = 0.25D;
+             } else {
+-                e = 1.0D;
++                d1 = 1.0D;
+             }
+         } else {
+-            float g = 0.0F;
+-            float h = 0.0F;
+-            float i = 0.0F;
+-            int j = 2;
+-            int k = seaLevel;
+-            float l = this.biomeSource.getNoiseBiome(x, seaLevel, z).getDepth();
++            float f = 0.0F;
++            float f1 = 0.0F;
++            float f2 = 0.0F;
++            boolean flag = true;
++            int j1 = seaLevel;
++            float f3 = this.biomeSource.getNoiseBiome(x, seaLevel, z).getDepth();
+ 
+-            for(int m = -2; m <= 2; ++m) {
+-                for(int n = -2; n <= 2; ++n) {
+-                    Biome biome = this.biomeSource.getNoiseBiome(x + m, k, z + n);
+-                    float o = biome.getDepth();
+-                    float p = biome.getScale();
+-                    float q;
+-                    float r;
+-                    if (config.isAmplified() && o > 0.0F) {
+-                        q = 1.0F + o * 2.0F;
+-                        r = 1.0F + p * 4.0F;
++            for (int k1 = -2; k1 <= 2; ++k1) {
++                for (int l1 = -2; l1 <= 2; ++l1) {
++                    Biome biomebase = this.biomeSource.getNoiseBiome(x + k1, j1, z + l1);
++                    float f4 = biomebase.getDepth();
++                    float f5 = biomebase.getScale();
++                    float f6;
++                    float f7;
++
++                    if (config.isAmplified() && f4 > 0.0F) {
++                        f6 = 1.0F + f4 * 2.0F;
++                        f7 = 1.0F + f5 * 4.0F;
+                     } else {
+-                        q = o;
+-                        r = p;
++                        f6 = f4;
++                        f7 = f5;
++                    }
++                    // CraftBukkit start - fix MC-54738
++                    if (f6 < -1.8F) {
++                        f6 = -1.8F;
+                     }
++                    // CraftBukkit end
+ 
+-                    float u = o > l ? 0.5F : 1.0F;
+-                    float v = u * BIOME_WEIGHTS[m + 2 + (n + 2) * 5] / (q + 2.0F);
+-                    g += r * v;
+-                    h += q * v;
+-                    i += v;
++                    float f8 = f4 > f3 ? 0.5F : 1.0F;
++                    float f9 = f8 * NoiseSampler.BIOME_WEIGHTS[k1 + 2 + (l1 + 2) * 5] / (f6 + 2.0F);
++
++                    f += f7 * f9;
++                    f1 += f6 * f9;
++                    f2 += f9;
+                 }
+             }
+ 
+-            float w = h / i;
+-            float y = g / i;
+-            double aa = (double)(w * 0.5F - 0.125F);
+-            double ab = (double)(y * 0.9F + 0.1F);
+-            d = aa * 0.265625D;
+-            e = 96.0D / ab;
++            float f10 = f1 / f2;
++            float f11 = f / f2;
++
++            d2 = (double) (f10 * 0.5F - 0.125F);
++            double d3 = (double) (f11 * 0.9F + 0.1F);
++
++            d0 = d2 * 0.265625D;
++            d1 = 96.0D / d3;
+         }
+ 
+-        double ae = 684.412D * config.noiseSamplingSettings().xzScale();
+-        double af = 684.412D * config.noiseSamplingSettings().yScale();
+-        double ag = ae / config.noiseSamplingSettings().xzFactor();
+-        double ah = af / config.noiseSamplingSettings().yFactor();
+-        double ai = config.randomDensityOffset() ? this.getRandomDensity(x, z) : 0.0D;
++        double d4 = 684.412D * config.noiseSamplingSettings().xzScale();
++        double d5 = 684.412D * config.noiseSamplingSettings().yScale();
++        double d6 = d4 / config.noiseSamplingSettings().xzFactor();
++        double d7 = d5 / config.noiseSamplingSettings().yFactor();
+ 
+-        for(int aj = 0; aj <= noiseSizeY; ++aj) {
+-            int ak = aj + minY;
+-            double al = this.blendedNoise.sampleAndClampNoise(x, ak, z, ae, af, ag, ah);
+-            double am = this.computeInitialDensity(ak, d, e, ai) + al;
+-            am = this.caveNoiseModifier.modifyNoise(am, ak * this.cellHeight, z * this.cellWidth, x * this.cellWidth);
+-            am = this.applySlide(am, ak);
+-            buffer[aj] = am;
++        d2 = config.randomDensityOffset() ? this.getRandomDensity(x, z) : 0.0D;
++
++        for (int i2 = 0; i2 <= noiseSizeY; ++i2) {
++            int j2 = i2 + minY;
++            double d8 = this.blendedNoise.sampleAndClampNoise(x, j2, z, d4, d5, d6, d7);
++            double d9 = this.computeInitialDensity(j2, d0, d1, d2) + d8;
++
++            d9 = this.caveNoiseModifier.modifyNoise(d9, j2 * this.cellHeight, z * this.cellWidth, x * this.cellWidth);
++            d9 = this.applySlide(d9, j2);
++            buffer[i2] = d9;
+         }
+ 
+     }
+ 
+     private double computeInitialDensity(int y, double depth, double scale, double randomDensityOffset) {
+-        double d = 1.0D - (double)y * 2.0D / 32.0D + randomDensityOffset;
+-        double e = d * this.dimensionDensityFactor + this.dimensionDensityOffset;
+-        double f = (e + depth) * scale;
+-        return f * (double)(f > 0.0D ? 4 : 1);
++        double d3 = 1.0D - (double) y * 2.0D / 32.0D + randomDensityOffset;
++        double d4 = d3 * this.dimensionDensityFactor + this.dimensionDensityOffset;
++        double d5 = (d4 + depth) * scale;
++
++        return d5 * (double) (d5 > 0.0D ? 4 : 1);
+     }
+ 
+     private double applySlide(double noise, int y) {
+-        int i = Mth.intFloorDiv(this.noiseSettings.minY(), this.cellHeight);
+-        int j = y - i;
++        int j = Mth.intFloorDiv(this.noiseSettings.minY(), this.cellHeight);
++        int k = y - j;
++        double d1;
++
+         if (this.topSlideSize > 0.0D) {
+-            double d = ((double)(this.cellCountY - j) - this.topSlideOffset) / this.topSlideSize;
+-            noise = Mth.clampedLerp(this.topSlideTarget, noise, d);
++            d1 = ((double) (this.cellCountY - k) - this.topSlideOffset) / this.topSlideSize;
++            noise = Mth.clampedLerp(this.topSlideTarget, noise, d1);
+         }
+ 
+         if (this.bottomSlideSize > 0.0D) {
+-            double e = ((double)j - this.bottomSlideOffset) / this.bottomSlideSize;
+-            noise = Mth.clampedLerp(this.bottomSlideTarget, noise, e);
++            d1 = ((double) k - this.bottomSlideOffset) / this.bottomSlideSize;
++            noise = Mth.clampedLerp(this.bottomSlideTarget, noise, d1);
+         }
+ 
+         return noise;
+     }
+ 
+     private double getRandomDensity(int x, int z) {
+-        double d = this.depthNoise.getValue((double)(x * 200), 10.0D, (double)(z * 200), 1.0D, 0.0D, true);
+-        double e;
+-        if (d < 0.0D) {
+-            e = -d * 0.3D;
++        double d0 = this.depthNoise.getValue((double) (x * 200), 10.0D, (double) (z * 200), 1.0D, 0.0D, true);
++        double d1;
++
++        if (d0 < 0.0D) {
++            d1 = -d0 * 0.3D;
+         } else {
+-            e = d;
++            d1 = d0;
+         }
+ 
+-        double g = e * 24.575625D - 2.0D;
+-        return g < 0.0D ? g * 0.009486607142857142D : Math.min(g, 1.0D) * 0.006640625D;
++        double d2 = d1 * 24.575625D - 2.0D;
++
++        return d2 < 0.0D ? d2 * 0.009486607142857142D : Math.min(d2, 1.0D) * 0.006640625D;
+     }
+ }

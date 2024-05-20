@@ -14,4 +14,12 @@ public record CommandData(String[] args) {
         return length() == equal;
     }
 
+    public boolean equals(int arg, String text) {
+        return args(arg).equals(text);
+    }
+
+    public boolean isEmpty() {
+        return args.length == 0;
+    }
+
 }

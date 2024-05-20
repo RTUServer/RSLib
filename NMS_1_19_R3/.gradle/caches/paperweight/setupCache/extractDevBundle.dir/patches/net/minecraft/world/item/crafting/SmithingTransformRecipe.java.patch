@@ -1,0 +1,94 @@
+--- a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
++++ b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
+@@ -10,8 +10,16 @@
+ import net.minecraft.world.Container;
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.level.Level;
++// CraftBukkit start
++import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
++import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftRecipe;
++import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftSmithingTransformRecipe;
++import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
++import org.bukkit.inventory.Recipe;
++// CraftBukkit end
+ 
+ public class SmithingTransformRecipe implements SmithingRecipe {
++
+     private final ResourceLocation id;
+     final Ingredient template;
+     final Ingredient base;
+@@ -33,13 +41,14 @@
+ 
+     @Override
+     public ItemStack assemble(Container inventory, RegistryAccess registryManager) {
+-        ItemStack itemStack = this.result.copy();
+-        CompoundTag compoundTag = inventory.getItem(1).getTag();
+-        if (compoundTag != null) {
+-            itemStack.setTag(compoundTag.copy());
++        ItemStack itemstack = this.result.copy();
++        CompoundTag nbttagcompound = inventory.getItem(1).getTag();
++
++        if (nbttagcompound != null) {
++            itemstack.setTag(nbttagcompound.copy());
+         }
+ 
+-        return itemStack;
++        return itemstack;
+     }
+ 
+     @Override
+@@ -77,26 +86,41 @@
+         return Stream.of(this.template, this.base, this.addition).anyMatch(Ingredient::isEmpty);
+     }
+ 
++    // CraftBukkit start
++    @Override
++    public Recipe toBukkitRecipe() {
++        CraftItemStack result = CraftItemStack.asCraftMirror(this.result);
++
++        CraftSmithingTransformRecipe recipe = new CraftSmithingTransformRecipe(CraftNamespacedKey.fromMinecraft(this.id), result, CraftRecipe.toBukkit(this.template), CraftRecipe.toBukkit(this.base), CraftRecipe.toBukkit(this.addition));
++
++        return recipe;
++    }
++    // CraftBukkit end
++
+     public static class Serializer implements RecipeSerializer<SmithingTransformRecipe> {
++
++        public Serializer() {}
++
+         @Override
+-        public SmithingTransformRecipe fromJson(ResourceLocation resourceLocation, JsonObject jsonObject) {
+-            Ingredient ingredient = Ingredient.fromJson(GsonHelper.getAsJsonObject(jsonObject, "template"));
+-            Ingredient ingredient2 = Ingredient.fromJson(GsonHelper.getAsJsonObject(jsonObject, "base"));
+-            Ingredient ingredient3 = Ingredient.fromJson(GsonHelper.getAsJsonObject(jsonObject, "addition"));
+-            ItemStack itemStack = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(jsonObject, "result"));
+-            return new SmithingTransformRecipe(resourceLocation, ingredient, ingredient2, ingredient3, itemStack);
++        public SmithingTransformRecipe fromJson(ResourceLocation id, JsonObject json) {
++            Ingredient recipeitemstack = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "template"));
++            Ingredient recipeitemstack1 = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "base"));
++            Ingredient recipeitemstack2 = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "addition"));
++            ItemStack itemstack = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
++
++            return new SmithingTransformRecipe(id, recipeitemstack, recipeitemstack1, recipeitemstack2, itemstack);
+         }
+ 
+         @Override
+-        public SmithingTransformRecipe fromNetwork(ResourceLocation resourceLocation, FriendlyByteBuf friendlyByteBuf) {
+-            Ingredient ingredient = Ingredient.fromNetwork(friendlyByteBuf);
+-            Ingredient ingredient2 = Ingredient.fromNetwork(friendlyByteBuf);
+-            Ingredient ingredient3 = Ingredient.fromNetwork(friendlyByteBuf);
+-            ItemStack itemStack = friendlyByteBuf.readItem();
+-            return new SmithingTransformRecipe(resourceLocation, ingredient, ingredient2, ingredient3, itemStack);
++        public SmithingTransformRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
++            Ingredient recipeitemstack = Ingredient.fromNetwork(buf);
++            Ingredient recipeitemstack1 = Ingredient.fromNetwork(buf);
++            Ingredient recipeitemstack2 = Ingredient.fromNetwork(buf);
++            ItemStack itemstack = buf.readItem();
++
++            return new SmithingTransformRecipe(id, recipeitemstack, recipeitemstack1, recipeitemstack2, itemstack);
+         }
+ 
+-        @Override
+         public void toNetwork(FriendlyByteBuf buf, SmithingTransformRecipe recipe) {
+             recipe.template.toNetwork(buf);
+             recipe.base.toNetwork(buf);

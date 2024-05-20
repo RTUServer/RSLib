@@ -1,0 +1,135 @@
+--- a/net/minecraft/world/entity/boss/enderdragon/phases/DragonSittingFlamingPhase.java
++++ b/net/minecraft/world/entity/boss/enderdragon/phases/DragonSittingFlamingPhase.java
+@@ -9,8 +9,12 @@
+ import net.minecraft.world.entity.AreaEffectCloud;
+ import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+ import net.minecraft.world.phys.Vec3;
++// CraftBukkit start
++import org.bukkit.event.entity.EntityRemoveEvent;
++// CraftBukkit end
+ 
+ public class DragonSittingFlamingPhase extends AbstractDragonSittingPhase {
++
+     private static final int FLAME_DURATION = 200;
+     private static final int SITTING_FLAME_ATTACKS_COUNT = 4;
+     private static final int WARMUP_TIME = 10;
+@@ -25,33 +29,33 @@
+ 
+     @Override
+     public void doClientTick() {
+-        this.flameTicks++;
++        ++this.flameTicks;
+         if (this.flameTicks % 2 == 0 && this.flameTicks < 10) {
+-            Vec3 vec3 = this.dragon.getHeadLookVector(1.0F).normalize();
+-            vec3.yRot((float) (-Math.PI / 4));
+-            double d = this.dragon.head.getX();
+-            double e = this.dragon.head.getY(0.5);
+-            double f = this.dragon.head.getZ();
++            Vec3 vec3d = this.dragon.getHeadLookVector(1.0F).normalize();
+ 
+-            for (int i = 0; i < 8; i++) {
+-                double g = d + this.dragon.getRandom().nextGaussian() / 2.0;
+-                double h = e + this.dragon.getRandom().nextGaussian() / 2.0;
+-                double j = f + this.dragon.getRandom().nextGaussian() / 2.0;
++            vec3d.yRot(-0.7853982F);
++            double d0 = this.dragon.head.getX();
++            double d1 = this.dragon.head.getY(0.5D);
++            double d2 = this.dragon.head.getZ();
+ 
+-                for (int k = 0; k < 6; k++) {
+-                    this.dragon
+-                        .level()
+-                        .addParticle(ParticleTypes.DRAGON_BREATH, g, h, j, -vec3.x * 0.08F * (double)k, -vec3.y * 0.6F, -vec3.z * 0.08F * (double)k);
++            for (int i = 0; i < 8; ++i) {
++                double d3 = d0 + this.dragon.getRandom().nextGaussian() / 2.0D;
++                double d4 = d1 + this.dragon.getRandom().nextGaussian() / 2.0D;
++                double d5 = d2 + this.dragon.getRandom().nextGaussian() / 2.0D;
++
++                for (int j = 0; j < 6; ++j) {
++                    this.dragon.level().addParticle(ParticleTypes.DRAGON_BREATH, d3, d4, d5, -vec3d.x * 0.07999999821186066D * (double) j, -vec3d.y * 0.6000000238418579D, -vec3d.z * 0.07999999821186066D * (double) j);
+                 }
+ 
+-                vec3.yRot((float) (Math.PI / 16));
++                vec3d.yRot(0.19634955F);
+             }
+         }
++
+     }
+ 
+     @Override
+     public void doServerTick() {
+-        this.flameTicks++;
++        ++this.flameTicks;
+         if (this.flameTicks >= 200) {
+             if (this.flameCount >= 4) {
+                 this.dragon.getPhaseManager().setPhase(EnderDragonPhase.TAKEOFF);
+@@ -59,46 +63,55 @@
+                 this.dragon.getPhaseManager().setPhase(EnderDragonPhase.SITTING_SCANNING);
+             }
+         } else if (this.flameTicks == 10) {
+-            Vec3 vec3 = new Vec3(this.dragon.head.getX() - this.dragon.getX(), 0.0, this.dragon.head.getZ() - this.dragon.getZ()).normalize();
++            Vec3 vec3d = (new Vec3(this.dragon.head.getX() - this.dragon.getX(), 0.0D, this.dragon.head.getZ() - this.dragon.getZ())).normalize();
+             float f = 5.0F;
+-            double d = this.dragon.head.getX() + vec3.x * 5.0 / 2.0;
+-            double e = this.dragon.head.getZ() + vec3.z * 5.0 / 2.0;
+-            double g = this.dragon.head.getY(0.5);
+-            double h = g;
+-            BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos(d, g, e);
++            double d0 = this.dragon.head.getX() + vec3d.x * 5.0D / 2.0D;
++            double d1 = this.dragon.head.getZ() + vec3d.z * 5.0D / 2.0D;
++            double d2 = this.dragon.head.getY(0.5D);
++            double d3 = d2;
++            BlockPos.MutableBlockPos blockposition_mutableblockposition = new BlockPos.MutableBlockPos(d0, d2, d1);
+ 
+-            while (this.dragon.level().isEmptyBlock(mutableBlockPos)) {
+-                if (--h < 0.0) {
+-                    h = g;
++            while (this.dragon.level().isEmptyBlock(blockposition_mutableblockposition)) {
++                --d3;
++                if (d3 < 0.0D) {
++                    d3 = d2;
+                     break;
+                 }
+ 
+-                mutableBlockPos.set(d, h, e);
++                blockposition_mutableblockposition.set(d0, d3, d1);
+             }
+ 
+-            h = (double)(Mth.floor(h) + 1);
+-            this.flame = new AreaEffectCloud(this.dragon.level(), d, h, e);
++            d3 = (double) (Mth.floor(d3) + 1);
++            this.flame = new AreaEffectCloud(this.dragon.level(), d0, d3, d1);
+             this.flame.setOwner(this.dragon);
+             this.flame.setRadius(5.0F);
+             this.flame.setDuration(200);
+             this.flame.setParticle(ParticleTypes.DRAGON_BREATH);
+             this.flame.addEffect(new MobEffectInstance(MobEffects.HARM));
++            if (new com.destroystokyo.paper.event.entity.EnderDragonFlameEvent((org.bukkit.entity.EnderDragon) this.dragon.getBukkitEntity(), (org.bukkit.entity.AreaEffectCloud) this.flame.getBukkitEntity()).callEvent()) { // Paper - EnderDragon Events
+             this.dragon.level().addFreshEntity(this.flame);
++            // Paper start - EnderDragon Events
++            } else {
++                this.end();
++            }
++            // Paper end - EnderDragon Events
+         }
++
+     }
+ 
+     @Override
+     public void begin() {
+         this.flameTicks = 0;
+-        this.flameCount++;
++        ++this.flameCount;
+     }
+ 
+     @Override
+     public void end() {
+         if (this.flame != null) {
+-            this.flame.discard();
++            this.flame.discard(EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
+             this.flame = null;
+         }
++
+     }
+ 
+     @Override

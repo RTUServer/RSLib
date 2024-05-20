@@ -1,0 +1,55 @@
+--- a/net/minecraft/world/entity/ai/behavior/warden/Digging.java
++++ b/net/minecraft/world/entity/ai/behavior/warden/Digging.java
+@@ -10,36 +10,39 @@
+ import net.minecraft.world.entity.ai.memory.MemoryStatus;
+ import net.minecraft.world.entity.monster.warden.Warden;
+ 
++// CraftBukkit start - imports
++import org.bukkit.event.entity.EntityRemoveEvent;
++// CraftBukkit end
++
+ public class Digging<E extends Warden> extends Behavior<E> {
++
+     public Digging(int duration) {
+         super(ImmutableMap.of(MemoryModuleType.ATTACK_TARGET, MemoryStatus.VALUE_ABSENT, MemoryModuleType.WALK_TARGET, MemoryStatus.VALUE_ABSENT), duration);
+     }
+ 
+-    @Override
+     protected boolean canStillUse(ServerLevel world, E entity, long time) {
+         return entity.getRemovalReason() == null;
+     }
+ 
+-    @Override
+     protected boolean checkExtraStartConditions(ServerLevel world, E entity) {
+         return entity.onGround() || entity.isInWater() || entity.isInLava();
+     }
+ 
+-    @Override
+-    protected void start(ServerLevel serverLevel, E warden, long l) {
+-        if (warden.onGround()) {
+-            warden.setPose(Pose.DIGGING);
+-            warden.playSound(SoundEvents.WARDEN_DIG, 5.0F, 1.0F);
++    protected void start(ServerLevel worldserver, E e0, long i) {
++        if (e0.onGround()) {
++            e0.setPose(Pose.DIGGING);
++            e0.playSound(SoundEvents.WARDEN_DIG, 5.0F, 1.0F);
+         } else {
+-            warden.playSound(SoundEvents.WARDEN_AGITATED, 5.0F, 1.0F);
+-            this.stop(serverLevel, warden, l);
++            e0.playSound(SoundEvents.WARDEN_AGITATED, 5.0F, 1.0F);
++            this.stop(worldserver, e0, i);
+         }
++
+     }
+ 
+-    @Override
+-    protected void stop(ServerLevel serverLevel, E warden, long l) {
+-        if (warden.getRemovalReason() == null) {
+-            warden.remove(Entity.RemovalReason.DISCARDED);
++    protected void stop(ServerLevel worldserver, E e0, long i) {
++        if (e0.getRemovalReason() == null) {
++            e0.remove(Entity.RemovalReason.DISCARDED, EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - Add bukkit remove cause
+         }
++
+     }
+ }

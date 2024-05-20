@@ -1,0 +1,30 @@
+--- a/net/minecraft/world/level/StructureFeatureManager.java
++++ b/net/minecraft/world/level/StructureFeatureManager.java
+@@ -56,7 +56,12 @@
+     }
+ 
+     public List<StructureStart> startsForFeature(SectionPos sectionPos, ConfiguredStructureFeature<?, ?> configuredStructureFeature) {
+-        LongSet longSet = this.level.getChunk(sectionPos.x(), sectionPos.z(), ChunkStatus.STRUCTURE_REFERENCES).getReferencesForFeature(configuredStructureFeature);
++        // Paper start - add world option
++        return this.startsForFeature(sectionPos, configuredStructureFeature, (ServerLevelAccessor)null);
++    }
++    public List<StructureStart> startsForFeature(SectionPos sectionPos, ConfiguredStructureFeature<?, ?> configuredStructureFeature, ServerLevelAccessor world) {
++        LongSet longSet = (world == null ? this.level : world).getChunk(sectionPos.x(), sectionPos.z(), ChunkStatus.STRUCTURE_REFERENCES).getReferencesForFeature(configuredStructureFeature);
++        // Paper end - add world option
+         ImmutableList.Builder<StructureStart> builder = ImmutableList.builder();
+         this.fillStartsForFeature(configuredStructureFeature, longSet, builder::add);
+         return builder.build();
+@@ -106,7 +111,12 @@
+     }
+ 
+     public StructureStart getStructureWithPieceAt(BlockPos pos, ConfiguredStructureFeature<?, ?> configuredStructureFeature) {
+-        for(StructureStart structureStart : this.startsForFeature(SectionPos.of(pos), configuredStructureFeature)) {
++        // Paper start - add world option
++        return this.getStructureWithPieceAt(pos, configuredStructureFeature, (ServerLevelAccessor)null);
++    }
++    public StructureStart getStructureWithPieceAt(BlockPos pos, ConfiguredStructureFeature<?, ?> configuredStructureFeature, ServerLevelAccessor world) {
++        // Paper end - add world option
++        for(StructureStart structureStart : this.startsForFeature(SectionPos.of(pos), configuredStructureFeature, world)) { // Paper - add world option
+             if (this.structureHasPieceAt(pos, structureStart)) {
+                 return structureStart;
+             }

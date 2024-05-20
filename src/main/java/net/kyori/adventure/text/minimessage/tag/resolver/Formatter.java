@@ -43,101 +43,101 @@ import java.util.Locale;
  * @since 4.11.0
  */
 public final class Formatter {
-  private Formatter() {
-  }
+    private Formatter() {
+    }
 
-  /**
-   * Creates a replacement that inserts a number as a component. The component will be formatted by the provided DecimalFormat.
-   *
-   * <p>This tag accepts a locale, a format pattern, both or nothing as arguments. The locale has to be provided as first argument.</p>
-   *
-   * <p>Refer to {@link Locale} for usable locale tags. Refer to {@link DecimalFormat} for usable patterns.</p>
-   *
-   * <p>This replacement is auto-closing, so its style will not influence the style of following components.</p>
-   *
-   * @param key the key
-   * @param number the number
-   * @return the placeholder
-   * @since 4.11.0
-   */
-  public static @NotNull TagResolver number(@TagPattern final @NotNull String key, final @NotNull Number number) {
-    return TagResolver.resolver(key, (argumentQueue, context) -> {
-      final NumberFormat decimalFormat;
-      if (argumentQueue.hasNext()) {
-        final String locale = argumentQueue.pop().value();
-        if (argumentQueue.hasNext()) {
-          final String format = argumentQueue.pop().value();
-          decimalFormat = new DecimalFormat(format, new DecimalFormatSymbols(Locale.forLanguageTag(locale)));
-        } else {
-          if (locale.contains(".")) {
-            decimalFormat = new DecimalFormat(locale, DecimalFormatSymbols.getInstance());
-          } else {
-            decimalFormat = DecimalFormat.getInstance(Locale.forLanguageTag(locale));
-          }
-        }
-      } else {
-        decimalFormat = DecimalFormat.getInstance();
-      }
-      return Tag.inserting(context.deserialize(decimalFormat.format(number)));
-    });
-  }
+    /**
+     * Creates a replacement that inserts a number as a component. The component will be formatted by the provided DecimalFormat.
+     *
+     * <p>This tag accepts a locale, a format pattern, both or nothing as arguments. The locale has to be provided as first argument.</p>
+     *
+     * <p>Refer to {@link Locale} for usable locale tags. Refer to {@link DecimalFormat} for usable patterns.</p>
+     *
+     * <p>This replacement is auto-closing, so its style will not influence the style of following components.</p>
+     *
+     * @param key    the key
+     * @param number the number
+     * @return the placeholder
+     * @since 4.11.0
+     */
+    public static @NotNull TagResolver number(@TagPattern final @NotNull String key, final @NotNull Number number) {
+        return TagResolver.resolver(key, (argumentQueue, context) -> {
+            final NumberFormat decimalFormat;
+            if (argumentQueue.hasNext()) {
+                final String locale = argumentQueue.pop().value();
+                if (argumentQueue.hasNext()) {
+                    final String format = argumentQueue.pop().value();
+                    decimalFormat = new DecimalFormat(format, new DecimalFormatSymbols(Locale.forLanguageTag(locale)));
+                } else {
+                    if (locale.contains(".")) {
+                        decimalFormat = new DecimalFormat(locale, DecimalFormatSymbols.getInstance());
+                    } else {
+                        decimalFormat = DecimalFormat.getInstance(Locale.forLanguageTag(locale));
+                    }
+                }
+            } else {
+                decimalFormat = DecimalFormat.getInstance();
+            }
+            return Tag.inserting(context.deserialize(decimalFormat.format(number)));
+        });
+    }
 
-  /**
-   * Creates a replacement that inserts a date or a time as a component. The component will be formatted by the provided Date Format.
-   *
-   * <p>This tag expects a format as attribute. Refer to {@link DateTimeFormatter} for usable patterns.</p>
-   *
-   * <p>This replacement is auto-closing, so its style will not influence the style of following components.</p>
-   *
-   * @param key the key
-   * @param time the time
-   * @return the placeholder
-   * @since 4.11.0
-   */
-  public static @NotNull TagResolver date(@TagPattern final @NotNull String key, final @NotNull TemporalAccessor time) {
-    return TagResolver.resolver(key, (argumentQueue, context) -> {
-      final String format = argumentQueue.popOr("Format expected.").value();
-      return Tag.inserting(context.deserialize(DateTimeFormatter.ofPattern(format).format(time)));
-    });
-  }
+    /**
+     * Creates a replacement that inserts a date or a time as a component. The component will be formatted by the provided Date Format.
+     *
+     * <p>This tag expects a format as attribute. Refer to {@link DateTimeFormatter} for usable patterns.</p>
+     *
+     * <p>This replacement is auto-closing, so its style will not influence the style of following components.</p>
+     *
+     * @param key  the key
+     * @param time the time
+     * @return the placeholder
+     * @since 4.11.0
+     */
+    public static @NotNull TagResolver date(@TagPattern final @NotNull String key, final @NotNull TemporalAccessor time) {
+        return TagResolver.resolver(key, (argumentQueue, context) -> {
+            final String format = argumentQueue.popOr("Format expected.").value();
+            return Tag.inserting(context.deserialize(DateTimeFormatter.ofPattern(format).format(time)));
+        });
+    }
 
-  /**
-   * Creates a replacement that inserts a choice formatted text. The component will be formatted by the provided ChoiceFormat.
-   *
-   * <p>This tag expectes a format as attribute. Refer to {@link ChoiceFormat} for usable patterns.</p>
-   *
-   * <p>This replacement is auto-closing, so its style will not influence the style of following components.</p>
-   *
-   * @param key the key
-   * @param number the number
-   * @return the placeholder
-   * @since 4.11.0
-   */
-  public static @NotNull TagResolver choice(@TagPattern final @NotNull String key, final Number number) {
-    return TagResolver.resolver(key, (argumentQueue, context) -> {
-      final String format = argumentQueue.popOr("Format expected.").value();
-      final ChoiceFormat choiceFormat = new ChoiceFormat(format);
-      return Tag.inserting(context.deserialize(choiceFormat.format(number)));
-    });
-  }
+    /**
+     * Creates a replacement that inserts a choice formatted text. The component will be formatted by the provided ChoiceFormat.
+     *
+     * <p>This tag expectes a format as attribute. Refer to {@link ChoiceFormat} for usable patterns.</p>
+     *
+     * <p>This replacement is auto-closing, so its style will not influence the style of following components.</p>
+     *
+     * @param key    the key
+     * @param number the number
+     * @return the placeholder
+     * @since 4.11.0
+     */
+    public static @NotNull TagResolver choice(@TagPattern final @NotNull String key, final Number number) {
+        return TagResolver.resolver(key, (argumentQueue, context) -> {
+            final String format = argumentQueue.popOr("Format expected.").value();
+            final ChoiceFormat choiceFormat = new ChoiceFormat(format);
+            return Tag.inserting(context.deserialize(choiceFormat.format(number)));
+        });
+    }
 
-  /**
-   * Creates a choice tag. This will use the first argument when true, otherwise the second argument.
-   *
-   * <p>This tag expects two formats as attributes.</p>
-   *
-   * <p>This replacement is auto-closing, so its style will not influence the style of following components.</p>
-   *
-   * @param key the key
-   * @param value the value
-   * @return the placeholder
-   * @since 4.13.0
-   */
-  public static TagResolver booleanChoice(@TagPattern final @NotNull String key, final boolean value) {
-    return TagResolver.resolver(key, (argumentQueue, context) -> {
-      final String trueCase = argumentQueue.popOr("True format expected.").value();
-      final String falseCase = argumentQueue.popOr("False format expected.").value();
-      return Tag.inserting(context.deserialize(value ? trueCase : falseCase));
-    });
-  }
+    /**
+     * Creates a choice tag. This will use the first argument when true, otherwise the second argument.
+     *
+     * <p>This tag expects two formats as attributes.</p>
+     *
+     * <p>This replacement is auto-closing, so its style will not influence the style of following components.</p>
+     *
+     * @param key   the key
+     * @param value the value
+     * @return the placeholder
+     * @since 4.13.0
+     */
+    public static TagResolver booleanChoice(@TagPattern final @NotNull String key, final boolean value) {
+        return TagResolver.resolver(key, (argumentQueue, context) -> {
+            final String trueCase = argumentQueue.popOr("True format expected.").value();
+            final String falseCase = argumentQueue.popOr("False format expected.").value();
+            return Tag.inserting(context.deserialize(value ? trueCase : falseCase));
+        });
+    }
 }

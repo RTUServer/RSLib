@@ -1,0 +1,224 @@
+--- a/net/minecraft/world/inventory/BeaconMenu.java
++++ b/net/minecraft/world/inventory/BeaconMenu.java
+@@ -5,12 +5,16 @@
+ import net.minecraft.world.Container;
+ import net.minecraft.world.SimpleContainer;
+ import net.minecraft.world.effect.MobEffect;
++import net.minecraft.world.entity.player.Inventory;
+ import net.minecraft.world.entity.player.Player;
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.level.block.Blocks;
++import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryView;
++// CraftBukkit end
+ 
+ public class BeaconMenu extends AbstractContainerMenu {
++
+     private static final int PAYMENT_SLOT = 0;
+     private static final int SLOT_COUNT = 1;
+     private static final int DATA_COUNT = 3;
+@@ -18,20 +22,14 @@
+     private static final int INV_SLOT_END = 28;
+     private static final int USE_ROW_SLOT_START = 28;
+     private static final int USE_ROW_SLOT_END = 37;
+-    private final Container beacon = new SimpleContainer(1) {
+-        @Override
+-        public boolean canPlaceItem(int slot, ItemStack stack) {
+-            return stack.is(ItemTags.BEACON_PAYMENT_ITEMS);
+-        }
+-
+-        @Override
+-        public int getMaxStackSize() {
+-            return 1;
+-        }
+-    };
++    private final Container beacon;
+     private final BeaconMenu.PaymentSlot paymentSlot;
+     private final ContainerLevelAccess access;
+     private final ContainerData beaconData;
++    // CraftBukkit start
++    private CraftInventoryView bukkitEntity = null;
++    private Inventory player;
++    // CraftBukkit end
+ 
+     public BeaconMenu(int syncId, Container inventory) {
+         this(syncId, inventory, new SimpleContainerData(3), ContainerLevelAccess.NULL);
+@@ -39,23 +37,37 @@
+ 
+     public BeaconMenu(int syncId, Container inventory, ContainerData propertyDelegate, ContainerLevelAccess context) {
+         super(MenuType.BEACON, syncId);
++        this.player = (Inventory) inventory; // CraftBukkit - TODO: check this
++        this.beacon = new SimpleContainer(1) {
++            @Override
++            public boolean canPlaceItem(int slot, ItemStack stack) {
++                return stack.is(ItemTags.BEACON_PAYMENT_ITEMS);
++            }
++
++            @Override
++            public int getMaxStackSize() {
++                return 1;
++            }
++        };
+         checkContainerDataCount(propertyDelegate, 3);
+         this.beaconData = propertyDelegate;
+         this.access = context;
+         this.paymentSlot = new BeaconMenu.PaymentSlot(this.beacon, 0, 136, 110);
+         this.addSlot(this.paymentSlot);
+         this.addDataSlots(propertyDelegate);
+-        int i = 36;
+-        int j = 137;
++        boolean flag = true;
++        boolean flag1 = true;
+ 
+-        for(int k = 0; k < 3; ++k) {
+-            for(int l = 0; l < 9; ++l) {
+-                this.addSlot(new Slot(inventory, l + k * 9 + 9, 36 + l * 18, 137 + k * 18));
++        int j;
++
++        for (j = 0; j < 3; ++j) {
++            for (int k = 0; k < 9; ++k) {
++                this.addSlot(new Slot(inventory, k + j * 9 + 9, 36 + k * 18, 137 + j * 18));
+             }
+         }
+ 
+-        for(int m = 0; m < 9; ++m) {
+-            this.addSlot(new Slot(inventory, m, 36 + m * 18, 195));
++        for (j = 0; j < 9; ++j) {
++            this.addSlot(new Slot(inventory, j, 36 + j * 18, 195));
+         }
+ 
+     }
+@@ -64,9 +76,10 @@
+     public void removed(Player player) {
+         super.removed(player);
+         if (!player.level.isClientSide) {
+-            ItemStack itemStack = this.paymentSlot.remove(this.paymentSlot.getMaxStackSize());
+-            if (!itemStack.isEmpty()) {
+-                player.drop(itemStack, false);
++            ItemStack itemstack = this.paymentSlot.remove(this.paymentSlot.getMaxStackSize());
++
++            if (!itemstack.isEmpty()) {
++                player.drop(itemstack, false);
+             }
+ 
+         }
+@@ -74,6 +87,7 @@
+ 
+     @Override
+     public boolean stillValid(Player player) {
++        if (!this.checkReachable) return true; // CraftBukkit
+         return stillValid(this.access, player, Blocks.BEACON);
+     }
+ 
+@@ -85,47 +99,49 @@
+ 
+     @Override
+     public ItemStack quickMoveStack(Player player, int index) {
+-        ItemStack itemStack = ItemStack.EMPTY;
+-        Slot slot = this.slots.get(index);
++        ItemStack itemstack = ItemStack.EMPTY;
++        Slot slot = (Slot) this.slots.get(index);
++
+         if (slot != null && slot.hasItem()) {
+-            ItemStack itemStack2 = slot.getItem();
+-            itemStack = itemStack2.copy();
++            ItemStack itemstack1 = slot.getItem();
++
++            itemstack = itemstack1.copy();
+             if (index == 0) {
+-                if (!this.moveItemStackTo(itemStack2, 1, 37, true)) {
++                if (!this.moveItemStackTo(itemstack1, 1, 37, true)) {
+                     return ItemStack.EMPTY;
+                 }
+ 
+-                slot.onQuickCraft(itemStack2, itemStack);
+-            } else if (!this.paymentSlot.hasItem() && this.paymentSlot.mayPlace(itemStack2) && itemStack2.getCount() == 1) {
+-                if (!this.moveItemStackTo(itemStack2, 0, 1, false)) {
++                slot.onQuickCraft(itemstack1, itemstack);
++            } else if (!this.paymentSlot.hasItem() && this.paymentSlot.mayPlace(itemstack1) && itemstack1.getCount() == 1) {
++                if (!this.moveItemStackTo(itemstack1, 0, 1, false)) {
+                     return ItemStack.EMPTY;
+                 }
+             } else if (index >= 1 && index < 28) {
+-                if (!this.moveItemStackTo(itemStack2, 28, 37, false)) {
++                if (!this.moveItemStackTo(itemstack1, 28, 37, false)) {
+                     return ItemStack.EMPTY;
+                 }
+             } else if (index >= 28 && index < 37) {
+-                if (!this.moveItemStackTo(itemStack2, 1, 28, false)) {
++                if (!this.moveItemStackTo(itemstack1, 1, 28, false)) {
+                     return ItemStack.EMPTY;
+                 }
+-            } else if (!this.moveItemStackTo(itemStack2, 1, 37, false)) {
++            } else if (!this.moveItemStackTo(itemstack1, 1, 37, false)) {
+                 return ItemStack.EMPTY;
+             }
+ 
+-            if (itemStack2.isEmpty()) {
++            if (itemstack1.isEmpty()) {
+                 slot.set(ItemStack.EMPTY);
+             } else {
+                 slot.setChanged();
+             }
+ 
+-            if (itemStack2.getCount() == itemStack.getCount()) {
++            if (itemstack1.getCount() == itemstack.getCount()) {
+                 return ItemStack.EMPTY;
+             }
+ 
+-            slot.onTake(player, itemStack2);
++            slot.onTake(player, itemstack1);
+         }
+ 
+-        return itemStack;
++        return itemstack;
+     }
+ 
+     public int getLevels() {
+@@ -144,10 +160,16 @@
+ 
+     public void updateEffects(int primaryEffectId, int secondaryEffectId) {
+         if (this.paymentSlot.hasItem()) {
+-            this.beaconData.set(1, primaryEffectId);
+-            this.beaconData.set(2, secondaryEffectId);
++            // Paper start
++            io.papermc.paper.event.player.PlayerChangeBeaconEffectEvent event = new io.papermc.paper.event.player.PlayerChangeBeaconEffectEvent((org.bukkit.entity.Player) this.player.player.getBukkitEntity(), org.bukkit.potion.PotionEffectType.getById(primaryEffectId), org.bukkit.potion.PotionEffectType.getById(secondaryEffectId), this.access.getLocation().getBlock());
++            if (event.callEvent()) {
++                this.beaconData.set(1, event.getPrimary() == null ? 0 : event.getPrimary().getId());
++                this.beaconData.set(2, event.getSecondary() == null ? 0 : event.getSecondary().getId());
++                if (!event.willConsumeItem()) return;
+             this.paymentSlot.remove(1);
+             this.access.execute(Level::blockEntityChanged);
++            }
++            // Paper end
+         }
+ 
+     }
+@@ -156,7 +178,8 @@
+         return !this.beacon.getItem(0).isEmpty();
+     }
+ 
+-    class PaymentSlot extends Slot {
++    private class PaymentSlot extends Slot {
++
+         public PaymentSlot(Container inventory, int index, int x, int y) {
+             super(inventory, index, x, y);
+         }
+@@ -171,4 +194,17 @@
+             return 1;
+         }
+     }
++
++    // CraftBukkit start
++    @Override
++    public CraftInventoryView getBukkitView() {
++        if (this.bukkitEntity != null) {
++            return this.bukkitEntity;
++        }
++
++        org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventory inventory = new org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryBeacon(this.beacon);
++        this.bukkitEntity = new CraftInventoryView(this.player.player.getBukkitEntity(), inventory, this);
++        return this.bukkitEntity;
++    }
++    // CraftBukkit end
+ }

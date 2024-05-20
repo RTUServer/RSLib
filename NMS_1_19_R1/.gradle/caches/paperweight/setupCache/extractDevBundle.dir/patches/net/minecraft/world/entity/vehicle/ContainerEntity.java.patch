@@ -1,0 +1,52 @@
+--- a/net/minecraft/world/entity/vehicle/ContainerEntity.java
++++ b/net/minecraft/world/entity/vehicle/ContainerEntity.java
+@@ -61,7 +61,7 @@
+             if (this.getLootTableSeed() != 0L) {
+                 nbt.putLong("LootTableSeed", this.getLootTableSeed());
+             }
+-        } else {
++        } else if (true) { // Paper - always load the items, table may still remain
+             ContainerHelper.saveAllItems(nbt, this.getItemStacks());
+         }
+ 
+@@ -72,7 +72,7 @@
+         if (nbt.contains("LootTable", 8)) {
+             this.setLootTable(new ResourceLocation(nbt.getString("LootTable")));
+             this.setLootTableSeed(nbt.getLong("LootTableSeed"));
+-        } else {
++        } else if (true) { // Paper - always load the items, table may still remain
+             ContainerHelper.loadAllItems(nbt, this.getItemStacks());
+         }
+ 
+@@ -104,13 +104,15 @@
+ 
+     default void unpackChestVehicleLootTable(@Nullable Player player) {
+         MinecraftServer minecraftServer = this.getLevel().getServer();
+-        if (this.getLootTable() != null && minecraftServer != null) {
++        if (this.getLootableData().shouldReplenish(player) && minecraftServer != null) { // Paper
+             LootTable lootTable = minecraftServer.getLootTables().get(this.getLootTable());
+             if (player != null) {
+                 CriteriaTriggers.GENERATE_LOOT.trigger((ServerPlayer)player, this.getLootTable());
+             }
+ 
+-            this.setLootTable((ResourceLocation)null);
++            // this.setLootTable((ResourceLocation)null); // Paper
++            this.getLootableData().processRefill(player); // Paper
++
+             LootContext.Builder builder = (new LootContext.Builder((ServerLevel)this.getLevel())).withParameter(LootContextParams.ORIGIN, this.position()).withOptionalRandomSeed(this.getLootTableSeed());
+             if (player != null) {
+                 builder.withLuck(player.getLuck()).withParameter(LootContextParams.THIS_ENTITY, player);
+@@ -184,4 +186,13 @@
+     default boolean isChestVehicleStillValid(Player player) {
+         return !this.isRemoved() && this.position().closerThan(player.position(), 8.0D);
+     }
++    // Paper start
++    default Entity getEntity() {
++        throw new UnsupportedOperationException();
++    }
++
++    default com.destroystokyo.paper.loottable.PaperLootableInventoryData getLootableData() {
++        throw new UnsupportedOperationException();
++    }
++    // Paper end
+ }

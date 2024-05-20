@@ -40,6 +40,6 @@ import static java.lang.annotation.ElementType.*;
  */
 @Documented
 @Retention(RetentionPolicy.CLASS)
-@Target({ METHOD, FIELD, PARAMETER, LOCAL_VARIABLE })
+@Target({METHOD, FIELD, PARAMETER, LOCAL_VARIABLE})
 public @Pattern(TagInternals.TAG_NAME_REGEX) @interface TagPattern {
 }

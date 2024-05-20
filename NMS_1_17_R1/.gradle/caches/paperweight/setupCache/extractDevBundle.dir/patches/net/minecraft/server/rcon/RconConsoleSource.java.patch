@@ -1,0 +1,44 @@
+--- a/net/minecraft/server/rcon/RconConsoleSource.java
++++ b/net/minecraft/server/rcon/RconConsoleSource.java
+@@ -3,6 +3,7 @@
+ import java.util.UUID;
+ import net.minecraft.commands.CommandSource;
+ import net.minecraft.commands.CommandSourceStack;
++import net.minecraft.core.Vec3i;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.chat.TextComponent;
+ import net.minecraft.server.MinecraftServer;
+@@ -12,6 +13,7 @@
+ import net.minecraft.world.phys.Vec3;
+ 
+ public class RconConsoleSource implements CommandSource {
++
+     private static final String RCON = "Rcon";
+     private static final Component RCON_COMPONENT = new TextComponent("Rcon");
+     private final StringBuffer buffer = new StringBuffer();
+@@ -30,11 +32,23 @@
+     }
+ 
+     public CommandSourceStack createCommandSourceStack() {
+-        ServerLevel serverLevel = this.server.overworld();
+-        return new CommandSourceStack(this, Vec3.atLowerCornerOf(serverLevel.getSharedSpawnPos()), Vec2.ZERO, serverLevel, 4, "Rcon", RCON_COMPONENT, this.server, (Entity)null);
++        ServerLevel worldserver = this.server.overworld();
++
++        return new CommandSourceStack(this, Vec3.atLowerCornerOf((Vec3i) worldserver.getSharedSpawnPos()), Vec2.ZERO, worldserver, 4, "Rcon", RconConsoleSource.RCON_COMPONENT, this.server, (Entity) null);
++    }
++
++    // CraftBukkit start - Send a String
++    public void sendMessage(String message) {
++        this.buffer.append(message);
+     }
+ 
+     @Override
++    public org.bukkit.command.CommandSender getBukkitSender(CommandSourceStack wrapper) {
++        return server.remoteConsole;
++    }
++    // CraftBukkit end
++
++    @Override
+     public void sendMessage(Component message, UUID sender) {
+         this.buffer.append(message.getString());
+     }

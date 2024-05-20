@@ -32,11 +32,11 @@ import org.jetbrains.annotations.NotNull;
  */
 @FunctionalInterface
 public interface Emitable {
-  /**
-   * Emit tags based on this emitable's data.
-   *
-   * @param emitter the target to emit to
-   * @since 4.10.0
-   */
-  void emit(final @NotNull TokenEmitter emitter);
+    /**
+     * Emit tags based on this emitable's data.
+     *
+     * @param emitter the target to emit to
+     * @since 4.10.0
+     */
+    void emit(final @NotNull TokenEmitter emitter);
 }

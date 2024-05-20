@@ -31,42 +31,42 @@ import org.jetbrains.annotations.NotNull;
  * @since 4.10.0
  */
 public interface ClaimConsumer {
-  /**
-   * Submit a style claim for the active component.
-   *
-   * <p>Style claims are additive, but any single style element can only be claimed once.</p>
-   *
-   * @param claimKey an identifier for the style element being claimed
-   * @param styleClaim the claim of a style
-   * @since 4.10.0
-   */
-  void style(final @NotNull String claimKey, final @NotNull Emitable styleClaim);
+    /**
+     * Submit a style claim for the active component.
+     *
+     * <p>Style claims are additive, but any single style element can only be claimed once.</p>
+     *
+     * @param claimKey   an identifier for the style element being claimed
+     * @param styleClaim the claim of a style
+     * @since 4.10.0
+     */
+    void style(final @NotNull String claimKey, final @NotNull Emitable styleClaim);
 
-  /**
-   * Submit a component claim for the active component.
-   *
-   * <p>Only one component claim can be in effect. We use the first component claim.</p>
-   *
-   * @param componentClaim the claim of a component
-   * @return whether the claim was successful
-   * @since 4.10.0
-   */
-  boolean component(final @NotNull Emitable componentClaim);
+    /**
+     * Submit a component claim for the active component.
+     *
+     * <p>Only one component claim can be in effect. We use the first component claim.</p>
+     *
+     * @param componentClaim the claim of a component
+     * @return whether the claim was successful
+     * @since 4.10.0
+     */
+    boolean component(final @NotNull Emitable componentClaim);
 
-  /**
-   * Get whether a style element has been claimed yet.
-   *
-   * @param claimId the id for this style elemnt being tested
-   * @return whether style is claimed
-   * @since 4.10.0
-   */
-  boolean styleClaimed(final @NotNull String claimId);
+    /**
+     * Get whether a style element has been claimed yet.
+     *
+     * @param claimId the id for this style elemnt being tested
+     * @return whether style is claimed
+     * @since 4.10.0
+     */
+    boolean styleClaimed(final @NotNull String claimId);
 
-  /**
-   * Get whether a component has been claimed yet.
-   *
-   * @return whether a component has been claimed yet
-   * @since 4.10.0
-   */
-  boolean componentClaimed();
+    /**
+     * Get whether a component has been claimed yet.
+     *
+     * @return whether a component has been claimed yet
+     * @since 4.10.0
+     */
+    boolean componentClaimed();
 }

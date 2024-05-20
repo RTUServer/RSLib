@@ -1,0 +1,71 @@
+--- a/net/minecraft/world/level/biome/Biome.java
++++ b/net/minecraft/world/level/biome/Biome.java
+@@ -39,8 +39,32 @@
+ 
+ public final class Biome {
+     public static final Logger LOGGER = LogManager.getLogger();
+-    public static final Codec<Biome> DIRECT_CODEC;
+-    public static final Codec<Biome> NETWORK_CODEC;
++    // Paper start - decompile fix: move up verbatim from static block
++    public static final Codec<Biome> DIRECT_CODEC = RecordCodecBuilder.create((instance) -> {
++        return instance.group(Biome.ClimateSettings.CODEC.forGetter((biome) -> {
++            return biome.climateSettings;
++        }), Biome.BiomeCategory.CODEC.fieldOf("category").forGetter((biome) -> {
++            return biome.biomeCategory;
++        }), BiomeSpecialEffects.CODEC.fieldOf("effects").forGetter((biome) -> {
++            return biome.specialEffects;
++        }), BiomeGenerationSettings.CODEC.forGetter((biome) -> {
++            return biome.generationSettings;
++        }), MobSpawnSettings.CODEC.forGetter((biome) -> {
++            return biome.mobSettings;
++        })).apply(instance, Biome::new);
++    });
++    public static final Codec<Biome> NETWORK_CODEC = RecordCodecBuilder.create((instance) -> {
++        return instance.group(Biome.ClimateSettings.CODEC.forGetter((biome) -> {
++            return biome.climateSettings;
++        }), Biome.BiomeCategory.CODEC.fieldOf("category").forGetter((biome) -> {
++            return biome.biomeCategory;
++        }), BiomeSpecialEffects.CODEC.fieldOf("effects").forGetter((biome) -> {
++            return biome.specialEffects;
++        })).apply(instance, (climateSettings, biomeCategory, biomeSpecialEffects) -> {
++            return new Biome(climateSettings, biomeCategory, biomeSpecialEffects, BiomeGenerationSettings.EMPTY, MobSpawnSettings.EMPTY);
++        });
++    });
++    // Paper end
+     public static final Codec<Supplier<Biome>> CODEC = RegistryFileCodec.create(Registry.BIOME_REGISTRY, DIRECT_CODEC);
+     public static final Codec<List<Supplier<Biome>>> LIST_CODEC = RegistryFileCodec.homogeneousList(Registry.BIOME_REGISTRY, DIRECT_CODEC);
+     private static final PerlinSimplexNoise TEMPERATURE_NOISE = new PerlinSimplexNoise(new WorldgenRandom(new LegacyRandomSource(1234L)), ImmutableList.of(0));
+@@ -257,33 +281,6 @@
+         return resourceLocation == null ? super.toString() : resourceLocation.toString();
+     }
+ 
+-    static {
+-        DIRECT_CODEC = RecordCodecBuilder.create((instance) -> {
+-            return instance.group(Biome.ClimateSettings.CODEC.forGetter((biome) -> {
+-                return biome.climateSettings;
+-            }), Biome.BiomeCategory.CODEC.fieldOf("category").forGetter((biome) -> {
+-                return biome.biomeCategory;
+-            }), BiomeSpecialEffects.CODEC.fieldOf("effects").forGetter((biome) -> {
+-                return biome.specialEffects;
+-            }), BiomeGenerationSettings.CODEC.forGetter((biome) -> {
+-                return biome.generationSettings;
+-            }), MobSpawnSettings.CODEC.forGetter((biome) -> {
+-                return biome.mobSettings;
+-            })).apply(instance, Biome::new);
+-        });
+-        NETWORK_CODEC = RecordCodecBuilder.create((instance) -> {
+-            return instance.group(Biome.ClimateSettings.CODEC.forGetter((biome) -> {
+-                return biome.climateSettings;
+-            }), Biome.BiomeCategory.CODEC.fieldOf("category").forGetter((biome) -> {
+-                return biome.biomeCategory;
+-            }), BiomeSpecialEffects.CODEC.fieldOf("effects").forGetter((biome) -> {
+-                return biome.specialEffects;
+-            })).apply(instance, (climateSettings, biomeCategory, biomeSpecialEffects) -> {
+-                return new Biome(climateSettings, biomeCategory, biomeSpecialEffects, BiomeGenerationSettings.EMPTY, MobSpawnSettings.EMPTY);
+-            });
+-        });
+-    }
+-
+     public static class BiomeBuilder {
+         @Nullable
+         private Biome.Precipitation precipitation;

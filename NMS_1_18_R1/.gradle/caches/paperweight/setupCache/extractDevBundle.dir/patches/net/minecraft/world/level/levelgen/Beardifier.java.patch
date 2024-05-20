@@ -1,0 +1,28 @@
+--- a/net/minecraft/world/level/levelgen/Beardifier.java
++++ b/net/minecraft/world/level/levelgen/Beardifier.java
+@@ -16,6 +16,7 @@
+ import net.minecraft.world.level.levelgen.structure.BoundingBox;
+ import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
+ import net.minecraft.world.level.levelgen.structure.StructurePiece;
++import net.minecraft.world.level.levelgen.structure.StructureStart;
+ 
+ public class Beardifier implements NoiseChunk.NoiseFiller {
+     public static final int BEARD_KERNEL_RADIUS = 12;
+@@ -43,7 +44,7 @@
+         this.rigids = new ObjectArrayList<>(10);
+ 
+         for(StructureFeature<?> structureFeature : StructureFeature.NOISE_AFFECTING_FEATURES) {
+-            structureAccessor.startsForFeature(SectionPos.bottomOf(chunk), structureFeature).forEach((start) -> {
++            for (StructureStart<?> start : structureAccessor.startsForFeature(SectionPos.bottomOf(chunk), structureFeature)) { // Paper - remove streams
+                 for(StructurePiece structurePiece : start.getPieces()) {
+                     if (structurePiece.isCloseToChunk(chunkPos, 12)) {
+                         if (structurePiece instanceof PoolElementStructurePiece) {
+@@ -66,7 +67,7 @@
+                     }
+                 }
+ 
+-            });
++            } // Paper
+         }
+ 
+         this.pieceIterator = this.rigids.iterator();

@@ -1,0 +1,22 @@
+--- a/net/minecraft/core/registries/BuiltInRegistries.java
++++ b/net/minecraft/core/registries/BuiltInRegistries.java
+@@ -307,12 +307,18 @@
+         Bootstrap.checkBootstrapCalled(() -> "registry " + key);
+         ResourceLocation resourceLocation = key.location();
+         LOADERS.put(resourceLocation, () -> initializer.run(registry));
+-        WRITABLE_REGISTRY.register((ResourceKey<WritableRegistry<?>>)key, registry, lifecycle);
++        WRITABLE_REGISTRY.register((ResourceKey)key, registry, lifecycle); // Paper - decompile fix
+         return registry;
+     }
+ 
+     public static void bootStrap() {
++        // Paper start
++        bootStrap(() -> {});
++    }
++    public static void bootStrap(Runnable runnable) {
++        // Paper end
+         createContents();
++        runnable.run(); // Paper
+         freeze();
+         validate(REGISTRY);
+     }

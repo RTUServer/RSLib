@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/level/levelgen/surfacebuilders/NetherForestSurfaceBuilder.java
++++ b/net/minecraft/world/level/levelgen/surfacebuilders/NetherForestSurfaceBuilder.java
+@@ -34,7 +34,7 @@
+         int o = -1;
+         BlockState blockState = surfaceBuilderBaseConfiguration.getUnderMaterial();
+ 
+-        for(int p = 127; p >= i; --p) {
++        for(int p = height; p >= i; --p) { // Paper - fix MC-187716 - use configured height
+             mutableBlockPos.set(k, p, m);
+             BlockState blockState2 = surfaceBuilderBaseConfiguration.getTopMaterial();
+             BlockState blockState3 = chunk.getBlockState(mutableBlockPos);

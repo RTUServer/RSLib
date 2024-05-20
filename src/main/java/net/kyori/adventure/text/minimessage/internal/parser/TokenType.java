@@ -29,9 +29,9 @@ package net.kyori.adventure.text.minimessage.internal.parser;
  * @since 4.10.0
  */
 public enum TokenType {
-  TEXT,
-  OPEN_TAG,
-  OPEN_CLOSE_TAG, // one token that both opens and closes a tag
-  CLOSE_TAG,
-  TAG_VALUE;
+    TEXT,
+    OPEN_TAG,
+    OPEN_CLOSE_TAG, // one token that both opens and closes a tag
+    CLOSE_TAG,
+    TAG_VALUE
 }

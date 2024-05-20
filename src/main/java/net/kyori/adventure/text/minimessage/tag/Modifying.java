@@ -35,35 +35,35 @@ import org.jetbrains.annotations.NotNull;
  */
 @ApiStatus.OverrideOnly
 public /* non-sealed */ interface Modifying extends Tag {
-  /**
-   * Method called once for every element in the subtree, allowing calculations to be made before {@link #apply(Component, int) application}.
-   *
-   * @param current the current element in the subtree
-   * @param depth depth in the tree this node is at
-   * @since 4.10.0
-   */
-  default void visit(final @NotNull Node current, final int depth) {
-  }
+    /**
+     * Method called once for every element in the subtree, allowing calculations to be made before {@link #apply(Component, int) application}.
+     *
+     * @param current the current element in the subtree
+     * @param depth   depth in the tree this node is at
+     * @since 4.10.0
+     */
+    default void visit(final @NotNull Node current, final int depth) {
+    }
 
-  /**
-   * Called after the entire tree has been {@link #visit(Node, int) visited}.
-   *
-   * <p>This allows for finalizing calculations made during the tree visit, but before actual application to the child components of this tag.</p>
-   *
-   * @since 4.10.0
-   */
-  default void postVisit() {
-  }
+    /**
+     * Called after the entire tree has been {@link #visit(Node, int) visited}.
+     *
+     * <p>This allows for finalizing calculations made during the tree visit, but before actual application to the child components of this tag.</p>
+     *
+     * @since 4.10.0
+     */
+    default void postVisit() {
+    }
 
-  /**
-   * Applies this transformation for the current component.
-   *
-   * <p>This gets called after the component tree has been assembled, however, the tree can still be modified at this point if desired.</p>
-   *
-   * @param current the current component
-   * @param depth the depth of the tree the current component is at
-   * @return the new parent
-   * @since 4.10.0
-   */
-  Component apply(final @NotNull Component current, final int depth);
+    /**
+     * Applies this transformation for the current component.
+     *
+     * <p>This gets called after the component tree has been assembled, however, the tree can still be modified at this point if desired.</p>
+     *
+     * @param current the current component
+     * @param depth   the depth of the tree the current component is at
+     * @return the new parent
+     * @since 4.10.0
+     */
+    Component apply(final @NotNull Component current, final int depth);
 }

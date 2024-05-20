@@ -1,0 +1,28 @@
+--- a/net/minecraft/world/entity/ai/sensing/NearestLivingEntitySensor.java
++++ b/net/minecraft/world/entity/ai/sensing/NearestLivingEntitySensor.java
+@@ -18,12 +18,21 @@
+         List<LivingEntity> list = world.getEntitiesOfClass(LivingEntity.class, aABB, (livingEntity2) -> {
+             return livingEntity2 != entity && livingEntity2.isAlive();
+         });
+-        list.sort(Comparator.comparingDouble(entity::distanceToSqr));
++        // Paper start - remove streams
++        list.sort((e1, e2) -> Double.compare(entity.distanceToSqr(e1), entity.distanceToSqr(e2)));
+         Brain<?> brain = entity.getBrain();
+         brain.setMemory(MemoryModuleType.NEAREST_LIVING_ENTITIES, list);
+-        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES, list.stream().filter((livingEntity2) -> {
+-            return isEntityTargetable(entity, livingEntity2);
+-        }).collect(Collectors.toList()));
++        // Paper start - remove streams in favour of lists
++        List<LivingEntity> visibleMobs = new java.util.ArrayList<>();
++        for (int i = 0, len = list.size(); i < len; i++) {
++            LivingEntity nearby = list.get(i);
++            if (Sensor.isEntityTargetable(entity, nearby)) {
++                visibleMobs.add(nearby);
++            }
++        }
++        // Paper end - remove streams
++        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES, visibleMobs);
++        // Paper end
+     }
+ 
+     @Override

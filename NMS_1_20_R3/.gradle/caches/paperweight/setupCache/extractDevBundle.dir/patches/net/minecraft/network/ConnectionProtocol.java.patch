@@ -1,0 +1,28 @@
+--- a/net/minecraft/network/ConnectionProtocol.java
++++ b/net/minecraft/network/ConnectionProtocol.java
+@@ -451,7 +451,7 @@
+         protocol()
+             .addFlow(
+                 PacketFlow.CLIENTBOUND,
+-                new ConnectionProtocol.PacketSet<ClientCommonPacketListener>()
++                new ConnectionProtocol.PacketSet<net.minecraft.network.protocol.configuration.ClientConfigurationPacketListener>() // Paper - decompile fix
+                     .addPacket(ClientboundCustomPayloadPacket.class, ClientboundCustomPayloadPacket::new)
+                     .addPacket(ClientboundDisconnectPacket.class, ClientboundDisconnectPacket::new)
+                     .addPacket(ClientboundFinishConfigurationPacket.class, ClientboundFinishConfigurationPacket::new)
+@@ -465,7 +465,7 @@
+             )
+             .addFlow(
+                 PacketFlow.SERVERBOUND,
+-                new ConnectionProtocol.PacketSet<ServerCommonPacketListener>()
++                new ConnectionProtocol.PacketSet<net.minecraft.network.protocol.configuration.ServerConfigurationPacketListener>() // Paper - decompile fix
+                     .addPacket(ServerboundClientInformationPacket.class, ServerboundClientInformationPacket::new)
+                     .addPacket(ServerboundCustomPayloadPacket.class, ServerboundCustomPayloadPacket::new)
+                     .addPacket(ServerboundFinishConfigurationPacket.class, ServerboundFinishConfigurationPacket::new)
+@@ -590,6 +590,7 @@
+ 
+         @Nullable
+         public Packet<?> createPacket(int id, FriendlyByteBuf buf) {
++            if (id < 0 || id >= this.idToDeserializer.size()) return null; // Paper - Perf: Optimize exception handling
+             Function<FriendlyByteBuf, ? extends Packet<? super T>> function = this.idToDeserializer.get(id);
+             return (Packet<?>)(function != null ? function.apply(buf) : null);
+         }

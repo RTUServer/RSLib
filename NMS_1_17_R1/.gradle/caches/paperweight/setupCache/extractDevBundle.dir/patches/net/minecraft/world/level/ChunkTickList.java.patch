@@ -1,0 +1,35 @@
+--- a/net/minecraft/world/level/ChunkTickList.java
++++ b/net/minecraft/world/level/ChunkTickList.java
+@@ -15,7 +15,7 @@
+ 
+     public ChunkTickList(Function<T, ResourceLocation> identifierProvider, List<TickNextTickData<T>> scheduledTicks, long startTime) {
+         this(identifierProvider, scheduledTicks.stream().map((tickNextTickData) -> {
+-            return new ChunkTickList.ScheduledTick(tickNextTickData.getType(), tickNextTickData.pos, (int)(tickNextTickData.triggerTick - startTime), tickNextTickData.priority);
++            return new ChunkTickList.ScheduledTick<>(tickNextTickData.getType(), tickNextTickData.pos, (int)(tickNextTickData.triggerTick - startTime), tickNextTickData.priority); // Paper - decompile error
+         }).collect(Collectors.toList()));
+     }
+ 
+@@ -56,6 +56,7 @@
+         return listTag;
+     }
+ 
++    private static final int MAX_TICK_DELAY = Integer.getInteger("paper.ticklist-max-tick-delay", -1).intValue(); // Paper - clean up broken entries
+     public static <T> ChunkTickList<T> create(ListTag ticks, Function<T, ResourceLocation> function, Function<ResourceLocation, T> function2) {
+         List<ChunkTickList.ScheduledTick<T>> list = Lists.newArrayList();
+ 
+@@ -64,7 +65,14 @@
+             T object = function2.apply(new ResourceLocation(compoundTag.getString("i")));
+             if (object != null) {
+                 BlockPos blockPos = new BlockPos(compoundTag.getInt("x"), compoundTag.getInt("y"), compoundTag.getInt("z"));
+-                list.add(new ChunkTickList.ScheduledTick<>(object, blockPos, compoundTag.getInt("t"), TickPriority.byValue(compoundTag.getInt("p"))));
++                // Paper start - clean up broken entries
++                int delay = compoundTag.getInt("t");
++                if (MAX_TICK_DELAY > 0 && delay > MAX_TICK_DELAY) {
++                    net.minecraft.server.MinecraftServer.LOGGER.warn("Dropping tick for pos " + blockPos + ", tick delay " + delay);
++                    continue;
++                }
++                // Paper end - clean up broken entries
++                list.add(new ChunkTickList.ScheduledTick<>(object, blockPos, delay, TickPriority.byValue(compoundTag.getInt("p"))));
+             }
+         }
+ 

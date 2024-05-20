@@ -1,0 +1,62 @@
+--- a/net/minecraft/world/level/block/FungusBlock.java
++++ b/net/minecraft/world/level/block/FungusBlock.java
+@@ -5,6 +5,7 @@
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.tags.BlockTags;
++import net.minecraft.tags.Tag;
+ import net.minecraft.world.level.BlockGetter;
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.level.block.state.BlockBehaviour;
+@@ -15,6 +16,7 @@
+ import net.minecraft.world.phys.shapes.VoxelShape;
+ 
+ public class FungusBlock extends BushBlock implements BonemealableBlock {
++
+     protected static final VoxelShape SHAPE = Block.box(4.0D, 0.0D, 4.0D, 12.0D, 9.0D, 12.0D);
+     private static final double BONEMEAL_SUCCESS_PROBABILITY = 0.4D;
+     private final Supplier<ConfiguredFeature<HugeFungusConfiguration, ?>> feature;
+@@ -26,28 +28,36 @@
+ 
+     @Override
+     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+-        return SHAPE;
++        return FungusBlock.SHAPE;
+     }
+ 
+     @Override
+     protected boolean mayPlaceOn(BlockState floor, BlockGetter world, BlockPos pos) {
+-        return floor.is(BlockTags.NYLIUM) || floor.is(Blocks.MYCELIUM) || floor.is(Blocks.SOUL_SOIL) || super.mayPlaceOn(floor, world, pos);
++        return floor.is((Tag) BlockTags.NYLIUM) || floor.is(Blocks.MYCELIUM) || floor.is(Blocks.SOUL_SOIL) || super.mayPlaceOn(floor, world, pos);
+     }
+ 
+     @Override
+     public boolean isValidBonemealTarget(BlockGetter world, BlockPos pos, BlockState state, boolean isClient) {
+-        Block block = ((HugeFungusConfiguration)(this.feature.get()).config).validBaseState.getBlock();
+-        BlockState blockState = world.getBlockState(pos.below());
+-        return blockState.is(block);
++        Block block = ((HugeFungusConfiguration) ((ConfiguredFeature) this.feature.get()).config).validBaseState.getBlock();
++        BlockState iblockdata1 = world.getBlockState(pos.below());
++
++        return iblockdata1.is(block);
+     }
+ 
+     @Override
+     public boolean isBonemealSuccess(Level world, Random random, BlockPos pos, BlockState state) {
+-        return (double)random.nextFloat() < 0.4D;
++        return (double) random.nextFloat() < 0.4D;
+     }
+ 
+     @Override
+     public void performBonemeal(ServerLevel world, Random random, BlockPos pos, BlockState state) {
+-        this.feature.get().place(world, world.getChunkSource().getGenerator(), random, pos);
++        // CraftBukkit start
++        if (this == Blocks.WARPED_FUNGUS) {
++            SaplingBlock.treeType = org.bukkit.TreeType.WARPED_FUNGUS;
++        } else if (this == Blocks.CRIMSON_FUNGUS) {
++            SaplingBlock.treeType = org.bukkit.TreeType.CRIMSON_FUNGUS;
++        }
++        // CraftBukkit end
++        ((ConfiguredFeature) this.feature.get()).place(world, world.getChunkSource().getGenerator(), random, pos);
+     }
+ }

@@ -45,78 +45,77 @@ import java.util.Map;
  * @since 4.10.0
  */
 final class ColorTagResolver implements TagResolver, SerializableResolver.Single {
-  private static final String COLOR_3 = "c";
-  private static final String COLOR_2 = "colour";
-  private static final String COLOR = "color";
+    static final TagResolver INSTANCE = new ColorTagResolver();
+    private static final String COLOR_3 = "c";
+    private static final String COLOR_2 = "colour";
+    private static final String COLOR = "color";
+    private static final StyleClaim<TextColor> STYLE = StyleClaim.claim(COLOR, Style::color, (color, emitter) -> {
+        // TODO: custom aliases
+        // TODO: compact vs expanded format? COLOR vs color:COLOR vs c:COLOR
+        if (color instanceof NamedTextColor) {
+            emitter.tag(NamedTextColor.NAMES.key((NamedTextColor) color));
+        } else {
+            emitter.tag(color.asHexString());
+        }
+    });
 
-  static final TagResolver INSTANCE = new ColorTagResolver();
-  private static final StyleClaim<TextColor> STYLE = StyleClaim.claim(COLOR, Style::color, (color, emitter) -> {
-    // TODO: custom aliases
-    // TODO: compact vs expanded format? COLOR vs color:COLOR vs c:COLOR
-    if (color instanceof NamedTextColor) {
-      emitter.tag(NamedTextColor.NAMES.key((NamedTextColor) color));
-    } else {
-      emitter.tag(color.asHexString());
-    }
-  });
+    private static final Map<String, TextColor> COLOR_ALIASES = new HashMap<>();
 
-  private static final Map<String, TextColor> COLOR_ALIASES = new HashMap<>();
-
-  static {
-    COLOR_ALIASES.put("dark_grey", NamedTextColor.DARK_GRAY);
-    COLOR_ALIASES.put("grey", NamedTextColor.GRAY);
-  }
-
-  private static boolean isColorOrAbbreviation(final String name) {
-    return name.equals(COLOR) || name.equals(COLOR_2) || name.equals(COLOR_3);
-  }
-
-  ColorTagResolver() {
-  }
-
-  @Override
-  public @Nullable Tag resolve(final @NotNull String name, final @NotNull ArgumentQueue args, final @NotNull Context ctx) throws ParsingException {
-    if (!this.has(name)) {
-      return null;
+    static {
+        COLOR_ALIASES.put("dark_grey", NamedTextColor.DARK_GRAY);
+        COLOR_ALIASES.put("grey", NamedTextColor.GRAY);
     }
 
-    final String colorName;
-    if (isColorOrAbbreviation(name)) {
-      colorName = args.popOr("Expected to find a color parameter: <name>|#RRGGBB").lowerValue();
-    } else {
-      colorName = name;
+    ColorTagResolver() {
     }
 
-    final TextColor color = resolveColor(colorName, ctx);
-    return Tag.styling(color);
-  }
-
-  static @NotNull TextColor resolveColor(final @NotNull String colorName, final @NotNull Context ctx) throws ParsingException {
-    final TextColor color;
-    if (COLOR_ALIASES.containsKey(colorName)) {
-      color = COLOR_ALIASES.get(colorName);
-    } else if (colorName.charAt(0) == TextColor.HEX_CHARACTER) {
-      color = TextColor.fromHexString(colorName);
-    } else {
-      color = NamedTextColor.NAMES.value(colorName);
+    private static boolean isColorOrAbbreviation(final String name) {
+        return name.equals(COLOR) || name.equals(COLOR_2) || name.equals(COLOR_3);
     }
 
-    if (color == null) {
-      throw ctx.newException(String.format("Unable to parse a color from '%s'. Please use named colours or hex (#RRGGBB) colors.", colorName));
+    static @NotNull TextColor resolveColor(final @NotNull String colorName, final @NotNull Context ctx) throws ParsingException {
+        final TextColor color;
+        if (COLOR_ALIASES.containsKey(colorName)) {
+            color = COLOR_ALIASES.get(colorName);
+        } else if (colorName.charAt(0) == TextColor.HEX_CHARACTER) {
+            color = TextColor.fromHexString(colorName);
+        } else {
+            color = NamedTextColor.NAMES.value(colorName);
+        }
+
+        if (color == null) {
+            throw ctx.newException(String.format("Unable to parse a color from '%s'. Please use named colours or hex (#RRGGBB) colors.", colorName));
+        }
+        return color;
     }
-    return color;
-  }
 
-  @Override
-  public boolean has(final @NotNull String name) {
-    return isColorOrAbbreviation(name)
-      || TextColor.fromHexString(name) != null
-      || NamedTextColor.NAMES.value(name) != null
-      || COLOR_ALIASES.containsKey(name);
-  }
+    @Override
+    public @Nullable Tag resolve(final @NotNull String name, final @NotNull ArgumentQueue args, final @NotNull Context ctx) throws ParsingException {
+        if (!this.has(name)) {
+            return null;
+        }
 
-  @Override
-  public @Nullable StyleClaim<?> claimStyle() {
-    return STYLE;
-  }
+        final String colorName;
+        if (isColorOrAbbreviation(name)) {
+            colorName = args.popOr("Expected to find a color parameter: <name>|#RRGGBB").lowerValue();
+        } else {
+            colorName = name;
+        }
+
+        final TextColor color = resolveColor(colorName, ctx);
+        return Tag.styling(color);
+    }
+
+    @Override
+    public boolean has(final @NotNull String name) {
+        return isColorOrAbbreviation(name)
+                || TextColor.fromHexString(name) != null
+                || NamedTextColor.NAMES.value(name) != null
+                || COLOR_ALIASES.containsKey(name);
+    }
+
+    @Override
+    public @Nullable StyleClaim<?> claimStyle() {
+        return STYLE;
+    }
 }

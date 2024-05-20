@@ -42,85 +42,85 @@ import java.util.stream.Stream;
  * @since 4.10.0
  */
 final class RainbowTag extends AbstractColorChangingTag {
-  private static final String REVERSE = "!";
-  private static final String RAINBOW = "rainbow";
+    private static final String REVERSE = "!";
+    private static final String RAINBOW = "rainbow";
 
-  static final TagResolver RESOLVER = TagResolver.resolver(RAINBOW, RainbowTag::create);
+    static final TagResolver RESOLVER = TagResolver.resolver(RAINBOW, RainbowTag::create);
 
-  private final boolean reversed;
-  private final double dividedPhase;
+    private final boolean reversed;
+    private final double dividedPhase;
 
-  private int colorIndex = 0;
+    private int colorIndex = 0;
 
-  static Tag create(final ArgumentQueue args, final Context ctx) {
-    boolean reversed = false;
-    int phase = 0;
+    private RainbowTag(final boolean reversed, final int phase) {
+        this.reversed = reversed;
+        this.dividedPhase = ((double) phase) / 10d;
+    }
 
-    if (args.hasNext()) {
-      String value = args.pop().value();
-      if (value.startsWith(REVERSE)) {
-        reversed = true;
-        value = value.substring(REVERSE.length());
-      }
-      if (value.length() > 0) {
-        try {
-          phase = Integer.parseInt(value);
-        } catch (final NumberFormatException ex) {
-          throw ctx.newException("Expected phase, got " + value);
+    static Tag create(final ArgumentQueue args, final Context ctx) {
+        boolean reversed = false;
+        int phase = 0;
+
+        if (args.hasNext()) {
+            String value = args.pop().value();
+            if (value.startsWith(REVERSE)) {
+                reversed = true;
+                value = value.substring(REVERSE.length());
+            }
+            if (value.length() > 0) {
+                try {
+                    phase = Integer.parseInt(value);
+                } catch (final NumberFormatException ex) {
+                    throw ctx.newException("Expected phase, got " + value);
+                }
+            }
         }
-      }
+
+        return new RainbowTag(reversed, phase);
     }
 
-    return new RainbowTag(reversed, phase);
-  }
-
-  private RainbowTag(final boolean reversed, final int phase) {
-    this.reversed = reversed;
-    this.dividedPhase = ((double) phase) / 10d;
-  }
-
-  @Override
-  protected void init() {
-    if (this.reversed) {
-      this.colorIndex = this.size() - 1;
+    @Override
+    protected void init() {
+        if (this.reversed) {
+            this.colorIndex = this.size() - 1;
+        }
     }
-  }
 
-  @Override
-  protected void advanceColor() {
-    if (this.reversed) {
-      if (this.colorIndex == 0) {
-        this.colorIndex = this.size() - 1;
-      } else {
-        this.colorIndex--;
-      }
-    } else {
-      this.colorIndex++;
+    @Override
+    protected void advanceColor() {
+        if (this.reversed) {
+            if (this.colorIndex == 0) {
+                this.colorIndex = this.size() - 1;
+            } else {
+                this.colorIndex--;
+            }
+        } else {
+            this.colorIndex++;
+        }
     }
-  }
 
-  @Override
-  protected TextColor color() {
-    final float index = this.colorIndex;
-    final float hue = (float) ((index / this.size() + this.dividedPhase) % 1f);
-    return TextColor.color(HSVLike.hsvLike(hue, 1f, 1f));
-  }
+    @Override
+    protected TextColor color() {
+        final float index = this.colorIndex;
+        final float hue = (float) ((index / this.size() + this.dividedPhase) % 1f);
+        return TextColor.color(HSVLike.hsvLike(hue, 1f, 1f));
+    }
 
-  @Override
-  public @NotNull Stream<? extends ExaminableProperty> examinableProperties() {
-    return Stream.of(ExaminableProperty.of("phase", this.dividedPhase));
-  }
+    @Override
+    public @NotNull Stream<? extends ExaminableProperty> examinableProperties() {
+        return Stream.of(ExaminableProperty.of("phase", this.dividedPhase));
+    }
 
-  @Override
-  public boolean equals(final @Nullable Object other) {
-    if (this == other) return true;
-    if (other == null || this.getClass() != other.getClass()) return false;
-    final RainbowTag that = (RainbowTag) other;
-    return this.colorIndex == that.colorIndex && this.dividedPhase == that.dividedPhase;
-  }
+    @Override
+    public boolean equals(final @Nullable Object other) {
+        if (this == other) return true;
+        if (other == null || this.getClass() != other.getClass()) return false;
+        final RainbowTag that = (RainbowTag) other;
+        return this.colorIndex == that.colorIndex && this.dividedPhase == that.dividedPhase;
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.colorIndex, this.dividedPhase);
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.colorIndex, this.dividedPhase);
+    }
 }

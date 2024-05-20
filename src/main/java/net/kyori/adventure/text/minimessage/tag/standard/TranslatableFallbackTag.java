@@ -42,50 +42,50 @@ import java.util.List;
 /**
  * Insert a translation component into the result, with a fallback string.
  *
- * @since 4.13.0
  * @sinceMinecraft 1.19.4
+ * @since 4.13.0
  */
 final class TranslatableFallbackTag {
-  private static final String TR_OR = "tr_or";
-  private static final String TRANSLATE_OR = "translate_or";
-  private static final String LANG_OR = "lang_or";
+    private static final String TR_OR = "tr_or";
+    private static final String TRANSLATE_OR = "translate_or";
+    private static final String LANG_OR = "lang_or";
 
-  static final TagResolver RESOLVER = SerializableResolver.claimingComponent(
-    StandardTags.names(LANG_OR, TRANSLATE_OR, TR_OR),
-    TranslatableFallbackTag::create,
-    TranslatableFallbackTag::claim
-  );
+    static final TagResolver RESOLVER = SerializableResolver.claimingComponent(
+            StandardTags.names(LANG_OR, TRANSLATE_OR, TR_OR),
+            TranslatableFallbackTag::create,
+            TranslatableFallbackTag::claim
+    );
 
-  private TranslatableFallbackTag() {
-  }
-
-  static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
-    final String key = args.popOr("A translation key is required").value();
-    final String fallback = args.popOr("A fallback messages is required").value();
-    final List<Component> with;
-    if (args.hasNext()) {
-      with = new ArrayList<>();
-      while (args.hasNext()) {
-        with.add(ctx.deserialize(args.pop().value()));
-      }
-    } else {
-      with = Collections.emptyList();
+    private TranslatableFallbackTag() {
     }
 
-    return Tag.inserting(Component.translatable(key, fallback, with));
-  }
+    static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
+        final String key = args.popOr("A translation key is required").value();
+        final String fallback = args.popOr("A fallback messages is required").value();
+        final List<Component> with;
+        if (args.hasNext()) {
+            with = new ArrayList<>();
+            while (args.hasNext()) {
+                with.add(ctx.deserialize(args.pop().value()));
+            }
+        } else {
+            with = Collections.emptyList();
+        }
 
-  static @Nullable Emitable claim(final Component input) {
-    if (!(input instanceof TranslatableComponent) || ((TranslatableComponent) input).fallback() == null) return null;
+        return Tag.inserting(Component.translatable(key, fallback, with));
+    }
 
-    final TranslatableComponent tr = (TranslatableComponent) input;
-    return emit -> {
-      emit.tag(LANG_OR);
-      emit.argument(tr.key());
-      emit.argument(tr.fallback());
-      for (final TranslationArgument with : tr.arguments()) {
-        emit.argument(with.asComponent());
-      }
-    };
-  }
+    static @Nullable Emitable claim(final Component input) {
+        if (!(input instanceof TranslatableComponent tr) || ((TranslatableComponent) input).fallback() == null)
+            return null;
+
+        return emit -> {
+            emit.tag(LANG_OR);
+            emit.argument(tr.key());
+            emit.argument(tr.fallback());
+            for (final TranslationArgument with : tr.arguments()) {
+                emit.argument(with.asComponent());
+            }
+        };
+    }
 }

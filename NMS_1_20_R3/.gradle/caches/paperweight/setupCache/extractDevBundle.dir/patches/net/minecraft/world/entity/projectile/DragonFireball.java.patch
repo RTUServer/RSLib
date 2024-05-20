@@ -1,0 +1,80 @@
+--- a/net/minecraft/world/entity/projectile/DragonFireball.java
++++ b/net/minecraft/world/entity/projectile/DragonFireball.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.world.entity.projectile;
+ 
++import java.util.Iterator;
+ import java.util.List;
+ import net.minecraft.core.particles.ParticleOptions;
+ import net.minecraft.core.particles.ParticleTypes;
+@@ -13,8 +14,12 @@
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.phys.EntityHitResult;
+ import net.minecraft.world.phys.HitResult;
++// CraftBukkit start
++import org.bukkit.event.entity.EntityRemoveEvent;
++// CraftBukkit end
+ 
+ public class DragonFireball extends AbstractHurtingProjectile {
++
+     public static final float SPLASH_RANGE = 4.0F;
+ 
+     public DragonFireball(EntityType<? extends DragonFireball> type, Level world) {
+@@ -28,34 +33,42 @@
+     @Override
+     protected void onHit(HitResult hitResult) {
+         super.onHit(hitResult);
+-        if (hitResult.getType() != HitResult.Type.ENTITY || !this.ownedBy(((EntityHitResult)hitResult).getEntity())) {
++        if (hitResult.getType() != HitResult.Type.ENTITY || !this.ownedBy(((EntityHitResult) hitResult).getEntity())) {
+             if (!this.level().isClientSide) {
+-                List<LivingEntity> list = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(4.0, 2.0, 4.0));
+-                AreaEffectCloud areaEffectCloud = new AreaEffectCloud(this.level(), this.getX(), this.getY(), this.getZ());
++                List<LivingEntity> list = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(4.0D, 2.0D, 4.0D));
++                AreaEffectCloud entityareaeffectcloud = new AreaEffectCloud(this.level(), this.getX(), this.getY(), this.getZ());
+                 Entity entity = this.getOwner();
++
+                 if (entity instanceof LivingEntity) {
+-                    areaEffectCloud.setOwner((LivingEntity)entity);
++                    entityareaeffectcloud.setOwner((LivingEntity) entity);
+                 }
+ 
+-                areaEffectCloud.setParticle(ParticleTypes.DRAGON_BREATH);
+-                areaEffectCloud.setRadius(3.0F);
+-                areaEffectCloud.setDuration(600);
+-                areaEffectCloud.setRadiusPerTick((7.0F - areaEffectCloud.getRadius()) / (float)areaEffectCloud.getDuration());
+-                areaEffectCloud.addEffect(new MobEffectInstance(MobEffects.HARM, 1, 1));
++                entityareaeffectcloud.setParticle(ParticleTypes.DRAGON_BREATH);
++                entityareaeffectcloud.setRadius(3.0F);
++                entityareaeffectcloud.setDuration(600);
++                entityareaeffectcloud.setRadiusPerTick((7.0F - entityareaeffectcloud.getRadius()) / (float) entityareaeffectcloud.getDuration());
++                entityareaeffectcloud.addEffect(new MobEffectInstance(MobEffects.HARM, 1, 1));
+                 if (!list.isEmpty()) {
+-                    for (LivingEntity livingEntity : list) {
+-                        double d = this.distanceToSqr(livingEntity);
+-                        if (d < 16.0) {
+-                            areaEffectCloud.setPos(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
++                    Iterator iterator = list.iterator();
++
++                    while (iterator.hasNext()) {
++                        LivingEntity entityliving = (LivingEntity) iterator.next();
++                        double d0 = this.distanceToSqr((Entity) entityliving);
++
++                        if (d0 < 16.0D) {
++                            entityareaeffectcloud.setPos(entityliving.getX(), entityliving.getY(), entityliving.getZ());
+                             break;
+                         }
+                     }
+                 }
+ 
++                if (new com.destroystokyo.paper.event.entity.EnderDragonFireballHitEvent((org.bukkit.entity.DragonFireball) this.getBukkitEntity(), list.stream().map(LivingEntity::getBukkitLivingEntity).collect(java.util.stream.Collectors.toList()), (org.bukkit.entity.AreaEffectCloud) entityareaeffectcloud.getBukkitEntity()).callEvent()) { // Paper - EnderDragon Events
+                 this.level().levelEvent(2006, this.blockPosition(), this.isSilent() ? -1 : 1);
+-                this.level().addFreshEntity(areaEffectCloud);
+-                this.discard();
++                this.level().addFreshEntity(entityareaeffectcloud, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.EXPLOSION); // Paper - use correct spawn reason
++                } else entityareaeffectcloud.discard(null); // Paper - EnderDragon Events
++                this.discard(EntityRemoveEvent.Cause.HIT); // CraftBukkit - add Bukkit remove cause
+             }
++
+         }
+     }
+ 

@@ -1,0 +1,61 @@
+--- a/net/minecraft/core/Vec3i.java
++++ b/net/minecraft/core/Vec3i.java
+@@ -17,9 +17,18 @@
+         return IntStream.of(vec3i.getX(), vec3i.getY(), vec3i.getZ());
+     });
+     public static final Vec3i ZERO = new Vec3i(0, 0, 0);
+-    private int x;
+-    private int y;
+-    private int z;
++    protected int x; // Paper - protected
++    protected int y; // Paper - protected
++    protected int z; // Paper - protected
++
++    // Paper start
++    public boolean isValidLocation(net.minecraft.world.level.LevelHeightAccessor levelHeightAccessor) {
++        return getX() >= -30000000 && getZ() >= -30000000 && getX() < 30000000 && getZ() < 30000000 && !levelHeightAccessor.isOutsideBuildHeight(getY());
++    }
++    public boolean isInvalidYLocation(net.minecraft.world.level.LevelHeightAccessor levelHeightAccessor) {
++        return levelHeightAccessor.isOutsideBuildHeight(getY());
++    }
++    // Paper end
+ 
+     public Vec3i(int x, int y, int z) {
+         this.x = x;
+@@ -32,7 +41,7 @@
+     }
+ 
+     @Override
+-    public boolean equals(Object object) {
++    public final boolean equals(Object object) { // Paper
+         if (this == object) {
+             return true;
+         } else if (!(object instanceof Vec3i)) {
+@@ -50,7 +59,7 @@
+     }
+ 
+     @Override
+-    public int hashCode() {
++    public final int hashCode() { // Paper
+         return (this.getY() + this.getZ() * 31) * 31 + this.getX();
+     }
+ 
+@@ -63,15 +72,15 @@
+         }
+     }
+ 
+-    public int getX() {
++    public final int getX() { // Paper
+         return this.x;
+     }
+ 
+-    public int getY() {
++    public final int getY() { // Paper
+         return this.y;
+     }
+ 
+-    public int getZ() {
++    public final int getZ() { // Paper
+         return this.z;
+     }
+ 

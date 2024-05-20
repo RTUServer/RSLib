@@ -1,0 +1,230 @@
+--- a/net/minecraft/world/entity/projectile/ThrownTrident.java
++++ b/net/minecraft/world/entity/projectile/ThrownTrident.java
+@@ -23,8 +23,12 @@
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.phys.EntityHitResult;
+ import net.minecraft.world.phys.Vec3;
++// CraftBukkit start
++import org.bukkit.event.entity.EntityRemoveEvent;
++// CraftBukkit end
+ 
+ public class ThrownTrident extends AbstractArrow {
++
+     private static final EntityDataAccessor<Byte> ID_LOYALTY = SynchedEntityData.defineId(ThrownTrident.class, EntityDataSerializers.BYTE);
+     private static final EntityDataAccessor<Boolean> ID_FOIL = SynchedEntityData.defineId(ThrownTrident.class, EntityDataSerializers.BOOLEAN);
+     private static final ItemStack DEFAULT_ARROW_STACK = new ItemStack(Items.TRIDENT);
+@@ -32,20 +36,22 @@
+     public int clientSideReturnTridentTickCount;
+ 
+     public ThrownTrident(EntityType<? extends ThrownTrident> type, Level world) {
+-        super(type, world, DEFAULT_ARROW_STACK);
++        super(type, world, ThrownTrident.DEFAULT_ARROW_STACK);
++        this.setBaseDamage(net.minecraft.world.item.TridentItem.BASE_DAMAGE); // Paper - Allow trident custom damage
+     }
+ 
+     public ThrownTrident(Level world, LivingEntity owner, ItemStack stack) {
+         super(EntityType.TRIDENT, owner, world, stack);
+-        this.entityData.set(ID_LOYALTY, (byte)EnchantmentHelper.getLoyalty(stack));
+-        this.entityData.set(ID_FOIL, stack.hasFoil());
++        this.setBaseDamage(net.minecraft.world.item.TridentItem.BASE_DAMAGE); // Paper - Allow trident custom damage
++        this.entityData.set(ThrownTrident.ID_LOYALTY, (byte) EnchantmentHelper.getLoyalty(stack));
++        this.entityData.set(ThrownTrident.ID_FOIL, stack.hasFoil());
+     }
+ 
+     @Override
+     protected void defineSynchedData() {
+         super.defineSynchedData();
+-        this.entityData.define(ID_LOYALTY, (byte)0);
+-        this.entityData.define(ID_FOIL, false);
++        this.entityData.define(ThrownTrident.ID_LOYALTY, (byte) 0);
++        this.entityData.define(ThrownTrident.ID_FOIL, false);
+     }
+ 
+     @Override
+@@ -55,29 +61,32 @@
+         }
+ 
+         Entity entity = this.getOwner();
+-        int i = this.entityData.get(ID_LOYALTY);
+-        if (i > 0 && (this.dealtDamage || this.isNoPhysics()) && entity != null) {
++        byte b0 = (Byte) this.entityData.get(ThrownTrident.ID_LOYALTY);
++
++        if (b0 > 0 && (this.dealtDamage || this.isNoPhysics()) && entity != null) {
+             if (!this.isAcceptibleReturnOwner()) {
+                 if (!this.level().isClientSide && this.pickup == AbstractArrow.Pickup.ALLOWED) {
+                     this.spawnAtLocation(this.getPickupItem(), 0.1F);
+                 }
+ 
+-                this.discard();
++                this.discard(EntityRemoveEvent.Cause.DROP); // CraftBukkit - add Bukkit remove cause
+             } else {
+                 this.setNoPhysics(true);
+-                Vec3 vec3 = entity.getEyePosition().subtract(this.position());
+-                this.setPosRaw(this.getX(), this.getY() + vec3.y * 0.015 * (double)i, this.getZ());
++                Vec3 vec3d = entity.getEyePosition().subtract(this.position());
++
++                this.setPosRaw(this.getX(), this.getY() + vec3d.y * 0.015D * (double) b0, this.getZ());
+                 if (this.level().isClientSide) {
+                     this.yOld = this.getY();
+                 }
+ 
+-                double d = 0.05 * (double)i;
+-                this.setDeltaMovement(this.getDeltaMovement().scale(0.95).add(vec3.normalize().scale(d)));
++                double d0 = 0.05D * (double) b0;
++
++                this.setDeltaMovement(this.getDeltaMovement().scale(0.95D).add(vec3d.normalize().scale(d0)));
+                 if (this.clientSideReturnTridentTickCount == 0) {
+                     this.playSound(SoundEvents.TRIDENT_RETURN, 10.0F, 1.0F);
+                 }
+ 
+-                this.clientSideReturnTridentTickCount++;
++                ++this.clientSideReturnTridentTickCount;
+             }
+         }
+ 
+@@ -86,12 +95,27 @@
+ 
+     private boolean isAcceptibleReturnOwner() {
+         Entity entity = this.getOwner();
+-        return entity != null && entity.isAlive() && (!(entity instanceof ServerPlayer) || !entity.isSpectator());
++
++        return entity != null && entity.isAlive() ? !(entity instanceof ServerPlayer) || !entity.isSpectator() : false;
+     }
+ 
+     public boolean isFoil() {
+-        return this.entityData.get(ID_FOIL);
++        return (Boolean) this.entityData.get(ThrownTrident.ID_FOIL);
++    }
++
++    // Paper start
++    public void setFoil(boolean foil) {
++        this.entityData.set(ThrownTrident.ID_FOIL, foil);
++    }
++
++    public int getLoyalty() {
++        return this.entityData.get(ThrownTrident.ID_LOYALTY);
++    }
++
++    public void setLoyalty(byte loyalty) {
++        this.entityData.set(ThrownTrident.ID_LOYALTY, loyalty);
+     }
++    // Paper end
+ 
+     @Nullable
+     @Override
+@@ -102,50 +126,60 @@
+     @Override
+     protected void onHitEntity(EntityHitResult entityHitResult) {
+         Entity entity = entityHitResult.getEntity();
+-        float f = 8.0F;
+-        if (entity instanceof LivingEntity livingEntity) {
+-            f += EnchantmentHelper.getDamageBonus(this.getPickupItemStackOrigin(), livingEntity.getMobType());
++        float f = (float) this.getBaseDamage(); // Paper - Allow trident custom damage
++
++        if (entity instanceof LivingEntity) {
++            LivingEntity entityliving = (LivingEntity) entity;
++
++            f += EnchantmentHelper.getDamageBonus(this.getPickupItemStackOrigin(), entityliving.getMobType());
+         }
+ 
+-        Entity entity2 = this.getOwner();
+-        DamageSource damageSource = this.damageSources().trident(this, (Entity)(entity2 == null ? this : entity2));
++        Entity entity1 = this.getOwner();
++        DamageSource damagesource = this.damageSources().trident(this, (Entity) (entity1 == null ? this : entity1));
++
+         this.dealtDamage = true;
+-        SoundEvent soundEvent = SoundEvents.TRIDENT_HIT;
+-        if (entity.hurt(damageSource, f)) {
++        SoundEvent soundeffect = SoundEvents.TRIDENT_HIT;
++
++        if (entity.hurt(damagesource, f)) {
+             if (entity.getType() == EntityType.ENDERMAN) {
+                 return;
+             }
+ 
+-            if (entity instanceof LivingEntity livingEntity2) {
+-                if (entity2 instanceof LivingEntity) {
+-                    EnchantmentHelper.doPostHurtEffects(livingEntity2, entity2);
+-                    EnchantmentHelper.doPostDamageEffects((LivingEntity)entity2, livingEntity2);
++            if (entity instanceof LivingEntity) {
++                LivingEntity entityliving1 = (LivingEntity) entity;
++
++                if (entity1 instanceof LivingEntity) {
++                    EnchantmentHelper.doPostHurtEffects(entityliving1, entity1);
++                    EnchantmentHelper.doPostDamageEffects((LivingEntity) entity1, entityliving1);
+                 }
+ 
+-                this.doPostHurtEffects(livingEntity2);
++                this.doPostHurtEffects(entityliving1);
+             }
+         } else if (entity.getType().is(EntityTypeTags.DEFLECTS_TRIDENTS)) {
+             this.deflect();
+             return;
+         }
+ 
+-        this.setDeltaMovement(this.getDeltaMovement().multiply(-0.01, -0.1, -0.01));
+-        float g = 1.0F;
++        this.setDeltaMovement(this.getDeltaMovement().multiply(-0.01D, -0.1D, -0.01D));
++        float f1 = 1.0F;
++
+         if (this.level() instanceof ServerLevel && this.level().isThundering() && this.isChanneling()) {
+-            BlockPos blockPos = entity.blockPosition();
+-            if (this.level().canSeeSky(blockPos)) {
+-                LightningBolt lightningBolt = EntityType.LIGHTNING_BOLT.create(this.level());
+-                if (lightningBolt != null) {
+-                    lightningBolt.moveTo(Vec3.atBottomCenterOf(blockPos));
+-                    lightningBolt.setCause(entity2 instanceof ServerPlayer ? (ServerPlayer)entity2 : null);
+-                    this.level().addFreshEntity(lightningBolt);
+-                    soundEvent = SoundEvents.TRIDENT_THUNDER;
+-                    g = 5.0F;
++            BlockPos blockposition = entity.blockPosition();
++
++            if (this.level().canSeeSky(blockposition)) {
++                LightningBolt entitylightning = (LightningBolt) EntityType.LIGHTNING_BOLT.create(this.level());
++
++                if (entitylightning != null) {
++                    entitylightning.moveTo(Vec3.atBottomCenterOf(blockposition));
++                    entitylightning.setCause(entity1 instanceof ServerPlayer ? (ServerPlayer) entity1 : null);
++                    ((ServerLevel) this.level()).strikeLightning(entitylightning, org.bukkit.event.weather.LightningStrikeEvent.Cause.TRIDENT); // CraftBukkit
++                    soundeffect = SoundEvents.TRIDENT_THUNDER;
++                    f1 = 5.0F;
+                 }
+             }
+         }
+ 
+-        this.playSound(soundEvent, g, 1.0F);
++        this.playSound(soundeffect, f1, 1.0F);
+     }
+ 
+     public boolean isChanneling() {
+@@ -167,13 +201,14 @@
+         if (this.ownedBy(player) || this.getOwner() == null) {
+             super.playerTouch(player);
+         }
++
+     }
+ 
+     @Override
+     public void readAdditionalSaveData(CompoundTag nbt) {
+         super.readAdditionalSaveData(nbt);
+         this.dealtDamage = nbt.getBoolean("DealtDamage");
+-        this.entityData.set(ID_LOYALTY, (byte)EnchantmentHelper.getLoyalty(this.getPickupItemStackOrigin()));
++        this.entityData.set(ThrownTrident.ID_LOYALTY, (byte) EnchantmentHelper.getLoyalty(this.getPickupItemStackOrigin()));
+     }
+ 
+     @Override
+@@ -184,10 +219,12 @@
+ 
+     @Override
+     public void tickDespawn() {
+-        int i = this.entityData.get(ID_LOYALTY);
+-        if (this.pickup != AbstractArrow.Pickup.ALLOWED || i <= 0) {
++        byte b0 = (Byte) this.entityData.get(ThrownTrident.ID_LOYALTY);
++
++        if (this.pickup != AbstractArrow.Pickup.ALLOWED || b0 <= 0) {
+             super.tickDespawn();
+         }
++
+     }
+ 
+     @Override

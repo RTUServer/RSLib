@@ -1,0 +1,53 @@
+--- a/net/minecraft/world/level/CollisionGetter.java
++++ b/net/minecraft/world/level/CollisionGetter.java
+@@ -36,26 +36,40 @@
+         return this.isUnobstructed(entity, Shapes.create(entity.getBoundingBox()));
+     }
+ 
++    // Paper start - optimise collisions
++    default boolean noCollision(Entity entity, AABB box, Predicate<Entity> filter, boolean loadChunks) {
++        return !io.papermc.paper.util.CollisionUtil.getCollisionsForBlocksOrWorldBorder(this, entity, box, null, loadChunks, false, entity != null, true, null)
++            && !io.papermc.paper.util.CollisionUtil.getEntityHardCollisions(this, entity, box, null, true, filter);
++    }
++    // Paper end - optimise collisions
++
+     default boolean noCollision(AABB box) {
+-        return this.noCollision((Entity)null, box, (e) -> {
+-            return true;
+-        });
++        // Paper start - optimise collisions
++        return !io.papermc.paper.util.CollisionUtil.getCollisionsForBlocksOrWorldBorder(this, null, box, null, false, false, false, true, null)
++            && !io.papermc.paper.util.CollisionUtil.getEntityHardCollisions(this, null, box, null, true, null);
++        // Paper end - optimise collisions
+     }
+ 
+     default boolean noCollision(Entity entity) {
+-        return this.noCollision(entity, entity.getBoundingBox(), (e) -> {
+-            return true;
+-        });
++        // Paper start - optimise collisions
++        AABB box = entity.getBoundingBox();
++        return !io.papermc.paper.util.CollisionUtil.getCollisionsForBlocksOrWorldBorder(this, entity, box, null, false, false, entity != null, true, null)
++            && !io.papermc.paper.util.CollisionUtil.getEntityHardCollisions(this, entity, box, null, true, null);
++        // Paper end - optimise collisions
+     }
+ 
+     default boolean noCollision(Entity entity, AABB box) {
+-        return this.noCollision(entity, box, (e) -> {
+-            return true;
+-        });
++        // Paper start - optimise collisions
++        return !io.papermc.paper.util.CollisionUtil.getCollisionsForBlocksOrWorldBorder(this, entity, box, null, false, false, entity != null, true, null)
++            && !io.papermc.paper.util.CollisionUtil.getEntityHardCollisions(this, entity, box, null, true, null);
++        // Paper end - optimise collisions
+     }
+ 
+     default boolean noCollision(@Nullable Entity entity, AABB box, Predicate<Entity> filter) {
+-        return this.getCollisions(entity, box, filter).allMatch(VoxelShape::isEmpty);
++        // Paper start - optimise collisions
++        return !io.papermc.paper.util.CollisionUtil.getCollisionsForBlocksOrWorldBorder(this, entity, box, null, false, false, entity != null, true, null)
++            && !io.papermc.paper.util.CollisionUtil.getEntityHardCollisions(this, entity, box, null, true, filter);
++        // Paper end - optimise collisions
+     }
+ 
+     Stream<VoxelShape> getEntityCollisions(@Nullable Entity entity, AABB box, Predicate<Entity> predicate);

@@ -1,0 +1,112 @@
+--- a/net/minecraft/world/entity/decoration/Painting.java
++++ b/net/minecraft/world/entity/decoration/Painting.java
+@@ -18,26 +18,37 @@
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.item.Items;
+ import net.minecraft.world.level.GameRules;
++import net.minecraft.world.level.ItemLike;
+ import net.minecraft.world.level.Level;
+ 
+ public class Painting extends HangingEntity {
++
+     public Motive motive;
+ 
+     public Painting(EntityType<? extends Painting> type, Level world) {
+         super(type, world);
++        // CraftBukkit start - generate a non-null painting
++        List<Motive> list = Lists.newArrayList(Motive.KEBAB);
++        this.motive = (Motive) list.get(this.random.nextInt(list.size()));
++        // CraftBukkit end
+     }
+ 
+     public Painting(Level world, BlockPos pos, Direction direction) {
+         super(EntityType.PAINTING, world, pos);
+         List<Motive> list = Lists.newArrayList();
+         int i = 0;
++        Iterator iterator = Registry.MOTIVE.iterator();
+ 
+-        for(Motive motive : Registry.MOTIVE) {
+-            this.motive = motive;
++        Motive paintings;
++
++        while (iterator.hasNext()) {
++            paintings = (Motive) iterator.next();
++            this.motive = paintings;
+             this.setDirection(direction);
+             if (this.survives()) {
+-                list.add(motive);
+-                int j = motive.getWidth() * motive.getHeight();
++                list.add(paintings);
++                int j = paintings.getWidth() * paintings.getHeight();
++
+                 if (j > i) {
+                     i = j;
+                 }
+@@ -45,16 +56,16 @@
+         }
+ 
+         if (!list.isEmpty()) {
+-            Iterator<Motive> iterator = list.iterator();
++            iterator = list.iterator();
+ 
+-            while(iterator.hasNext()) {
+-                Motive motive2 = iterator.next();
+-                if (motive2.getWidth() * motive2.getHeight() < i) {
++            while (iterator.hasNext()) {
++                paintings = (Motive) iterator.next();
++                if (paintings.getWidth() * paintings.getHeight() < i) {
+                     iterator.remove();
+                 }
+             }
+ 
+-            this.motive = list.get(this.random.nextInt(list.size()));
++            this.motive = (Motive) list.get(this.random.nextInt(list.size()));
+         }
+ 
+         this.setDirection(direction);
+@@ -69,13 +80,13 @@
+     @Override
+     public void addAdditionalSaveData(CompoundTag nbt) {
+         nbt.putString("Motive", Registry.MOTIVE.getKey(this.motive).toString());
+-        nbt.putByte("Facing", (byte)this.direction.get2DDataValue());
++        nbt.putByte("Facing", (byte) this.direction.get2DDataValue());
+         super.addAdditionalSaveData(nbt);
+     }
+ 
+     @Override
+     public void readAdditionalSaveData(CompoundTag nbt) {
+-        this.motive = Registry.MOTIVE.get(ResourceLocation.tryParse(nbt.getString("Motive")));
++        this.motive = (Motive) Registry.MOTIVE.get(ResourceLocation.tryParse(nbt.getString("Motive")));
+         this.direction = Direction.from2DDataValue(nbt.getByte("Facing"));
+         super.readAdditionalSaveData(nbt);
+         this.setDirection(this.direction);
+@@ -96,13 +107,14 @@
+         if (this.level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
+             this.playSound(SoundEvents.PAINTING_BREAK, 1.0F, 1.0F);
+             if (entity instanceof Player) {
+-                Player player = (Player)entity;
+-                if (player.getAbilities().instabuild) {
++                Player entityhuman = (Player) entity;
++
++                if (entityhuman.getAbilities().instabuild) {
+                     return;
+                 }
+             }
+ 
+-            this.spawnAtLocation(Items.PAINTING);
++            this.spawnAtLocation((ItemLike) Items.PAINTING);
+         }
+     }
+ 
+@@ -118,8 +130,9 @@
+ 
+     @Override
+     public void lerpTo(double x, double y, double z, float yaw, float pitch, int interpolationSteps, boolean interpolate) {
+-        BlockPos blockPos = this.pos.offset(x - this.getX(), y - this.getY(), z - this.getZ());
+-        this.setPos((double)blockPos.getX(), (double)blockPos.getY(), (double)blockPos.getZ());
++        BlockPos blockposition = this.pos.offset(x - this.getX(), y - this.getY(), z - this.getZ());
++
++        this.setPos((double) blockposition.getX(), (double) blockposition.getY(), (double) blockposition.getZ());
+     }
+ 
+     @Override

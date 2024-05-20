@@ -1,0 +1,26 @@
+--- a/net/minecraft/world/level/levelgen/Beardifier.java
++++ b/net/minecraft/world/level/levelgen/Beardifier.java
+@@ -35,9 +35,10 @@
+         int j = pos.getMinBlockZ();
+         ObjectList<Beardifier.Rigid> objectList = new ObjectArrayList<>(10);
+         ObjectList<JigsawJunction> objectList2 = new ObjectArrayList<>(32);
+-        world.startsForStructure(pos, structure -> structure.terrainAdaptation() != TerrainAdjustment.NONE)
+-            .forEach(
+-                start -> {
++        // Paper start - Perf: Remove streams from hot code
++        for (net.minecraft.world.level.levelgen.structure.StructureStart start : world.startsForStructure(pos, (structure) -> {
++            return structure.terrainAdaptation() != TerrainAdjustment.NONE;
++        })) { // Paper end - Perf: Remove streams from hot code
+                     TerrainAdjustment terrainAdjustment = start.getStructure().terrainAdaptation();
+ 
+                     for (StructurePiece structurePiece : start.getPieces()) {
+@@ -65,8 +66,7 @@
+                             }
+                         }
+                     }
+-                }
+-            );
++        } // Paper - Perf: Remove streams from hot code
+         return new Beardifier(objectList.iterator(), objectList2.iterator());
+     }
+ 

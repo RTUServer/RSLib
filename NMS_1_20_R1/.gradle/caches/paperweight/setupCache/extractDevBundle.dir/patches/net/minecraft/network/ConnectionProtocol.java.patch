@@ -1,0 +1,18 @@
+--- a/net/minecraft/network/ConnectionProtocol.java
++++ b/net/minecraft/network/ConnectionProtocol.java
+@@ -329,13 +329,14 @@
+ 
+         @Nullable
+         public Packet<?> createPacket(int id, FriendlyByteBuf buf) {
++            if (id < 0 || id >= this.idToDeserializer.size()) return null; // Paper
+             Function<FriendlyByteBuf, ? extends Packet<T>> function = this.idToDeserializer.get(id);
+             return function != null ? function.apply(buf) : null;
+         }
+ 
+         public void listAllPackets(Consumer<Class<? extends Packet<?>>> consumer) {
+             this.classToId.keySet().stream().filter((type) -> {
+-                return type != BundleDelimiterPacket.class;
++                return !type.equals(BundleDelimiterPacket.class); // Paper - fix of some kind
+             }).forEach(consumer);
+             this.extraClasses.forEach(consumer);
+         }

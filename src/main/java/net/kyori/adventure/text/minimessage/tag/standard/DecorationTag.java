@@ -48,78 +48,75 @@ import static java.util.Objects.requireNonNull;
  * @since 4.10.0
  */
 final class DecorationTag {
-  // vanilla decoration
-  private static final String B = "b";
-  private static final String I = "i";
-  private static final String EM = "em";
-  private static final String OBF = "obf";
-  private static final String ST = "st";
-  private static final String U = "u";
+    public static final String REVERT = "!";
+    // vanilla decoration
+    private static final String B = "b";
+    private static final String I = "i";
+    private static final String EM = "em";
+    private static final String OBF = "obf";
+    private static final String ST = "st";
+    private static final String U = "u";
+    static final Map<TextDecoration, TagResolver> RESOLVERS = Stream.of(
+                    resolvers(TextDecoration.OBFUSCATED, OBF),
+                    resolvers(TextDecoration.BOLD, B),
+                    resolvers(TextDecoration.STRIKETHROUGH, ST),
+                    resolvers(TextDecoration.UNDERLINED, U),
+                    resolvers(TextDecoration.ITALIC, EM, I)
+            )
+            .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    ent -> ent.getValue().collect(TagResolver.toTagResolver()),
+                    (l, r) -> TagResolver.builder().resolver(l).resolver(r).build(),
+                    LinkedHashMap::new
+            ));
+    static final TagResolver RESOLVER = TagResolver.resolver(RESOLVERS.values());
 
-  public static final String REVERT = "!";
-
-  // create resolvers for canonical + configured alternates
-  static Map.Entry<TextDecoration, Stream<TagResolver>> resolvers(final TextDecoration decoration, final @Nullable String shortName, final @NotNull String@NotNull... secondaryAliases) {
-    final String canonicalName = TextDecoration.NAMES.key(decoration);
-    final Set<String> names = new HashSet<>();
-    names.add(canonicalName);
-    if (shortName != null) names.add(shortName);
-    Collections.addAll(names, secondaryAliases);
-
-    return new AbstractMap.SimpleImmutableEntry<>(decoration, Stream.concat(
-      Stream.of(SerializableResolver.claimingStyle(
-          names,
-          (args, ctx) -> DecorationTag.create(decoration, args, ctx),
-          claim(decoration, (state, emitter) -> emit(canonicalName, shortName == null ? canonicalName : shortName, state, emitter))
-        )),
-      names.stream().map(name -> TagResolver.resolver(DecorationTag.REVERT + name, DecorationTag.createNegated(decoration)))
-    ));
-  }
-
-  static final Map<TextDecoration, TagResolver> RESOLVERS = Stream.of(
-      resolvers(TextDecoration.OBFUSCATED, OBF),
-      resolvers(TextDecoration.BOLD, B),
-      resolvers(TextDecoration.STRIKETHROUGH, ST),
-      resolvers(TextDecoration.UNDERLINED, U),
-      resolvers(TextDecoration.ITALIC, EM, I)
-    )
-    .collect(Collectors.toMap(
-      Map.Entry::getKey,
-      ent -> ent.getValue().collect(TagResolver.toTagResolver()),
-      (l, r) -> TagResolver.builder().resolver(l).resolver(r).build(),
-      LinkedHashMap::new
-    ));
-
-  static final TagResolver RESOLVER = TagResolver.resolver(RESOLVERS.values());
-
-  private DecorationTag() {
-  }
-
-  static Tag create(final TextDecoration toApply, final ArgumentQueue args, final Context ctx) {
-    final boolean flag = !args.hasNext() || !args.pop().isFalse();
-
-    return Tag.styling(toApply.as(flag));
-  }
-
-  static Tag createNegated(final TextDecoration toApply) {
-    return Tag.styling(toApply.as(false));
-  }
-
-  static @NotNull StyleClaim<State> claim(final @NotNull TextDecoration decoration, final @NotNull BiConsumer<State, TokenEmitter> emitable) {
-    requireNonNull(decoration, "decoration");
-    return StyleClaim.claim(
-      "decoration_" + TextDecoration.NAMES.key(decoration),
-      style -> style.decoration(decoration),
-      state -> state != State.NOT_SET,
-      emitable
-    );
-  }
-
-  static void emit(final @NotNull String longName, final @NotNull String shortName, final @NotNull State state, final @NotNull TokenEmitter emitter) {
-    if (state == State.FALSE) {
-      emitter.tag(REVERT + longName);
-    } else {
-      emitter.tag(longName);
+    private DecorationTag() {
     }
-  }
+
+    // create resolvers for canonical + configured alternates
+    static Map.Entry<TextDecoration, Stream<TagResolver>> resolvers(final TextDecoration decoration, final @Nullable String shortName, final @NotNull String @NotNull ... secondaryAliases) {
+        final String canonicalName = TextDecoration.NAMES.key(decoration);
+        final Set<String> names = new HashSet<>();
+        names.add(canonicalName);
+        if (shortName != null) names.add(shortName);
+        Collections.addAll(names, secondaryAliases);
+
+        return new AbstractMap.SimpleImmutableEntry<>(decoration, Stream.concat(
+                Stream.of(SerializableResolver.claimingStyle(
+                        names,
+                        (args, ctx) -> DecorationTag.create(decoration, args, ctx),
+                        claim(decoration, (state, emitter) -> emit(canonicalName, shortName == null ? canonicalName : shortName, state, emitter))
+                )),
+                names.stream().map(name -> TagResolver.resolver(DecorationTag.REVERT + name, DecorationTag.createNegated(decoration)))
+        ));
+    }
+
+    static Tag create(final TextDecoration toApply, final ArgumentQueue args, final Context ctx) {
+        final boolean flag = !args.hasNext() || !args.pop().isFalse();
+
+        return Tag.styling(toApply.as(flag));
+    }
+
+    static Tag createNegated(final TextDecoration toApply) {
+        return Tag.styling(toApply.as(false));
+    }
+
+    static @NotNull StyleClaim<State> claim(final @NotNull TextDecoration decoration, final @NotNull BiConsumer<State, TokenEmitter> emitable) {
+        requireNonNull(decoration, "decoration");
+        return StyleClaim.claim(
+                "decoration_" + TextDecoration.NAMES.key(decoration),
+                style -> style.decoration(decoration),
+                state -> state != State.NOT_SET,
+                emitable
+        );
+    }
+
+    static void emit(final @NotNull String longName, final @NotNull String shortName, final @NotNull State state, final @NotNull TokenEmitter emitter) {
+        if (state == State.FALSE) {
+            emitter.tag(REVERT + longName);
+        } else {
+            emitter.tag(longName);
+        }
+    }
 }

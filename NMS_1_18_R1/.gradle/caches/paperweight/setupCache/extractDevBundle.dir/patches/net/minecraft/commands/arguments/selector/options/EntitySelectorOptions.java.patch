@@ -1,0 +1,44 @@
+--- a/net/minecraft/commands/arguments/selector/options/EntitySelectorOptions.java
++++ b/net/minecraft/commands/arguments/selector/options/EntitySelectorOptions.java
+@@ -69,6 +69,19 @@
+     public static final DynamicCommandExceptionType ERROR_ENTITY_TYPE_INVALID = new DynamicCommandExceptionType((entity) -> {
+         return new TranslatableComponent("argument.entity.options.type.invalid", entity);
+     });
++    // Paper start
++    public static final DynamicCommandExceptionType ERROR_ENTITY_TAG_INVALID = new DynamicCommandExceptionType((object) -> {
++        return io.papermc.paper.adventure.PaperAdventure
++            .asVanilla(net.kyori.adventure.text.Component
++                .text("Invalid or unknown entity type tag '" + object + "'")
++                .hoverEvent(net.kyori.adventure.text.event.HoverEvent
++                    .showText(net.kyori.adventure.text.Component
++                        .text("You can disable this error in 'paper.yml'")
++                    )
++                )
++            );
++    });
++    // Paper end
+ 
+     private static void register(String id, EntitySelectorOptions.Modifier handler, Predicate<EntitySelectorParser> condition, Component description) {
+         OPTIONS.put(id, new EntitySelectorOptions.Option(handler, condition, description));
+@@ -316,8 +329,20 @@
+ 
+                     if (reader.isTag()) {
+                         ResourceLocation resourceLocation = ResourceLocation.read(reader.getReader());
++                        // Paper start - throw error if invalid entity tag (only on suggestions to keep cmd success behavior)
++                        final net.minecraft.tags.Tag<EntityType<?>> tag;
++                        if (com.destroystokyo.paper.PaperConfig.fixTargetSelectorTagCompletion && reader.parsingEntityArgumentSuggestions) {
++                            tag = EntityTypeTags.getAllTags().getTag(resourceLocation);
++                        } else {
++                            tag = EntityTypeTags.getAllTags().getTagOrEmpty(resourceLocation);
++                        }
++                        if (tag == null) {
++                            reader.getReader().setCursor(i);
++                            throw ERROR_ENTITY_TAG_INVALID.createWithContext(reader.getReader(), resourceLocation.toString());
++                        }
++                        // Paper end
+                         reader.addPredicate((entity) -> {
+-                            return entity.getType().is(entity.getServer().getTags().getOrEmpty(Registry.ENTITY_TYPE_REGISTRY).getTagOrEmpty(resourceLocation)) != bl;
++                            return entity.getType().is(tag) != bl; // Paper
+                         });
+                     } else {
+                         ResourceLocation resourceLocation2 = ResourceLocation.read(reader.getReader());

@@ -1,0 +1,13 @@
+--- a/net/minecraft/world/entity/animal/WaterAnimal.java
++++ b/net/minecraft/world/entity/animal/WaterAnimal.java
+@@ -79,6 +79,10 @@
+     public static boolean checkSurfaceWaterAnimalSpawnRules(EntityType<? extends WaterAnimal> type, LevelAccessor world, MobSpawnType reason, BlockPos pos, Random random) {
+         int i = world.getSeaLevel();
+         int j = i - 13;
++        // Paper start
++        i = world.getMinecraftWorld().paperConfig.waterAnimalMaxSpawnHeight != null ? world.getMinecraftWorld().paperConfig.waterAnimalMaxSpawnHeight : i;
++        j = world.getMinecraftWorld().paperConfig.waterAnimalMinSpawnHeight != null ? world.getMinecraftWorld().paperConfig.waterAnimalMinSpawnHeight : j;
++        // Paper end
+         return pos.getY() >= j && pos.getY() <= i && world.getFluidState(pos.below()).is(FluidTags.WATER) && world.getBlockState(pos.above()).is(Blocks.WATER);
+     }
+ }

@@ -40,61 +40,61 @@ import static java.util.Objects.requireNonNull;
  * @since 4.10.0
  */
 public final class Placeholder {
-  private Placeholder() {
-  }
+    private Placeholder() {
+    }
 
-  /**
-   * Creates a placeholder that inserts a MiniMessage string.
-   *
-   * <p>The inserted string will impact the rest of the parse process.</p>
-   *
-   * @param key the key
-   * @param value the replacement
-   * @return the placeholder
-   * @since 4.10.0
-   */
-  public static TagResolver.@NotNull Single parsed(@TagPattern final @NotNull String key, final @NotNull String value) {
-    return TagResolver.resolver(key, Tag.preProcessParsed(value));
-  }
+    /**
+     * Creates a placeholder that inserts a MiniMessage string.
+     *
+     * <p>The inserted string will impact the rest of the parse process.</p>
+     *
+     * @param key   the key
+     * @param value the replacement
+     * @return the placeholder
+     * @since 4.10.0
+     */
+    public static TagResolver.@NotNull Single parsed(@TagPattern final @NotNull String key, final @NotNull String value) {
+        return TagResolver.resolver(key, Tag.preProcessParsed(value));
+    }
 
-  /**
-   * Creates a placeholder that inserts a literal string, without attempting to parse any contained tags.
-   *
-   * @param key the key
-   * @param value the replacement
-   * @return the placeholder
-   * @since 4.10.0
-   */
-  public static TagResolver.@NotNull Single unparsed(@TagPattern final @NotNull String key, final @NotNull String value) {
-    requireNonNull(value, "value");
-    return Placeholder.component(key, Component.text(value));
-  }
+    /**
+     * Creates a placeholder that inserts a literal string, without attempting to parse any contained tags.
+     *
+     * @param key   the key
+     * @param value the replacement
+     * @return the placeholder
+     * @since 4.10.0
+     */
+    public static TagResolver.@NotNull Single unparsed(@TagPattern final @NotNull String key, final @NotNull String value) {
+        requireNonNull(value, "value");
+        return Placeholder.component(key, Component.text(value));
+    }
 
-  /**
-   * Creates a replacement that inserts a component.
-   *
-   * <p>This replacement is auto-closing, so its style will not influence the style of following components.</p>
-   *
-   * @param key the key
-   * @param value the replacement
-   * @return the placeholder
-   * @since 4.10.0
-   */
-  public static TagResolver.@NotNull Single component(@TagPattern final @NotNull String key, final @NotNull ComponentLike value) {
-    return TagResolver.resolver(key, Tag.selfClosingInserting(value));
-  }
+    /**
+     * Creates a replacement that inserts a component.
+     *
+     * <p>This replacement is auto-closing, so its style will not influence the style of following components.</p>
+     *
+     * @param key   the key
+     * @param value the replacement
+     * @return the placeholder
+     * @since 4.10.0
+     */
+    public static TagResolver.@NotNull Single component(@TagPattern final @NotNull String key, final @NotNull ComponentLike value) {
+        return TagResolver.resolver(key, Tag.selfClosingInserting(value));
+    }
 
-  /**
-   * Creates a style tag which will modify the style of the component.
-   *
-   * <p>This style can be used like other styles.</p>
-   *
-   * @param key the key
-   * @param style the style
-   * @return the placeholder
-   * @since 4.13.0
-   */
-  public static TagResolver.@NotNull Single styling(@TagPattern final @NotNull String key, final @NotNull StyleBuilderApplicable@NotNull... style) {
-    return TagResolver.resolver(key, Tag.styling(style));
-  }
+    /**
+     * Creates a style tag which will modify the style of the component.
+     *
+     * <p>This style can be used like other styles.</p>
+     *
+     * @param key   the key
+     * @param style the style
+     * @return the placeholder
+     * @since 4.13.0
+     */
+    public static TagResolver.@NotNull Single styling(@TagPattern final @NotNull String key, final @NotNull StyleBuilderApplicable @NotNull ... style) {
+        return TagResolver.resolver(key, Tag.styling(style));
+    }
 }

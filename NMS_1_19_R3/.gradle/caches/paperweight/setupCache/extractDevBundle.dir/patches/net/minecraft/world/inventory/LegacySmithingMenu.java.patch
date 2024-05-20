@@ -1,0 +1,148 @@
+--- a/net/minecraft/world/inventory/LegacySmithingMenu.java
++++ b/net/minecraft/world/inventory/LegacySmithingMenu.java
+@@ -2,22 +2,20 @@
+ 
+ import java.util.List;
+ import javax.annotation.Nullable;
+-import net.minecraft.world.Container;
+ import net.minecraft.world.entity.player.Inventory;
+ import net.minecraft.world.entity.player.Player;
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.item.crafting.LegacyUpgradeRecipe;
+ import net.minecraft.world.item.crafting.RecipeType;
+-import net.minecraft.world.item.crafting.SmithingRecipe;
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.level.block.Blocks;
+ import net.minecraft.world.level.block.state.BlockState;
++import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventoryView; // CraftBukkit
+ 
+ /** @deprecated */
+-@Deprecated(
+-    forRemoval = true
+-)
++@Deprecated(forRemoval = true)
+ public class LegacySmithingMenu extends ItemCombinerMenu {
++
+     private final Level level;
+     public static final int INPUT_SLOT = 0;
+     public static final int ADDITIONAL_SLOT = 1;
+@@ -29,6 +27,9 @@
+     @Nullable
+     private LegacyUpgradeRecipe selectedRecipe;
+     private final List<LegacyUpgradeRecipe> recipes;
++    // CraftBukkit start
++    private CraftInventoryView bukkitEntity;
++    // CraftBukkit end
+ 
+     public LegacySmithingMenu(int syncId, Inventory playerInventory) {
+         this(syncId, playerInventory, ContainerLevelAccess.NULL);
+@@ -37,18 +38,18 @@
+     public LegacySmithingMenu(int syncId, Inventory playerInventory, ContainerLevelAccess context) {
+         super(MenuType.LEGACY_SMITHING, syncId, playerInventory, context);
+         this.level = playerInventory.player.level;
+-        this.recipes = this.level.getRecipeManager().<Container, SmithingRecipe>getAllRecipesFor(RecipeType.SMITHING).stream().filter((recipe) -> {
+-            return recipe instanceof LegacyUpgradeRecipe;
+-        }).map((recipe) -> {
+-            return (LegacyUpgradeRecipe)recipe;
++        this.recipes = this.level.getRecipeManager().getAllRecipesFor(RecipeType.SMITHING).stream().filter((smithingrecipe) -> {
++            return smithingrecipe instanceof LegacyUpgradeRecipe;
++        }).map((smithingrecipe) -> {
++            return (LegacyUpgradeRecipe) smithingrecipe;
+         }).toList();
+     }
+ 
+     @Override
+     protected ItemCombinerMenuSlotDefinition createInputSlotDefinitions() {
+-        return ItemCombinerMenuSlotDefinition.create().withSlot(0, 27, 47, (stack) -> {
++        return ItemCombinerMenuSlotDefinition.create().withSlot(0, 27, 47, (itemstack) -> {
+             return true;
+-        }).withSlot(1, 76, 47, (stack) -> {
++        }).withSlot(1, 76, 47, (itemstack) -> {
+             return true;
+         }).withResultSlot(2, 134, 47).build();
+     }
+@@ -69,33 +70,38 @@
+         this.resultSlots.awardUsedRecipes(player);
+         this.shrinkStackInSlot(0);
+         this.shrinkStackInSlot(1);
+-        this.access.execute((world, pos) -> {
+-            world.levelEvent(1044, pos, 0);
++        this.access.execute((world, blockposition) -> {
++            world.levelEvent(1044, blockposition, 0);
+         });
+     }
+ 
+     private void shrinkStackInSlot(int slot) {
+-        ItemStack itemStack = this.inputSlots.getItem(slot);
+-        itemStack.shrink(1);
+-        this.inputSlots.setItem(slot, itemStack);
++        ItemStack itemstack = this.inputSlots.getItem(slot);
++
++        itemstack.shrink(1);
++        this.inputSlots.setItem(slot, itemstack);
+     }
+ 
+     @Override
+     public void createResult() {
+-        List<LegacyUpgradeRecipe> list = this.level.getRecipeManager().getRecipesFor(RecipeType.SMITHING, this.inputSlots, this.level).stream().filter((recipe) -> {
+-            return recipe instanceof LegacyUpgradeRecipe;
+-        }).map((recipe) -> {
+-            return (LegacyUpgradeRecipe)recipe;
++        List<LegacyUpgradeRecipe> list = this.level.getRecipeManager().getRecipesFor(RecipeType.SMITHING, this.inputSlots, this.level).stream().filter((smithingrecipe) -> {
++            return smithingrecipe instanceof LegacyUpgradeRecipe;
++        }).map((smithingrecipe) -> {
++            return (LegacyUpgradeRecipe) smithingrecipe;
+         }).toList();
++
+         if (list.isEmpty()) {
+-            this.resultSlots.setItem(0, ItemStack.EMPTY);
++            org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callPrepareSmithingEvent(this.getBukkitView(), ItemStack.EMPTY); // CraftBukkit
+         } else {
+-            LegacyUpgradeRecipe legacyUpgradeRecipe = list.get(0);
+-            ItemStack itemStack = legacyUpgradeRecipe.assemble(this.inputSlots, this.level.registryAccess());
+-            if (itemStack.isItemEnabled(this.level.enabledFeatures())) {
+-                this.selectedRecipe = legacyUpgradeRecipe;
+-                this.resultSlots.setRecipeUsed(legacyUpgradeRecipe);
+-                this.resultSlots.setItem(0, itemStack);
++            LegacyUpgradeRecipe legacyupgraderecipe = (LegacyUpgradeRecipe) list.get(0);
++            ItemStack itemstack = legacyupgraderecipe.assemble(this.inputSlots, this.level.registryAccess());
++
++            if (itemstack.isItemEnabled(this.level.enabledFeatures())) {
++                this.selectedRecipe = legacyupgraderecipe;
++                this.resultSlots.setRecipeUsed(legacyupgraderecipe);
++                // CraftBukkit start
++                org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory.callPrepareSmithingEvent(this.getBukkitView(), itemstack);
++                // CraftBukkit end
+             }
+         }
+ 
+@@ -107,8 +113,8 @@
+     }
+ 
+     protected boolean shouldQuickMoveToAdditionalSlot(ItemStack stack) {
+-        return this.recipes.stream().anyMatch((recipe) -> {
+-            return recipe.isAdditionIngredient(stack);
++        return this.recipes.stream().anyMatch((legacyupgraderecipe) -> {
++            return legacyupgraderecipe.isAdditionIngredient(stack);
+         });
+     }
+ 
+@@ -116,4 +122,18 @@
+     public boolean canTakeItemForPickAll(ItemStack stack, Slot slot) {
+         return slot.container != this.resultSlots && super.canTakeItemForPickAll(stack, slot);
+     }
++
++    // CraftBukkit start
++    @Override
++    public CraftInventoryView getBukkitView() {
++        if (this.bukkitEntity != null) {
++            return this.bukkitEntity;
++        }
++
++        org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventory inventory = new org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventorySmithing(
++                access.getLocation(), this.inputSlots, this.resultSlots);
++        this.bukkitEntity = new CraftInventoryView(this.player.getBukkitEntity(), inventory, this);
++        return this.bukkitEntity;
++    }
++    // CraftBukkit end
+ }

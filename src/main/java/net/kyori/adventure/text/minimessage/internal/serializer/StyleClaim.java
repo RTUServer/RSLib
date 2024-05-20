@@ -40,54 +40,54 @@ import static java.util.Objects.requireNonNull;
  * @since 4.10.0
  */
 public interface StyleClaim<V> {
-  /**
-   * Create a new style claim that will emit content for any non-null value.
-   *
-   * @param <T> the value type
-   * @param claimKey claim key for de-duplication
-   * @param lens value extractor from a {@link Style} instance
-   * @param emitable the function that handles emitting
-   * @return a new claim
-   * @since 4.10.0
-   */
-  static <T> @NotNull StyleClaim<T> claim(final @NotNull String claimKey, final @NotNull Function<Style, @Nullable T> lens, final @NotNull BiConsumer<T, TokenEmitter> emitable) {
-    return claim(claimKey, lens, $ -> true, emitable);
-  }
+    /**
+     * Create a new style claim that will emit content for any non-null value.
+     *
+     * @param <T>      the value type
+     * @param claimKey claim key for de-duplication
+     * @param lens     value extractor from a {@link Style} instance
+     * @param emitable the function that handles emitting
+     * @return a new claim
+     * @since 4.10.0
+     */
+    static <T> @NotNull StyleClaim<T> claim(final @NotNull String claimKey, final @NotNull Function<Style, @Nullable T> lens, final @NotNull BiConsumer<T, TokenEmitter> emitable) {
+        return claim(claimKey, lens, $ -> true, emitable);
+    }
 
-  /**
-   * Create a new style claim that will emit content for any non-null value that passes the filter.
-   *
-   * @param <T> the value type
-   * @param claimKey claim key for de-duplication
-   * @param lens value extractor from a {@link Style} instance
-   * @param filter a filter for values, will only receive non-null values
-   * @param emitable the function that handles emitting
-   * @return a new claim
-   * @since 4.10.0
-   */
-  static <T> @NotNull StyleClaim<T> claim(final @NotNull String claimKey, final @NotNull Function<Style, @Nullable T> lens, final @NotNull Predicate<T> filter, final @NotNull BiConsumer<T, TokenEmitter> emitable) {
-    return new StyleClaimImpl<>(
-      requireNonNull(claimKey, "claimKey"),
-      requireNonNull(lens, "lens"),
-      requireNonNull(filter, "filter"),
-      requireNonNull(emitable, "emitable")
-    );
-  }
+    /**
+     * Create a new style claim that will emit content for any non-null value that passes the filter.
+     *
+     * @param <T>      the value type
+     * @param claimKey claim key for de-duplication
+     * @param lens     value extractor from a {@link Style} instance
+     * @param filter   a filter for values, will only receive non-null values
+     * @param emitable the function that handles emitting
+     * @return a new claim
+     * @since 4.10.0
+     */
+    static <T> @NotNull StyleClaim<T> claim(final @NotNull String claimKey, final @NotNull Function<Style, @Nullable T> lens, final @NotNull Predicate<T> filter, final @NotNull BiConsumer<T, TokenEmitter> emitable) {
+        return new StyleClaimImpl<>(
+                requireNonNull(claimKey, "claimKey"),
+                requireNonNull(lens, "lens"),
+                requireNonNull(filter, "filter"),
+                requireNonNull(emitable, "emitable")
+        );
+    }
 
-  /**
-   * The key identifying this style element.
-   *
-   * @return the key to claim
-   * @since 4.10.0
-   */
-  @NotNull String claimKey(); // TODO: multiple claim keys? for custom styling tags?
+    /**
+     * The key identifying this style element.
+     *
+     * @return the key to claim
+     * @since 4.10.0
+     */
+    @NotNull String claimKey(); // TODO: multiple claim keys? for custom styling tags?
 
-  /**
-   * Prepare an emitable to apply this claim based on the style.
-   *
-   * @param style the style to test
-   * @return an emitable for this style claim, if it is applicable to the provided style
-   * @since 4.10.0
-   */
-  @Nullable Emitable apply(final @NotNull Style style);
+    /**
+     * Prepare an emitable to apply this claim based on the style.
+     *
+     * @param style the style to test
+     * @return an emitable for this style claim, if it is applicable to the provided style
+     * @since 4.10.0
+     */
+    @Nullable Emitable apply(final @NotNull Style style);
 }

@@ -41,29 +41,29 @@ import org.jetbrains.annotations.Nullable;
  * @since 4.10.0
  */
 final class ClickTag {
-  private static final String CLICK = "click";
+    private static final String CLICK = "click";
 
-  static final TagResolver RESOLVER = SerializableResolver.claimingStyle(
-    CLICK,
-    ClickTag::create,
-    StyleClaim.<ClickEvent>claim(CLICK, Style::clickEvent, (event, emitter) -> {
-      emitter.tag(CLICK)
-        .argument(ClickEvent.Action.NAMES.key(event.action()))
-        .argument(event.value(), QuotingOverride.QUOTED);
-    })
-  );
+    static final TagResolver RESOLVER = SerializableResolver.claimingStyle(
+            CLICK,
+            ClickTag::create,
+            StyleClaim.claim(CLICK, Style::clickEvent, (event, emitter) -> {
+                emitter.tag(CLICK)
+                        .argument(ClickEvent.Action.NAMES.key(event.action()))
+                        .argument(event.value(), QuotingOverride.QUOTED);
+            })
+    );
 
-  private ClickTag() {
-  }
-
-  static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
-    final String actionName = args.popOr(() -> "A click tag requires an action of one of " + ClickEvent.Action.NAMES.keys()).lowerValue();
-    final ClickEvent.@Nullable Action action = ClickEvent.Action.NAMES.value(actionName);
-    if (action == null) {
-      throw ctx.newException("Unknown click event action '" + actionName + "'", args);
+    private ClickTag() {
     }
 
-    final String value = args.popOr("Click event actions require a value").value();
-    return Tag.styling(ClickEvent.clickEvent(action, value));
-  }
+    static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
+        final String actionName = args.popOr(() -> "A click tag requires an action of one of " + ClickEvent.Action.NAMES.keys()).lowerValue();
+        final ClickEvent.@Nullable Action action = ClickEvent.Action.NAMES.value(actionName);
+        if (action == null) {
+            throw ctx.newException("Unknown click event action '" + actionName + "'", args);
+        }
+
+        final String value = args.popOr("Click event actions require a value").value();
+        return Tag.styling(ClickEvent.clickEvent(action, value));
+    }
 }

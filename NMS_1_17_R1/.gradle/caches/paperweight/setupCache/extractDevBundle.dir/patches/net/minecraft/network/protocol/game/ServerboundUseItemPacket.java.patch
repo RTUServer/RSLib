@@ -1,0 +1,35 @@
+--- a/net/minecraft/network/protocol/game/ServerboundUseItemPacket.java
++++ b/net/minecraft/network/protocol/game/ServerboundUseItemPacket.java
+@@ -1,3 +1,4 @@
++// mc-dev import
+ package net.minecraft.network.protocol.game;
+ 
+ import net.minecraft.network.FriendlyByteBuf;
+@@ -5,22 +6,24 @@
+ import net.minecraft.world.InteractionHand;
+ 
+ public class ServerboundUseItemPacket implements Packet<ServerGamePacketListener> {
++
+     private final InteractionHand hand;
++    public long timestamp; // Spigot
+ 
+     public ServerboundUseItemPacket(InteractionHand hand) {
+         this.hand = hand;
+     }
+ 
+     public ServerboundUseItemPacket(FriendlyByteBuf buf) {
+-        this.hand = buf.readEnum(InteractionHand.class);
++        this.timestamp = System.currentTimeMillis(); // Spigot
++        this.hand = (InteractionHand) buf.readEnum(InteractionHand.class);
+     }
+ 
+     @Override
+     public void write(FriendlyByteBuf buf) {
+-        buf.writeEnum(this.hand);
++        buf.writeEnum((Enum) this.hand);
+     }
+ 
+-    @Override
+     public void handle(ServerGamePacketListener listener) {
+         listener.handleUseItem(this);
+     }

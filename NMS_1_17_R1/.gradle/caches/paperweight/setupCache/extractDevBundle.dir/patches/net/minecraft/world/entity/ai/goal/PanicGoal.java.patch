@@ -1,0 +1,116 @@
+--- a/net/minecraft/world/entity/ai/goal/PanicGoal.java
++++ b/net/minecraft/world/entity/ai/goal/PanicGoal.java
+@@ -4,13 +4,16 @@
+ import javax.annotation.Nullable;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.tags.FluidTags;
++import net.minecraft.tags.Tag;
+ import net.minecraft.world.entity.Entity;
++import net.minecraft.world.entity.LivingEntity;
+ import net.minecraft.world.entity.PathfinderMob;
+ import net.minecraft.world.entity.ai.util.DefaultRandomPos;
+ import net.minecraft.world.level.BlockGetter;
+ import net.minecraft.world.phys.Vec3;
+ 
+ public class PanicGoal extends Goal {
++
+     protected final PathfinderMob mob;
+     protected final double speedModifier;
+     protected double posX;
+@@ -30,11 +33,12 @@
+             return false;
+         } else {
+             if (this.mob.isOnFire()) {
+-                BlockPos blockPos = this.lookForWater(this.mob.level, this.mob, 5, 4);
+-                if (blockPos != null) {
+-                    this.posX = (double)blockPos.getX();
+-                    this.posY = (double)blockPos.getY();
+-                    this.posZ = (double)blockPos.getZ();
++                BlockPos blockposition = this.lookForWater(this.mob.level, this.mob, 5, 4);
++
++                if (blockposition != null) {
++                    this.posX = (double) blockposition.getX();
++                    this.posY = (double) blockposition.getY();
++                    this.posZ = (double) blockposition.getZ();
+                     return true;
+                 }
+             }
+@@ -44,13 +48,14 @@
+     }
+ 
+     protected boolean findRandomPosition() {
+-        Vec3 vec3 = DefaultRandomPos.getPos(this.mob, 5, 4);
+-        if (vec3 == null) {
++        Vec3 vec3d = DefaultRandomPos.getPos(this.mob, 5, 4);
++
++        if (vec3d == null) {
+             return false;
+         } else {
+-            this.posX = vec3.x;
+-            this.posY = vec3.y;
+-            this.posZ = vec3.z;
++            this.posX = vec3d.x;
++            this.posY = vec3d.y;
++            this.posZ = vec3d.z;
+             return true;
+         }
+     }
+@@ -72,34 +77,41 @@
+ 
+     @Override
+     public boolean canContinueToUse() {
++        // CraftBukkit start - introduce a temporary timeout hack until this is fixed properly
++        if ((this.mob.tickCount - this.mob.lastHurtByMobTimestamp) > 100) {
++            this.mob.setLastHurtByMob((LivingEntity) null);
++            return false;
++        }
++        // CraftBukkit end
+         return !this.mob.getNavigation().isDone();
+     }
+ 
+     @Nullable
+     protected BlockPos lookForWater(BlockGetter blockView, Entity entity, int rangeX, int rangeY) {
+-        BlockPos blockPos = entity.blockPosition();
+-        int i = blockPos.getX();
+-        int j = blockPos.getY();
+-        int k = blockPos.getZ();
+-        float f = (float)(rangeX * rangeX * rangeY * 2);
+-        BlockPos blockPos2 = null;
+-        BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
++        BlockPos blockposition = entity.blockPosition();
++        int k = blockposition.getX();
++        int l = blockposition.getY();
++        int i1 = blockposition.getZ();
++        float f = (float) (rangeX * rangeX * rangeY * 2);
++        BlockPos blockposition1 = null;
++        BlockPos.MutableBlockPos blockposition_mutableblockposition = new BlockPos.MutableBlockPos();
+ 
+-        for(int l = i - rangeX; l <= i + rangeX; ++l) {
+-            for(int m = j - rangeY; m <= j + rangeY; ++m) {
+-                for(int n = k - rangeX; n <= k + rangeX; ++n) {
+-                    mutableBlockPos.set(l, m, n);
+-                    if (blockView.getFluidState(mutableBlockPos).is(FluidTags.WATER)) {
+-                        float g = (float)((l - i) * (l - i) + (m - j) * (m - j) + (n - k) * (n - k));
+-                        if (g < f) {
+-                            f = g;
+-                            blockPos2 = new BlockPos(mutableBlockPos);
++        for (int j1 = k - rangeX; j1 <= k + rangeX; ++j1) {
++            for (int k1 = l - rangeY; k1 <= l + rangeY; ++k1) {
++                for (int l1 = i1 - rangeX; l1 <= i1 + rangeX; ++l1) {
++                    blockposition_mutableblockposition.set(j1, k1, l1);
++                    if (blockView.getFluidState(blockposition_mutableblockposition).is((Tag) FluidTags.WATER)) {
++                        float f1 = (float) ((j1 - k) * (j1 - k) + (k1 - l) * (k1 - l) + (l1 - i1) * (l1 - i1));
++
++                        if (f1 < f) {
++                            f = f1;
++                            blockposition1 = new BlockPos(blockposition_mutableblockposition);
+                         }
+                     }
+                 }
+             }
+         }
+ 
+-        return blockPos2;
++        return blockposition1;
+     }
+ }

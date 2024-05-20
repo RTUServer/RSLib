@@ -1,0 +1,17 @@
+--- a/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java
+@@ -94,7 +94,13 @@
+         INITIALIZE_CHAT((serialized, buf) -> {
+             serialized.chatSession = buf.readNullable(RemoteChatSession.Data::read);
+         }, (buf, entry) -> {
+-            buf.writeNullable(entry.chatSession, RemoteChatSession.Data::write);
++            // Paper start
++            RemoteChatSession.Data chatSession = entry.chatSession;
++            if (chatSession != null && chatSession.profilePublicKey().hasExpired()) {
++                chatSession = null;
++            }
++            buf.writeNullable(chatSession, RemoteChatSession.Data::write);
++            // Paper end
+         }),
+         UPDATE_GAME_MODE((serialized, buf) -> {
+             serialized.gameMode = GameType.byId(buf.readVarInt());

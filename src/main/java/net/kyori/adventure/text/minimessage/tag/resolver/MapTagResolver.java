@@ -31,37 +31,36 @@ import java.util.Map;
 import java.util.Objects;
 
 final class MapTagResolver implements TagResolver.WithoutArguments, MappableResolver {
-  private final Map<String, ? extends Tag> tagMap;
+    private final Map<String, ? extends Tag> tagMap;
 
-  MapTagResolver(final @NotNull Map<String, ? extends Tag> placeholderMap) {
-    this.tagMap = placeholderMap;
-  }
-
-  @Override
-  public @Nullable Tag resolve(final @NotNull String name) {
-    return this.tagMap.get(name);
-  }
-
-  @Override
-  public boolean contributeToMap(final @NotNull Map<String, Tag> map) {
-    map.putAll(this.tagMap);
-    return true;
-  }
-
-  @Override
-  public boolean equals(final @Nullable Object other) {
-    if (this == other) {
-      return true;
+    MapTagResolver(final @NotNull Map<String, ? extends Tag> placeholderMap) {
+        this.tagMap = placeholderMap;
     }
-    if (!(other instanceof MapTagResolver)) {
-      return false;
-    }
-    final MapTagResolver that = (MapTagResolver) other;
-    return Objects.equals(this.tagMap, that.tagMap);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.tagMap);
-  }
+    @Override
+    public @Nullable Tag resolve(final @NotNull String name) {
+        return this.tagMap.get(name);
+    }
+
+    @Override
+    public boolean contributeToMap(final @NotNull Map<String, Tag> map) {
+        map.putAll(this.tagMap);
+        return true;
+    }
+
+    @Override
+    public boolean equals(final @Nullable Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof MapTagResolver that)) {
+            return false;
+        }
+        return Objects.equals(this.tagMap, that.tagMap);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.tagMap);
+    }
 }

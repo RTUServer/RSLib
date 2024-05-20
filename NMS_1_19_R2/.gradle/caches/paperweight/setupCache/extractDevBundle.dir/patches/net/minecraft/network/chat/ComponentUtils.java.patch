@@ -1,0 +1,24 @@
+--- a/net/minecraft/network/chat/ComponentUtils.java
++++ b/net/minecraft/network/chat/ComponentUtils.java
+@@ -42,6 +42,11 @@
+         if (depth > 100) {
+             return text.copy();
+         } else {
++            // Paper start
++            if (text instanceof io.papermc.paper.adventure.AdventureComponent adventureComponent) {
++                text = adventureComponent.deepConverted();
++            }
++            // Paper end
+             MutableComponent mutableComponent = text.getContents().resolve(source, sender, depth + 1);
+ 
+             for(Component component : text.getSiblings()) {
+@@ -138,8 +143,7 @@
+             ComponentContents string = text.getContents();
+             if (string instanceof TranslatableContents) {
+                 TranslatableContents translatableContents = (TranslatableContents)string;
+-                String string = translatableContents.getKey();
+-                return Language.getInstance().has(string);
++                return Language.getInstance().has(translatableContents.getKey()); // Paper - decompile fix
+             }
+         }
+ 

@@ -33,18 +33,18 @@ import org.jetbrains.annotations.ApiStatus;
  */
 @ApiStatus.NonExtendable
 public /* sealed */ interface ParserDirective extends Tag {
-  /**
-   * Instructs the parser to reset all style, events, insertions, etc.
-   *
-   * <p>If {@link net.kyori.adventure.text.minimessage.MiniMessage.Builder#strict(boolean) strict mode} is enabled, usage of
-   * this tag is disallowed and a parse exception will be thrown if this tag is present.</p>
-   *
-   * @since 4.10.0
-   */
-  Tag RESET = new ParserDirective() {
-    @Override
-    public String toString() {
-      return "ParserDirective.RESET";
-    }
-  };
+    /**
+     * Instructs the parser to reset all style, events, insertions, etc.
+     *
+     * <p>If {@link net.kyori.adventure.text.minimessage.MiniMessage.Builder#strict(boolean) strict mode} is enabled, usage of
+     * this tag is disallowed and a parse exception will be thrown if this tag is present.</p>
+     *
+     * @since 4.10.0
+     */
+    Tag RESET = new ParserDirective() {
+        @Override
+        public String toString() {
+            return "ParserDirective.RESET";
+        }
+    };
 }

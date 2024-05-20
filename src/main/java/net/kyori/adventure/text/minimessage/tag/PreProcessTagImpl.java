@@ -31,32 +31,31 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 final class PreProcessTagImpl extends AbstractTag implements PreProcess {
-  private final String value;
+    private final String value;
 
-  PreProcessTagImpl(final String value) {
-    this.value = value;
-  }
+    PreProcessTagImpl(final String value) {
+        this.value = value;
+    }
 
-  @Override
-  public @NotNull String value() {
-    return this.value;
-  }
+    @Override
+    public @NotNull String value() {
+        return this.value;
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.value);
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.value);
+    }
 
-  @Override
-  public boolean equals(final @Nullable Object other) {
-    if (this == other) return true;
-    if (!(other instanceof PreProcessTagImpl)) return false;
-    final PreProcessTagImpl that = (PreProcessTagImpl) other;
-    return Objects.equals(this.value, that.value);
-  }
+    @Override
+    public boolean equals(final @Nullable Object other) {
+        if (this == other) return true;
+        if (!(other instanceof PreProcessTagImpl that)) return false;
+        return Objects.equals(this.value, that.value);
+    }
 
-  @Override
-  public @NotNull Stream<? extends ExaminableProperty> examinableProperties() {
-    return Stream.of(ExaminableProperty.of("value", this.value));
-  }
+    @Override
+    public @NotNull Stream<? extends ExaminableProperty> examinableProperties() {
+        return Stream.of(ExaminableProperty.of("value", this.value));
+    }
 }

@@ -35,30 +35,30 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 final class StyleClaimingResolverImpl implements TagResolver, SerializableResolver.Single {
-  private final @NotNull Set<String> names;
-  private final @NotNull BiFunction<ArgumentQueue, Context, Tag> handler;
-  private final @NotNull StyleClaim<?> styleClaim;
+    private final @NotNull Set<String> names;
+    private final @NotNull BiFunction<ArgumentQueue, Context, Tag> handler;
+    private final @NotNull StyleClaim<?> styleClaim;
 
-  StyleClaimingResolverImpl(final @NotNull Set<String> names, final @NotNull BiFunction<ArgumentQueue, Context, Tag> handler, final @NotNull StyleClaim<?> styleClaim) {
-    this.names = names;
-    this.handler = handler;
-    this.styleClaim = styleClaim;
-  }
+    StyleClaimingResolverImpl(final @NotNull Set<String> names, final @NotNull BiFunction<ArgumentQueue, Context, Tag> handler, final @NotNull StyleClaim<?> styleClaim) {
+        this.names = names;
+        this.handler = handler;
+        this.styleClaim = styleClaim;
+    }
 
-  @Override
-  public @Nullable Tag resolve(final @NotNull String name, final @NotNull ArgumentQueue arguments, final @NotNull Context ctx) throws ParsingException {
-    if (!this.names.contains(name)) return null;
+    @Override
+    public @Nullable Tag resolve(final @NotNull String name, final @NotNull ArgumentQueue arguments, final @NotNull Context ctx) throws ParsingException {
+        if (!this.names.contains(name)) return null;
 
-    return this.handler.apply(arguments, ctx);
-  }
+        return this.handler.apply(arguments, ctx);
+    }
 
-  @Override
-  public boolean has(final @NotNull String name) {
-    return this.names.contains(name);
-  }
+    @Override
+    public boolean has(final @NotNull String name) {
+        return this.names.contains(name);
+    }
 
-  @Override
-  public @Nullable StyleClaim<?> claimStyle() {
-    return this.styleClaim;
-  }
+    @Override
+    public @Nullable StyleClaim<?> claimStyle() {
+        return this.styleClaim;
+    }
 }

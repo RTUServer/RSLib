@@ -1,0 +1,182 @@
+--- a/net/minecraft/world/level/dimension/end/DragonRespawnAnimation.java
++++ b/net/minecraft/world/level/dimension/end/DragonRespawnAnimation.java
+@@ -1,27 +1,36 @@
+ package net.minecraft.world.level.dimension.end;
+ 
+ import com.google.common.collect.ImmutableList;
++import java.util.Iterator;
+ import java.util.List;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.util.RandomSource;
++import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.level.levelgen.feature.Feature;
+ import net.minecraft.world.level.levelgen.feature.SpikeFeature;
+ import net.minecraft.world.level.levelgen.feature.configurations.SpikeConfiguration;
++// CraftBukkit start
++import org.bukkit.event.entity.EntityRemoveEvent;
++// CraftBukkit end
+ 
+ public enum DragonRespawnAnimation {
++
+     START {
+         @Override
+         public void tick(ServerLevel world, EndDragonFight fight, List<EndCrystal> crystals, int tick, BlockPos pos) {
+-            BlockPos blockPos = new BlockPos(0, 128, 0);
++            BlockPos blockposition1 = new BlockPos(0, 128, 0);
++            Iterator iterator = crystals.iterator();
+ 
+-            for (EndCrystal endCrystal : crystals) {
+-                endCrystal.setBeamTarget(blockPos);
++            while (iterator.hasNext()) {
++                EndCrystal entityendercrystal = (EndCrystal) iterator.next();
++
++                entityendercrystal.setBeamTarget(blockposition1);
+             }
+ 
+-            fight.setRespawnStage(PREPARING_TO_SUMMON_PILLARS);
++            fight.setRespawnStage(PREPARING_TO_SUMMON_PILLARS); // CraftBukkit - decompile error
+         }
+     },
+     PREPARING_TO_SUMMON_PILLARS {
+@@ -32,87 +41,93 @@
+                     world.levelEvent(3001, new BlockPos(0, 128, 0), 0);
+                 }
+             } else {
+-                fight.setRespawnStage(SUMMONING_PILLARS);
++                fight.setRespawnStage(SUMMONING_PILLARS); // CraftBukkit - decompile error
+             }
++
+         }
+     },
+     SUMMONING_PILLARS {
+         @Override
+         public void tick(ServerLevel world, EndDragonFight fight, List<EndCrystal> crystals, int tick, BlockPos pos) {
+-            int i = 40;
+-            boolean bl = tick % 40 == 0;
+-            boolean bl2 = tick % 40 == 39;
+-            if (bl || bl2) {
+-                List<SpikeFeature.EndSpike> list = SpikeFeature.getSpikesForLevel(world);
++            boolean flag = true;
++            boolean flag1 = tick % 40 == 0;
++            boolean flag2 = tick % 40 == 39;
++
++            if (flag1 || flag2) {
++                List<SpikeFeature.EndSpike> list1 = SpikeFeature.getSpikesForLevel(world);
+                 int j = tick / 40;
+-                if (j < list.size()) {
+-                    SpikeFeature.EndSpike endSpike = list.get(j);
+-                    if (bl) {
+-                        for (EndCrystal endCrystal : crystals) {
+-                            endCrystal.setBeamTarget(new BlockPos(endSpike.getCenterX(), endSpike.getHeight() + 1, endSpike.getCenterZ()));
++
++                if (j < list1.size()) {
++                    SpikeFeature.EndSpike worldgenender_spike = (SpikeFeature.EndSpike) list1.get(j);
++
++                    if (flag1) {
++                        Iterator iterator = crystals.iterator();
++
++                        while (iterator.hasNext()) {
++                            EndCrystal entityendercrystal = (EndCrystal) iterator.next();
++
++                            entityendercrystal.setBeamTarget(new BlockPos(worldgenender_spike.getCenterX(), worldgenender_spike.getHeight() + 1, worldgenender_spike.getCenterZ()));
+                         }
+                     } else {
+-                        int k = 10;
++                        boolean flag3 = true;
++                        Iterator iterator1 = BlockPos.betweenClosed(new BlockPos(worldgenender_spike.getCenterX() - 10, worldgenender_spike.getHeight() - 10, worldgenender_spike.getCenterZ() - 10), new BlockPos(worldgenender_spike.getCenterX() + 10, worldgenender_spike.getHeight() + 10, worldgenender_spike.getCenterZ() + 10)).iterator();
+ 
+-                        for (BlockPos blockPos : BlockPos.betweenClosed(
+-                            new BlockPos(endSpike.getCenterX() - 10, endSpike.getHeight() - 10, endSpike.getCenterZ() - 10),
+-                            new BlockPos(endSpike.getCenterX() + 10, endSpike.getHeight() + 10, endSpike.getCenterZ() + 10)
+-                        )) {
+-                            world.removeBlock(blockPos, false);
++                        while (iterator1.hasNext()) {
++                            BlockPos blockposition1 = (BlockPos) iterator1.next();
++
++                            world.removeBlock(blockposition1, false);
+                         }
+ 
+-                        world.explode(
+-                            null,
+-                            (double)((float)endSpike.getCenterX() + 0.5F),
+-                            (double)endSpike.getHeight(),
+-                            (double)((float)endSpike.getCenterZ() + 0.5F),
+-                            5.0F,
+-                            Level.ExplosionInteraction.BLOCK
+-                        );
+-                        SpikeConfiguration spikeConfiguration = new SpikeConfiguration(true, ImmutableList.of(endSpike), new BlockPos(0, 128, 0));
+-                        Feature.END_SPIKE
+-                            .place(
+-                                spikeConfiguration,
+-                                world,
+-                                world.getChunkSource().getGenerator(),
+-                                RandomSource.create(),
+-                                new BlockPos(endSpike.getCenterX(), 45, endSpike.getCenterZ())
+-                            );
++                        world.explode((Entity) null, (double) ((float) worldgenender_spike.getCenterX() + 0.5F), (double) worldgenender_spike.getHeight(), (double) ((float) worldgenender_spike.getCenterZ() + 0.5F), 5.0F, Level.ExplosionInteraction.BLOCK);
++                        SpikeConfiguration worldgenfeatureendspikeconfiguration = new SpikeConfiguration(true, ImmutableList.of(worldgenender_spike), new BlockPos(0, 128, 0));
++
++                        Feature.END_SPIKE.place(worldgenfeatureendspikeconfiguration, world, world.getChunkSource().getGenerator(), RandomSource.create(), new BlockPos(worldgenender_spike.getCenterX(), 45, worldgenender_spike.getCenterZ()));
+                     }
+-                } else if (bl) {
+-                    fight.setRespawnStage(SUMMONING_DRAGON);
++                } else if (flag1) {
++                    fight.setRespawnStage(SUMMONING_DRAGON); // CraftBukkit - decompile error
+                 }
+             }
++
+         }
+     },
+     SUMMONING_DRAGON {
+         @Override
+         public void tick(ServerLevel world, EndDragonFight fight, List<EndCrystal> crystals, int tick, BlockPos pos) {
++            Iterator iterator;
++            EndCrystal entityendercrystal;
++
+             if (tick >= 100) {
+-                fight.setRespawnStage(END);
++                fight.setRespawnStage(END); // CraftBukkit - decompile error
+                 fight.resetSpikeCrystals();
++                iterator = crystals.iterator();
+ 
+-                for (EndCrystal endCrystal : crystals) {
+-                    endCrystal.setBeamTarget(null);
+-                    world.explode(endCrystal, endCrystal.getX(), endCrystal.getY(), endCrystal.getZ(), 6.0F, Level.ExplosionInteraction.NONE);
+-                    endCrystal.discard();
++                while (iterator.hasNext()) {
++                    entityendercrystal = (EndCrystal) iterator.next();
++                    entityendercrystal.setBeamTarget((BlockPos) null);
++                    world.explode(entityendercrystal, entityendercrystal.getX(), entityendercrystal.getY(), entityendercrystal.getZ(), 6.0F, Level.ExplosionInteraction.NONE);
++                    entityendercrystal.discard(EntityRemoveEvent.Cause.EXPLODE); // CraftBukkit - add Bukkit remove cause
+                 }
+             } else if (tick >= 80) {
+                 world.levelEvent(3001, new BlockPos(0, 128, 0), 0);
+             } else if (tick == 0) {
+-                for (EndCrystal endCrystal2 : crystals) {
+-                    endCrystal2.setBeamTarget(new BlockPos(0, 128, 0));
++                iterator = crystals.iterator();
++
++                while (iterator.hasNext()) {
++                    entityendercrystal = (EndCrystal) iterator.next();
++                    entityendercrystal.setBeamTarget(new BlockPos(0, 128, 0));
+                 }
+             } else if (tick < 5) {
+                 world.levelEvent(3001, new BlockPos(0, 128, 0), 0);
+             }
++
+         }
+     },
+     END {
+         @Override
+-        public void tick(ServerLevel world, EndDragonFight fight, List<EndCrystal> crystals, int tick, BlockPos pos) {
+-        }
++        public void tick(ServerLevel world, EndDragonFight fight, List<EndCrystal> crystals, int tick, BlockPos pos) {}
+     };
+ 
++    DragonRespawnAnimation() {}
++
+     public abstract void tick(ServerLevel world, EndDragonFight fight, List<EndCrystal> crystals, int tick, BlockPos pos);
+ }

@@ -40,23 +40,23 @@ import org.jetbrains.annotations.Nullable;
  * @since 4.10.0
  */
 final class KeybindTag {
-  public static final String KEYBIND = "key";
+    public static final String KEYBIND = "key";
 
-  static final TagResolver RESOLVER = SerializableResolver.claimingComponent(KeybindTag.KEYBIND, KeybindTag::create, KeybindTag::emit);
+    static final TagResolver RESOLVER = SerializableResolver.claimingComponent(KeybindTag.KEYBIND, KeybindTag::create, KeybindTag::emit);
 
-  private KeybindTag() {
-  }
+    private KeybindTag() {
+    }
 
-  static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
-    return Tag.inserting(Component.keybind(args.popOr("A keybind id is required").value()));
-  }
+    static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
+        return Tag.inserting(Component.keybind(args.popOr("A keybind id is required").value()));
+    }
 
-  static @Nullable Emitable emit(final Component component) {
-    if (!(component instanceof KeybindComponent)) return null;
+    static @Nullable Emitable emit(final Component component) {
+        if (!(component instanceof KeybindComponent)) return null;
 
-    final String key = ((KeybindComponent) component).keybind();
+        final String key = ((KeybindComponent) component).keybind();
 
-    return emit -> emit.tag(KEYBIND).argument(key);
-  }
+        return emit -> emit.tag(KEYBIND).argument(key);
+    }
 
 }

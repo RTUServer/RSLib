@@ -1,0 +1,81 @@
+--- a/net/minecraft/world/entity/monster/Endermite.java
++++ b/net/minecraft/world/entity/monster/Endermite.java
+@@ -29,7 +29,12 @@
+ import net.minecraft.world.level.block.state.BlockState;
+ import org.joml.Vector3f;
+ 
++// CraftBukkit start
++import org.bukkit.event.entity.EntityRemoveEvent;
++// CraftBukkit end
++
+ public class Endermite extends Monster {
++
+     private static final int MAX_LIFE = 2400;
+     public int life;
+ 
+@@ -42,11 +47,11 @@
+     protected void registerGoals() {
+         this.goalSelector.addGoal(1, new FloatGoal(this));
+         this.goalSelector.addGoal(1, new ClimbOnTopOfPowderSnowGoal(this, this.level()));
+-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0, false));
+-        this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 1.0));
++        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0D, false));
++        this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 1.0D));
+         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 8.0F));
+         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+-        this.targetSelector.addGoal(1, new HurtByTargetGoal(this).setAlertOthers());
++        this.targetSelector.addGoal(1, (new HurtByTargetGoal(this, new Class[0])).setAlertOthers());
+         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+     }
+ 
+@@ -56,7 +61,7 @@
+     }
+ 
+     public static AttributeSupplier.Builder createAttributes() {
+-        return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 8.0).add(Attributes.MOVEMENT_SPEED, 0.25).add(Attributes.ATTACK_DAMAGE, 2.0);
++        return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 8.0D).add(Attributes.MOVEMENT_SPEED, 0.25D).add(Attributes.ATTACK_DAMAGE, 2.0D);
+     }
+ 
+     @Override
+@@ -112,33 +117,26 @@
+     public void aiStep() {
+         super.aiStep();
+         if (this.level().isClientSide) {
+-            for (int i = 0; i < 2; i++) {
+-                this.level()
+-                    .addParticle(
+-                        ParticleTypes.PORTAL,
+-                        this.getRandomX(0.5),
+-                        this.getRandomY(),
+-                        this.getRandomZ(0.5),
+-                        (this.random.nextDouble() - 0.5) * 2.0,
+-                        -this.random.nextDouble(),
+-                        (this.random.nextDouble() - 0.5) * 2.0
+-                    );
++            for (int i = 0; i < 2; ++i) {
++                this.level().addParticle(ParticleTypes.PORTAL, this.getRandomX(0.5D), this.getRandomY(), this.getRandomZ(0.5D), (this.random.nextDouble() - 0.5D) * 2.0D, -this.random.nextDouble(), (this.random.nextDouble() - 0.5D) * 2.0D);
+             }
+         } else {
+             if (!this.isPersistenceRequired()) {
+-                this.life++;
++                ++this.life;
+             }
+ 
+             if (this.life >= 2400) {
+-                this.discard();
++                this.discard(EntityRemoveEvent.Cause.DESPAWN); // CraftBukkit - add Bukkit remove cause
+             }
+         }
++
+     }
+ 
+     public static boolean checkEndermiteSpawnRules(EntityType<Endermite> type, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, RandomSource random) {
+         if (checkAnyLightMonsterSpawnRules(type, world, spawnReason, pos, random)) {
+-            Player player = world.getNearestPlayer((double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, 5.0, true);
+-            return player == null;
++            Player entityhuman = world.getNearestPlayer((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D, 5.0D, true);
++
++            return entityhuman == null;
+         } else {
+             return false;
+         }

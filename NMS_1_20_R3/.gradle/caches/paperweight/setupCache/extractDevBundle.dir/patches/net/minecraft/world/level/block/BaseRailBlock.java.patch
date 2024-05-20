@@ -1,0 +1,10 @@
+--- a/net/minecraft/world/level/block/BaseRailBlock.java
++++ b/net/minecraft/world/level/block/BaseRailBlock.java
+@@ -68,6 +68,7 @@
+         state = this.updateDir(world, pos, state, true);
+         if (this.isStraight) {
+             world.neighborChanged(state, pos, this, pos, notify);
++            state = world.getBlockState(pos); // Paper - Fix some rails connecting improperly
+         }
+ 
+         return state;

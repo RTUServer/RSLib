@@ -38,48 +38,48 @@ import java.util.List;
  */
 @ApiStatus.NonExtendable
 public interface Node {
-  /**
-   * Get a human-readable representation of this node and its descendants for debugging purposes.
-   *
-   * @return the human-readable representation of this node tree
-   * @since 4.10.0
-   */
-  @Override
-  @NotNull String toString();
-
-  /**
-   * Get children of this node.
-   *
-   * <p>The returned list is unmodifiable.</p>
-   *
-   * @return a list of children
-   * @since 4.10.0
-   */
-  @NotNull List<? extends Node> children();
-
-  /**
-   * Get the parent of this node.
-   *
-   * <p>If this node is at the root of the tree, this may be {@code null}.</p>
-   *
-   * @return this node's parent
-   * @since 4.10.0
-   */
-  @Nullable Node parent();
-
-  /**
-   * The root node of a parse.
-   *
-   * @since 4.10.0
-   */
-  @ApiStatus.NonExtendable
-  interface Root extends Node {
     /**
-     * Get the original provided message which produced this node.
+     * Get a human-readable representation of this node and its descendants for debugging purposes.
      *
-     * @return the input message
+     * @return the human-readable representation of this node tree
      * @since 4.10.0
      */
-    @NotNull String input();
-  }
+    @Override
+    @NotNull String toString();
+
+    /**
+     * Get children of this node.
+     *
+     * <p>The returned list is unmodifiable.</p>
+     *
+     * @return a list of children
+     * @since 4.10.0
+     */
+    @NotNull List<? extends Node> children();
+
+    /**
+     * Get the parent of this node.
+     *
+     * <p>If this node is at the root of the tree, this may be {@code null}.</p>
+     *
+     * @return this node's parent
+     * @since 4.10.0
+     */
+    @Nullable Node parent();
+
+    /**
+     * The root node of a parse.
+     *
+     * @since 4.10.0
+     */
+    @ApiStatus.NonExtendable
+    interface Root extends Node {
+        /**
+         * Get the original provided message which produced this node.
+         *
+         * @return the input message
+         * @since 4.10.0
+         */
+        @NotNull String input();
+    }
 }

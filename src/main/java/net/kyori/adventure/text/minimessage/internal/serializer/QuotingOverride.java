@@ -31,18 +31,18 @@ package net.kyori.adventure.text.minimessage.internal.serializer;
  * @since 4.10.0
  */
 public enum QuotingOverride {
-  /**
-   * Request that this argument is included unquoted.
-   *
-   * <p>As no escapes can be included in an unquoted argument, this request may be ignored depending on the content of the argument.</p>
-   *
-   * @since 4.10.0
-   */
-  UNQUOTED,
-  /**
-   * Request that this argument is included quoted.
-   *
-   * @since 4.10.0
-   */
-  QUOTED;
+    /**
+     * Request that this argument is included unquoted.
+     *
+     * <p>As no escapes can be included in an unquoted argument, this request may be ignored depending on the content of the argument.</p>
+     *
+     * @since 4.10.0
+     */
+    UNQUOTED,
+    /**
+     * Request that this argument is included quoted.
+     *
+     * @since 4.10.0
+     */
+    QUOTED
 }

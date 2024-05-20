@@ -45,7 +45,7 @@ public class VersionUtil {
     }
 
     public static boolean isPaper() {
-        return hasClass("com.destroystokyo.paper.PaperConfig") || hasClass("io.papermc.paper.configuration.Configuration");
+        return hasClass("com.destroystokyo.paper.PaperConfig") || hasClass("com.github.ipecter.rtuserver.lib.plugin.configuration.Configuration");
     }
 
     private static boolean hasClass(String className) {
@@ -78,7 +78,7 @@ public class VersionUtil {
             case 1200, 1201 -> "v1_20_R1";
             case 1202 -> "v1_20_R2";
             case 1203, 1204 -> "v1_20_R3";
-            case 1205 -> "v1_20_R4";
+            case 1205, 1206 -> "v1_20_R4";
             default -> "";
         };
     }

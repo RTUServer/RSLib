@@ -1,0 +1,23 @@
+--- a/net/minecraft/world/level/chunk/EmptyLevelChunk.java
++++ b/net/minecraft/world/level/chunk/EmptyLevelChunk.java
+@@ -19,6 +19,11 @@
+         super(world, pos, new EmptyLevelChunk.EmptyChunkBiomeContainer(world));
+     }
+ 
++    // Paper start
++    @Override public BlockState getType(int x, int y, int z) {
++        return Blocks.VOID_AIR.defaultBlockState();
++    }
++    // Paper end
+     @Override
+     public BlockState getBlockState(BlockPos pos) {
+         return Blocks.VOID_AIR.defaultBlockState();
+@@ -81,7 +86,7 @@
+         private static final Biome[] EMPTY_BIOMES = new Biome[0];
+ 
+         public EmptyChunkBiomeContainer(Level world) {
+-            super(world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), world, EMPTY_BIOMES);
++            super(net.minecraft.server.MinecraftServer.getServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), world, EMPTY_BIOMES); // Paper - Anti-Xray - The world isnt ready yet, use server singleton for registry
+         }
+ 
+         @Override

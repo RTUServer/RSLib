@@ -42,40 +42,40 @@ import org.intellij.lang.annotations.Subst;
  * @since 4.10.0
  */
 final class FontTag {
-  static final String FONT = "font";
+    static final String FONT = "font";
 
-  static final TagResolver RESOLVER = SerializableResolver.claimingStyle(
-    FontTag.FONT,
-    FontTag::create,
-    StyleClaim.claim(FONT, Style::font, FontTag::emit)
-  );
+    static final TagResolver RESOLVER = SerializableResolver.claimingStyle(
+            FontTag.FONT,
+            FontTag::create,
+            StyleClaim.claim(FONT, Style::font, FontTag::emit)
+    );
 
-  private FontTag() {
-  }
-
-  static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
-    final Key font;
-    @Subst("empty") final String valueOrNamespace = args.popOr("A font tag must have either arguments of either <value> or <namespace:value>").value();
-    try {
-      if (!args.hasNext()) {
-        font = Key.key(valueOrNamespace);
-      } else {
-        @Subst("empty") final String fontKey = args.pop().value();
-        font = Key.key(valueOrNamespace, fontKey);
-      }
-    } catch (final InvalidKeyException ex) {
-      throw ctx.newException(ex.getMessage(), args);
+    private FontTag() {
     }
 
-    return Tag.styling(builder -> builder.font(font));
-  }
+    static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
+        final Key font;
+        @Subst("empty") final String valueOrNamespace = args.popOr("A font tag must have either arguments of either <value> or <namespace:value>").value();
+        try {
+            if (!args.hasNext()) {
+                font = Key.key(valueOrNamespace);
+            } else {
+                @Subst("empty") final String fontKey = args.pop().value();
+                font = Key.key(valueOrNamespace, fontKey);
+            }
+        } catch (final InvalidKeyException ex) {
+            throw ctx.newException(ex.getMessage(), args);
+        }
 
-  static void emit(final Key font, final TokenEmitter emitter) {
-    emitter.tag(FONT);
-    if (font.namespace().equals(Key.MINECRAFT_NAMESPACE)) {
-      emitter.argument(font.value());
-    } else {
-      emitter.arguments(font.namespace(), font.value());
+        return Tag.styling(builder -> builder.font(font));
     }
-  }
+
+    static void emit(final Key font, final TokenEmitter emitter) {
+        emitter.tag(FONT);
+        if (font.namespace().equals(Key.MINECRAFT_NAMESPACE)) {
+            emitter.argument(font.value());
+        } else {
+            emitter.arguments(font.namespace(), font.value());
+        }
+    }
 }

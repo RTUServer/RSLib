@@ -35,48 +35,48 @@ import org.jetbrains.annotations.UnknownNullability;
  * @since 4.10.0
  */
 public abstract class MatchedTokenConsumer<T> {
-  protected final String input;
+    protected final String input;
 
-  private int lastIndex = -1;
+    private int lastIndex = -1;
 
-  /**
-   * Creates a new matched token consumer.
-   *
-   * @param input the input
-   * @since 4.10.0
-   */
-  public MatchedTokenConsumer(final @NotNull String input) {
-    this.input = input;
-  }
+    /**
+     * Creates a new matched token consumer.
+     *
+     * @param input the input
+     * @since 4.10.0
+     */
+    public MatchedTokenConsumer(final @NotNull String input) {
+        this.input = input;
+    }
 
-  /**
-   * Accepts a matched token.
-   *
-   * @param start     the start of the token
-   * @param end       the end of the token
-   * @param tokenType the type of the token
-   * @since 4.10.0
-   */
-  @MustBeInvokedByOverriders
-  public void accept(final int start, final int end, final @NotNull TokenType tokenType) {
-    this.lastIndex = end;
-  }
+    /**
+     * Accepts a matched token.
+     *
+     * @param start     the start of the token
+     * @param end       the end of the token
+     * @param tokenType the type of the token
+     * @since 4.10.0
+     */
+    @MustBeInvokedByOverriders
+    public void accept(final int start, final int end, final @NotNull TokenType tokenType) {
+        this.lastIndex = end;
+    }
 
-  /**
-   * Gets the result of this consumer, if any.
-   *
-   * @return the result
-   * @since 4.10.0
-   */
-  public abstract @UnknownNullability T result();
+    /**
+     * Gets the result of this consumer, if any.
+     *
+     * @return the result
+     * @since 4.10.0
+     */
+    public abstract @UnknownNullability T result();
 
-  /**
-   * The last accepted end index, or {@code -1} if no match has been accepted.
-   *
-   * @return the last accepted end index
-   * @since 4.10.0
-   */
-  public final int lastEndIndex() {
-    return this.lastIndex;
-  }
+    /**
+     * The last accepted end index, or {@code -1} if no match has been accepted.
+     *
+     * @return the last accepted end index
+     * @since 4.10.0
+     */
+    public final int lastEndIndex() {
+        return this.lastIndex;
+    }
 }

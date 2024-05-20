@@ -1,0 +1,267 @@
+--- a/net/minecraft/world/level/levelgen/structure/templatesystem/StructureManager.java
++++ b/net/minecraft/world/level/levelgen/structure/templatesystem/StructureManager.java
+@@ -10,6 +10,7 @@
+ import java.io.OutputStream;
+ import java.nio.file.Files;
+ import java.nio.file.InvalidPathException;
++import java.nio.file.LinkOption;
+ import java.nio.file.Path;
+ import java.util.Map;
+ import java.util.Optional;
+@@ -28,11 +29,12 @@
+ import org.apache.logging.log4j.Logger;
+ 
+ public class StructureManager {
++
+     private static final Logger LOGGER = LogManager.getLogger();
+     private static final String STRUCTURE_DIRECTORY_NAME = "structures";
+     private static final String STRUCTURE_FILE_EXTENSION = ".nbt";
+     private static final String STRUCTURE_TEXT_FILE_EXTENSION = ".snbt";
+-    private final Map<ResourceLocation, Optional<StructureTemplate>> structureRepository = Maps.newConcurrentMap();
++    public final Map<ResourceLocation, Optional<StructureTemplate>> structureRepository = Maps.newConcurrentMap(); // PAIL private->public
+     private final DataFixer fixerUpper;
+     private ResourceManager resourceManager;
+     private final Path generatedDir;
+@@ -45,19 +47,22 @@
+ 
+     public StructureTemplate getOrCreate(ResourceLocation id) {
+         Optional<StructureTemplate> optional = this.get(id);
++
+         if (optional.isPresent()) {
+-            return optional.get();
++            return (StructureTemplate) optional.get();
+         } else {
+-            StructureTemplate structureTemplate = new StructureTemplate();
+-            this.structureRepository.put(id, Optional.of(structureTemplate));
+-            return structureTemplate;
++            StructureTemplate definedstructure = new StructureTemplate();
++
++            this.structureRepository.put(id, Optional.of(definedstructure));
++            return definedstructure;
+         }
+     }
+ 
+     public Optional<StructureTemplate> get(ResourceLocation id) {
+-        return this.structureRepository.computeIfAbsent(id, (resourceLocation) -> {
+-            Optional<StructureTemplate> optional = this.loadFromGenerated(resourceLocation);
+-            return optional.isPresent() ? optional : this.loadFromResource(resourceLocation);
++        return (Optional) this.structureRepository.computeIfAbsent(id, (minecraftkey1) -> {
++            Optional<StructureTemplate> optional = this.loadFromGenerated(minecraftkey1);
++
++            return optional.isPresent() ? optional : this.loadFromResource(minecraftkey1);
+         });
+     }
+ 
+@@ -66,76 +71,79 @@
+         this.structureRepository.clear();
+     }
+ 
+-    private Optional<StructureTemplate> loadFromResource(ResourceLocation id) {
+-        ResourceLocation resourceLocation = new ResourceLocation(id.getNamespace(), "structures/" + id.getPath() + ".nbt");
++    public Optional<StructureTemplate> loadFromResource(ResourceLocation id) { // PAIL private->public
++        ResourceLocation minecraftkey1 = new ResourceLocation(id.getNamespace(), "structures/" + id.getPath() + ".nbt");
+ 
+         try {
+-            Resource resource = this.resourceManager.getResource(resourceLocation);
++            Resource iresource = this.resourceManager.getResource(minecraftkey1);
++
++            Optional optional;
+ 
+-            Optional var4;
+             try {
+-                var4 = Optional.of(this.readStructure(resource.getInputStream()));
+-            } catch (Throwable var7) {
+-                if (resource != null) {
++                optional = Optional.of(this.readStructure(iresource.getInputStream()));
++            } catch (Throwable throwable) {
++                if (iresource != null) {
+                     try {
+-                        resource.close();
+-                    } catch (Throwable var6) {
+-                        var7.addSuppressed(var6);
++                        iresource.close();
++                    } catch (Throwable throwable1) {
++                        throwable.addSuppressed(throwable1);
+                     }
+                 }
+ 
+-                throw var7;
++                throw throwable;
+             }
+ 
+-            if (resource != null) {
+-                resource.close();
++            if (iresource != null) {
++                iresource.close();
+             }
+ 
+-            return var4;
+-        } catch (FileNotFoundException var8) {
++            return optional;
++        } catch (FileNotFoundException filenotfoundexception) {
+             return Optional.empty();
+-        } catch (Throwable var9) {
+-            LOGGER.error("Couldn't load structure {}: {}", id, var9.toString());
++        } catch (Throwable throwable2) {
++            StructureManager.LOGGER.error("Couldn't load structure {}: {}", id, throwable2.toString());
+             return Optional.empty();
+         }
+     }
+ 
+-    private Optional<StructureTemplate> loadFromGenerated(ResourceLocation id) {
++    public Optional<StructureTemplate> loadFromGenerated(ResourceLocation id) { // PAIL private->public
+         if (!this.generatedDir.toFile().isDirectory()) {
+             return Optional.empty();
+         } else {
+             Path path = this.createAndValidatePathToStructure(id, ".nbt");
+ 
+             try {
+-                InputStream inputStream = new FileInputStream(path.toFile());
++                FileInputStream fileinputstream = new FileInputStream(path.toFile());
++
++                Optional optional;
+ 
+-                Optional var4;
+                 try {
+-                    var4 = Optional.of(this.readStructure(inputStream));
+-                } catch (Throwable var7) {
++                    optional = Optional.of(this.readStructure((InputStream) fileinputstream));
++                } catch (Throwable throwable) {
+                     try {
+-                        inputStream.close();
+-                    } catch (Throwable var6) {
+-                        var7.addSuppressed(var6);
++                        fileinputstream.close();
++                    } catch (Throwable throwable1) {
++                        throwable.addSuppressed(throwable1);
+                     }
+ 
+-                    throw var7;
++                    throw throwable;
+                 }
+ 
+-                inputStream.close();
+-                return var4;
+-            } catch (FileNotFoundException var8) {
++                fileinputstream.close();
++                return optional;
++            } catch (FileNotFoundException filenotfoundexception) {
+                 return Optional.empty();
+-            } catch (IOException var9) {
+-                LOGGER.error("Couldn't load structure from {}", path, var9);
++            } catch (IOException ioexception) {
++                StructureManager.LOGGER.error("Couldn't load structure from {}", path, ioexception);
+                 return Optional.empty();
+             }
+         }
+     }
+ 
+-    private StructureTemplate readStructure(InputStream structureInputStream) throws IOException {
+-        CompoundTag compoundTag = NbtIo.readCompressed(structureInputStream);
+-        return this.readStructure(compoundTag);
++    public StructureTemplate readStructure(InputStream structureInputStream) throws IOException { //PAIL rename loadFromStream; private -> public
++        CompoundTag nbttagcompound = NbtIo.readCompressed(structureInputStream);
++
++        return this.readStructure(nbttagcompound);
+     }
+ 
+     public StructureTemplate readStructure(CompoundTag nbt) {
+@@ -143,49 +151,52 @@
+             nbt.putInt("DataVersion", 500);
+         }
+ 
+-        StructureTemplate structureTemplate = new StructureTemplate();
+-        structureTemplate.load(NbtUtils.update(this.fixerUpper, DataFixTypes.STRUCTURE, nbt, nbt.getInt("DataVersion")));
+-        return structureTemplate;
++        StructureTemplate definedstructure = new StructureTemplate();
++
++        definedstructure.load(NbtUtils.update(this.fixerUpper, DataFixTypes.STRUCTURE, nbt, nbt.getInt("DataVersion")));
++        return definedstructure;
+     }
+ 
+     public boolean save(ResourceLocation id) {
+-        Optional<StructureTemplate> optional = this.structureRepository.get(id);
++        Optional<StructureTemplate> optional = (Optional) this.structureRepository.get(id);
++
+         if (!optional.isPresent()) {
+             return false;
+         } else {
+-            StructureTemplate structureTemplate = optional.get();
++            StructureTemplate definedstructure = (StructureTemplate) optional.get();
+             Path path = this.createAndValidatePathToStructure(id, ".nbt");
+-            Path path2 = path.getParent();
+-            if (path2 == null) {
++            Path path1 = path.getParent();
++
++            if (path1 == null) {
+                 return false;
+             } else {
+                 try {
+-                    Files.createDirectories(Files.exists(path2) ? path2.toRealPath() : path2);
+-                } catch (IOException var13) {
+-                    LOGGER.error("Failed to create parent directory: {}", (Object)path2);
++                    Files.createDirectories(Files.exists(path1, new LinkOption[0]) ? path1.toRealPath() : path1);
++                } catch (IOException ioexception) {
++                    StructureManager.LOGGER.error("Failed to create parent directory: {}", path1);
+                     return false;
+                 }
+ 
+-                CompoundTag compoundTag = structureTemplate.save(new CompoundTag());
++                CompoundTag nbttagcompound = definedstructure.save(new CompoundTag());
+ 
+                 try {
+-                    OutputStream outputStream = new FileOutputStream(path.toFile());
++                    FileOutputStream fileoutputstream = new FileOutputStream(path.toFile());
+ 
+                     try {
+-                        NbtIo.writeCompressed(compoundTag, outputStream);
+-                    } catch (Throwable var11) {
++                        NbtIo.writeCompressed(nbttagcompound, (OutputStream) fileoutputstream);
++                    } catch (Throwable throwable) {
+                         try {
+-                            outputStream.close();
+-                        } catch (Throwable var10) {
+-                            var11.addSuppressed(var10);
++                            fileoutputstream.close();
++                        } catch (Throwable throwable1) {
++                            throwable.addSuppressed(throwable1);
+                         }
+ 
+-                        throw var11;
++                        throw throwable;
+                     }
+ 
+-                    outputStream.close();
++                    fileoutputstream.close();
+                     return true;
+-                } catch (Throwable var12) {
++                } catch (Throwable throwable2) {
+                     return false;
+                 }
+             }
+@@ -195,18 +206,20 @@
+     public Path createPathToStructure(ResourceLocation id, String extension) {
+         try {
+             Path path = this.generatedDir.resolve(id.getNamespace());
+-            Path path2 = path.resolve("structures");
+-            return FileUtil.createPathToResource(path2, id.getPath(), extension);
+-        } catch (InvalidPathException var5) {
+-            throw new ResourceLocationException("Invalid resource path: " + id, var5);
++            Path path1 = path.resolve("structures");
++
++            return FileUtil.createPathToResource(path1, id.getPath(), extension);
++        } catch (InvalidPathException invalidpathexception) {
++            throw new ResourceLocationException("Invalid resource path: " + id, invalidpathexception);
+         }
+     }
+ 
+-    private Path createAndValidatePathToStructure(ResourceLocation id, String extension) {
++    public Path createAndValidatePathToStructure(ResourceLocation id, String extension) { //PAIL private->public
+         if (id.getPath().contains("//")) {
+             throw new ResourceLocationException("Invalid resource path: " + id);
+         } else {
+             Path path = this.createPathToStructure(id, extension);
++
+             if (path.startsWith(this.generatedDir) && FileUtil.isPathNormalized(path) && FileUtil.isPathPortable(path)) {
+                 return path;
+             } else {

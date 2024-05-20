@@ -1,0 +1,72 @@
+--- a/net/minecraft/world/level/block/DirtPathBlock.java
++++ b/net/minecraft/world/level/block/DirtPathBlock.java
+@@ -5,6 +5,7 @@
+ import net.minecraft.core.Direction;
+ import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.util.RandomSource;
++import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.item.context.BlockPlaceContext;
+ import net.minecraft.world.level.BlockGetter;
+ import net.minecraft.world.level.LevelAccessor;
+@@ -16,12 +17,13 @@
+ import net.minecraft.world.phys.shapes.VoxelShape;
+ 
+ public class DirtPathBlock extends Block {
++
+     public static final MapCodec<DirtPathBlock> CODEC = simpleCodec(DirtPathBlock::new);
+     protected static final VoxelShape SHAPE = FarmBlock.SHAPE;
+ 
+     @Override
+     public MapCodec<DirtPathBlock> codec() {
+-        return CODEC;
++        return DirtPathBlock.CODEC;
+     }
+ 
+     protected DirtPathBlock(BlockBehaviour.Properties settings) {
+@@ -35,15 +37,13 @@
+ 
+     @Override
+     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+-        return !this.defaultBlockState().canSurvive(ctx.getLevel(), ctx.getClickedPos())
+-            ? Block.pushEntitiesUp(this.defaultBlockState(), Blocks.DIRT.defaultBlockState(), ctx.getLevel(), ctx.getClickedPos())
+-            : super.getStateForPlacement(ctx);
++        return !this.defaultBlockState().canSurvive(ctx.getLevel(), ctx.getClickedPos()) ? Block.pushEntitiesUp(this.defaultBlockState(), Blocks.DIRT.defaultBlockState(), ctx.getLevel(), ctx.getClickedPos()) : super.getStateForPlacement(ctx);
+     }
+ 
+     @Override
+     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+         if (direction == Direction.UP && !state.canSurvive(world, pos)) {
+-            world.scheduleTick(pos, this, 1);
++            world.scheduleTick(pos, (Block) this, 1);
+         }
+ 
+         return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
+@@ -51,18 +51,24 @@
+ 
+     @Override
+     public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+-        FarmBlock.turnToDirt(null, state, world, pos);
++        // CraftBukkit start - do not fade if the block is valid here
++        if (state.canSurvive(world, pos)) {
++            return;
++        }
++        // CraftBukkit end
++        FarmBlock.turnToDirt((Entity) null, state, world, pos);
+     }
+ 
+     @Override
+     public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
+-        BlockState blockState = world.getBlockState(pos.above());
+-        return !blockState.isSolid() || blockState.getBlock() instanceof FenceGateBlock;
++        BlockState iblockdata1 = world.getBlockState(pos.above());
++
++        return !iblockdata1.isSolid() || iblockdata1.getBlock() instanceof FenceGateBlock;
+     }
+ 
+     @Override
+     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+-        return SHAPE;
++        return DirtPathBlock.SHAPE;
+     }
+ 
+     @Override

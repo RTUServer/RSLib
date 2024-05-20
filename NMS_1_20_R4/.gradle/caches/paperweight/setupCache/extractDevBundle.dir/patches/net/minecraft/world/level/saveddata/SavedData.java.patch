@@ -1,0 +1,37 @@
+--- a/net/minecraft/world/level/saveddata/SavedData.java
++++ b/net/minecraft/world/level/saveddata/SavedData.java
+@@ -29,20 +29,34 @@
+         return this.dirty;
+     }
+ 
++    @io.papermc.paper.annotation.DoNotUse // Paper - Write SavedData IO async - This is dead
+     public void save(File file) {
++        save(file, null).join(); // Paper - Write SavedData IO async - joining is evil, but we assume the old blocking behavior here just for safety
++    }
++
++    public java.util.concurrent.CompletableFuture<Void> save(File file, @org.jetbrains.annotations.Nullable java.util.concurrent.ExecutorService ioExecutor) { // Paper - Write SavedData IO async
+         if (this.isDirty()) {
+             CompoundTag compoundTag = new CompoundTag();
+             compoundTag.put("data", this.save(new CompoundTag()));
+             NbtUtils.addCurrentDataVersion(compoundTag);
+ 
++            Runnable writeRunnable = () -> { // Paper - Write SavedData IO async
+             try {
+                 NbtIo.writeCompressed(compoundTag, file.toPath());
+             } catch (IOException var4) {
+                 LOGGER.error("Could not save data {}", this, var4);
+             }
++            }; // Paper - Write SavedData IO async
+ 
+             this.setDirty(false);
++            // Paper start - Write SavedData IO async
++            if (ioExecutor == null) {
++                return java.util.concurrent.CompletableFuture.runAsync(writeRunnable); // No executor, just use common pool
++            }
++            return java.util.concurrent.CompletableFuture.runAsync(writeRunnable, ioExecutor);
+         }
++        return java.util.concurrent.CompletableFuture.completedFuture(null);
++        // Paper end - Write SavedData IO async
+     }
+ 
+     public static record Factory<T extends SavedData>(Supplier<T> constructor, Function<CompoundTag, T> deserializer, DataFixTypes type) {

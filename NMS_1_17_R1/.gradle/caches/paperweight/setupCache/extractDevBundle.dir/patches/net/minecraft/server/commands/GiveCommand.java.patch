@@ -1,0 +1,11 @@
+--- a/net/minecraft/server/commands/GiveCommand.java
++++ b/net/minecraft/server/commands/GiveCommand.java
+@@ -47,7 +47,7 @@
+                     boolean bl = serverPlayer.getInventory().add(itemStack);
+                     if (bl && itemStack.isEmpty()) {
+                         itemStack.setCount(1);
+-                        ItemEntity itemEntity2 = serverPlayer.drop(itemStack, false);
++                        ItemEntity itemEntity2 = serverPlayer.drop(itemStack, false, false, true); // Paper - Fix duplicating /give items on item drop cancel
+                         if (itemEntity2 != null) {
+                             itemEntity2.makeFakeItem();
+                         }

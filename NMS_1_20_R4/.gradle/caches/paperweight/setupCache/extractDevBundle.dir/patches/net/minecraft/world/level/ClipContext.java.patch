@@ -1,0 +1,75 @@
+--- a/net/minecraft/world/level/ClipContext.java
++++ b/net/minecraft/world/level/ClipContext.java
+@@ -14,14 +14,15 @@
+ import net.minecraft.world.phys.shapes.VoxelShape;
+ 
+ public class ClipContext {
++
+     private final Vec3 from;
+     private final Vec3 to;
+-    private final ClipContext.Block block;
+-    private final ClipContext.Fluid fluid;
++    public final ClipContext.Block block; // Paper - optimise collisions - public
++    public final ClipContext.Fluid fluid; // Paper - optimise collisions - public
+     private final CollisionContext collisionContext;
+ 
+     public ClipContext(Vec3 start, Vec3 end, ClipContext.Block shapeType, ClipContext.Fluid fluidHandling, Entity entity) {
+-        this(start, end, shapeType, fluidHandling, CollisionContext.of(entity));
++        this(start, end, shapeType, fluidHandling, (entity == null) ? CollisionContext.empty() : CollisionContext.of(entity)); // CraftBukkit
+     }
+ 
+     public ClipContext(Vec3 start, Vec3 end, ClipContext.Block shapeType, ClipContext.Fluid fluidHandling, CollisionContext shapeContext) {
+@@ -49,15 +50,15 @@
+     }
+ 
+     public static enum Block implements ClipContext.ShapeGetter {
+-        COLLIDER(BlockBehaviour.BlockStateBase::getCollisionShape),
+-        OUTLINE(BlockBehaviour.BlockStateBase::getShape),
+-        VISUAL(BlockBehaviour.BlockStateBase::getVisualShape),
+-        FALLDAMAGE_RESETTING((state, world, pos, context) -> state.is(BlockTags.FALL_DAMAGE_RESETTING) ? Shapes.block() : Shapes.empty());
++
++        COLLIDER(BlockBehaviour.BlockStateBase::getCollisionShape), OUTLINE(BlockBehaviour.BlockStateBase::getShape), VISUAL(BlockBehaviour.BlockStateBase::getVisualShape), FALLDAMAGE_RESETTING((iblockdata, iblockaccess, blockposition, voxelshapecollision) -> {
++            return iblockdata.is(BlockTags.FALL_DAMAGE_RESETTING) ? Shapes.block() : Shapes.empty();
++        });
+ 
+         private final ClipContext.ShapeGetter shapeGetter;
+ 
+-        private Block(ClipContext.ShapeGetter provider) {
+-            this.shapeGetter = provider;
++        private Block(ClipContext.ShapeGetter raytrace_c) {
++            this.shapeGetter = raytrace_c;
+         }
+ 
+         @Override
+@@ -67,14 +68,18 @@
+     }
+ 
+     public static enum Fluid {
+-        NONE(state -> false),
+-        SOURCE_ONLY(FluidState::isSource),
+-        ANY(state -> !state.isEmpty()),
+-        WATER(state -> state.is(FluidTags.WATER));
++
++        NONE((fluid) -> {
++            return false;
++        }), SOURCE_ONLY(FluidState::isSource), ANY((fluid) -> {
++            return !fluid.isEmpty();
++        }), WATER((fluid) -> {
++            return fluid.is(FluidTags.WATER);
++        });
+ 
+         private final Predicate<FluidState> canPick;
+ 
+-        private Fluid(Predicate<FluidState> predicate) {
++        private Fluid(Predicate<FluidState> predicate) { // CraftBukkit - decompile error
+             this.canPick = predicate;
+         }
+ 
+@@ -84,6 +89,7 @@
+     }
+ 
+     public interface ShapeGetter {
++
+         VoxelShape get(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context);
+     }
+ }

@@ -1,0 +1,12 @@
+--- a/net/minecraft/world/flag/FeatureFlag.java
++++ b/net/minecraft/world/flag/FeatureFlag.java
+@@ -1,7 +1,8 @@
+ package net.minecraft.world.flag;
+ 
+ public class FeatureFlag {
+-    final FeatureFlagUniverse universe;
++
++    public final FeatureFlagUniverse universe; // PAIL public
+     final long mask;
+ 
+     FeatureFlag(FeatureFlagUniverse universe, int id) {

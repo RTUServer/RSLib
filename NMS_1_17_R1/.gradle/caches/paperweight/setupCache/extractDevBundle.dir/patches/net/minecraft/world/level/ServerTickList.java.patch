@@ -1,0 +1,253 @@
+--- a/net/minecraft/world/level/ServerTickList.java
++++ b/net/minecraft/world/level/ServerTickList.java
+@@ -17,6 +17,7 @@
+ import net.minecraft.CrashReportCategory;
+ import net.minecraft.ReportedException;
+ import net.minecraft.core.BlockPos;
++import net.minecraft.core.Vec3i;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.nbt.ListTag;
+ import net.minecraft.resources.ResourceLocation;
+@@ -25,6 +26,7 @@
+ import net.minecraft.world.level.levelgen.structure.BoundingBox;
+ 
+ public class ServerTickList<T> implements TickList<T> {
++
+     public static final int MAX_TICK_BLOCKS_PER_TICK = 65536;
+     protected final Predicate<T> ignore;
+     private final Function<T, ResourceLocation> toId;
+@@ -35,58 +37,82 @@
+     private final List<TickNextTickData<T>> alreadyTicked = Lists.newArrayList();
+     private final Consumer<TickNextTickData<T>> ticker;
+ 
+-    public ServerTickList(ServerLevel world, Predicate<T> invalidObjPredicate, Function<T, ResourceLocation> idToName, Consumer<TickNextTickData<T>> tickConsumer) {
++    // Paper start - timings
++    private final co.aikar.timings.Timing timingCleanup; // Paper
++    private final co.aikar.timings.Timing timingTicking; // Paper
++
++    public ServerTickList(ServerLevel world, Predicate<T> invalidObjPredicate, Function<T, ResourceLocation> idToName, Consumer<TickNextTickData<T>> tickConsumer, String timingsType) {
++        this.timingCleanup = co.aikar.timings.WorldTimingsHandler.getTickList(world, timingsType + " - Cleanup");
++        this.timingTicking = co.aikar.timings.WorldTimingsHandler.getTickList(world, timingsType + " - Ticking");
++        // Paper end
+         this.ignore = invalidObjPredicate;
+         this.toId = idToName;
+         this.level = world;
+         this.ticker = tickConsumer;
+     }
+ 
++    // Paper start
++    public void nextTick() {}
++    // Paper end
+     public void tick() {
+         int i = this.tickNextTickList.size();
+-        if (i != this.tickNextTickSet.size()) {
++
++        if (false) { // CraftBukkit
+             throw new IllegalStateException("TickNextTick list out of synch");
+         } else {
+             if (i > 65536) {
+-                i = 65536;
++                // CraftBukkit start - If the server has too much to process over time, try to alleviate that
++                if (i > 20 * 65536) {
++                    i = i / 20;
++                } else {
++                    i = 65536;
++                }
++                // CraftBukkit end
+             }
+ 
+             Iterator<TickNextTickData<T>> iterator = this.tickNextTickList.iterator();
++
+             this.level.getProfiler().push("cleaning");
+ 
+-            while(i > 0 && iterator.hasNext()) {
+-                TickNextTickData<T> tickNextTickData = iterator.next();
+-                if (tickNextTickData.triggerTick > this.level.getGameTime()) {
++            this.timingCleanup.startTiming(); // Paper
++            TickNextTickData nextticklistentry;
++
++            while (i > 0 && iterator.hasNext()) {
++                nextticklistentry = (TickNextTickData) iterator.next();
++                if (nextticklistentry.triggerTick > this.level.getGameTime()) {
+                     break;
+                 }
+ 
+-                if (this.level.isPositionTickingWithEntitiesLoaded(tickNextTickData.pos)) {
++                if (this.level.isPositionTickingWithEntitiesLoaded(nextticklistentry.pos)) {
+                     iterator.remove();
+-                    this.tickNextTickSet.remove(tickNextTickData);
+-                    this.currentlyTicking.add(tickNextTickData);
++                    this.tickNextTickSet.remove(nextticklistentry);
++                    this.currentlyTicking.add(nextticklistentry);
+                     --i;
+                 }
+             }
++            this.timingCleanup.stopTiming(); // Paper
+ 
++            this.timingTicking.startTiming(); // Paper
+             this.level.getProfiler().popPush("ticking");
+ 
+-            TickNextTickData<T> tickNextTickData2;
+-            while((tickNextTickData2 = this.currentlyTicking.poll()) != null) {
+-                if (this.level.isPositionTickingWithEntitiesLoaded(tickNextTickData2.pos)) {
++            while ((nextticklistentry = (TickNextTickData) this.currentlyTicking.poll()) != null) {
++                if (this.level.isPositionTickingWithEntitiesLoaded(nextticklistentry.pos)) {
+                     try {
+-                        this.alreadyTicked.add(tickNextTickData2);
+-                        this.ticker.accept(tickNextTickData2);
+-                    } catch (Throwable var7) {
+-                        CrashReport crashReport = CrashReport.forThrowable(var7, "Exception while ticking");
+-                        CrashReportCategory crashReportCategory = crashReport.addCategory("Block being ticked");
+-                        CrashReportCategory.populateBlockDetails(crashReportCategory, this.level, tickNextTickData2.pos, (BlockState)null);
+-                        throw new ReportedException(crashReport);
++                        this.alreadyTicked.add(nextticklistentry);
++                        this.ticker.accept(nextticklistentry);
++                    } catch (Throwable throwable) {
++                        CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception while ticking");
++                        CrashReportCategory crashreportsystemdetails = crashreport.addCategory("Block being ticked");
++
++                        CrashReportCategory.populateBlockDetails(crashreportsystemdetails, this.level, nextticklistentry.pos, (BlockState) null);
++                        throw new ReportedException(crashreport);
+                     }
+                 } else {
+-                    this.scheduleTick(tickNextTickData2.pos, tickNextTickData2.getType(), 0);
++                    this.scheduleTick(nextticklistentry.pos, (T) nextticklistentry.getType(), 0); // CraftBukkit - decompile error
+                 }
+             }
+ 
++            this.timingTicking.stopTiming(); // Paper
+             this.level.getProfiler().pop();
+             this.alreadyTicked.clear();
+             this.currentlyTicking.clear();
+@@ -95,7 +121,7 @@
+ 
+     @Override
+     public boolean willTickThisTick(BlockPos pos, T object) {
+-        return this.currentlyTicking.contains(new TickNextTickData(pos, object));
++        return this.currentlyTicking.contains(new TickNextTickData<>(pos, object));
+     }
+ 
+     public List<TickNextTickData<T>> fetchTicksInChunk(ChunkPos pos, boolean updateState, boolean getStaleTicks) {
+@@ -103,11 +129,13 @@
+         int j = i + 16 + 2;
+         int k = pos.getMinBlockZ() - 2;
+         int l = k + 16 + 2;
++
+         return this.fetchTicksInArea(new BoundingBox(i, this.level.getMinBuildHeight(), k, j, this.level.getMaxBuildHeight(), l), updateState, getStaleTicks);
+     }
+ 
+     public List<TickNextTickData<T>> fetchTicksInArea(BoundingBox bounds, boolean updateState, boolean getStaleTicks) {
+-        List<TickNextTickData<T>> list = this.fetchTicksInArea((List<TickNextTickData<T>>)null, this.tickNextTickList, bounds, updateState);
++        List<TickNextTickData<T>> list = this.fetchTicksInArea((List) null, this.tickNextTickList, bounds, updateState);
++
+         if (updateState && list != null) {
+             this.tickNextTickSet.removeAll(list);
+         }
+@@ -122,12 +150,13 @@
+ 
+     @Nullable
+     private List<TickNextTickData<T>> fetchTicksInArea(@Nullable List<TickNextTickData<T>> dst, Collection<TickNextTickData<T>> src, BoundingBox bounds, boolean move) {
+-        Iterator<TickNextTickData<T>> iterator = src.iterator();
++        Iterator iterator = src.iterator();
+ 
+-        while(iterator.hasNext()) {
+-            TickNextTickData<T> tickNextTickData = iterator.next();
+-            BlockPos blockPos = tickNextTickData.pos;
+-            if (blockPos.getX() >= bounds.minX() && blockPos.getX() < bounds.maxX() && blockPos.getZ() >= bounds.minZ() && blockPos.getZ() < bounds.maxZ()) {
++        while (iterator.hasNext()) {
++            TickNextTickData<T> nextticklistentry = (TickNextTickData) iterator.next();
++            BlockPos blockposition = nextticklistentry.pos;
++
++            if (blockposition.getX() >= bounds.minX() && blockposition.getX() < bounds.maxX() && blockposition.getZ() >= bounds.minZ() && blockposition.getZ() < bounds.maxZ()) {
+                 if (move) {
+                     iterator.remove();
+                 }
+@@ -136,55 +165,65 @@
+                     dst = Lists.newArrayList();
+                 }
+ 
+-                dst.add(tickNextTickData);
++                ((List) dst).add(nextticklistentry);
+             }
+         }
+ 
+-        return dst;
++        return (List) dst;
+     }
+ 
+     public void copy(BoundingBox box, BlockPos offset) {
+-        for(TickNextTickData<T> tickNextTickData : this.fetchTicksInArea(box, false, false)) {
+-            if (box.isInside(tickNextTickData.pos)) {
+-                BlockPos blockPos = tickNextTickData.pos.offset(offset);
+-                T object = tickNextTickData.getType();
+-                this.addTickData(new TickNextTickData<>(blockPos, object, tickNextTickData.triggerTick, tickNextTickData.priority));
++        List<TickNextTickData<T>> list = this.fetchTicksInArea(box, false, false);
++        Iterator iterator = list.iterator();
++
++        while (iterator.hasNext()) {
++            TickNextTickData<T> nextticklistentry = (TickNextTickData) iterator.next();
++
++            if (box.isInside((Vec3i) nextticklistentry.pos)) {
++                BlockPos blockposition1 = nextticklistentry.pos.offset(offset);
++                T t0 = nextticklistentry.getType();
++
++                this.addTickData(new TickNextTickData<>(blockposition1, t0, nextticklistentry.triggerTick, nextticklistentry.priority));
+             }
+         }
+ 
+     }
+ 
+-    public ListTag save(ChunkPos chunkPos) {
+-        List<TickNextTickData<T>> list = this.fetchTicksInChunk(chunkPos, false, true);
+-        return saveTickList(this.toId, list, this.level.getGameTime());
++    public ListTag save(ChunkPos chunkcoordintpair) {
++        List<TickNextTickData<T>> list = this.fetchTicksInChunk(chunkcoordintpair, false, true);
++
++        return ServerTickList.saveTickList(this.toId, list, this.level.getGameTime());
+     }
+ 
+     public static <T> ListTag saveTickList(Function<T, ResourceLocation> identifierProvider, Iterable<TickNextTickData<T>> scheduledTicks, long time) {
+-        ListTag listTag = new ListTag();
++        ListTag nbttaglist = new ListTag();
++        Iterator iterator = scheduledTicks.iterator();
+ 
+-        for(TickNextTickData<T> tickNextTickData : scheduledTicks) {
+-            CompoundTag compoundTag = new CompoundTag();
+-            compoundTag.putString("i", identifierProvider.apply(tickNextTickData.getType()).toString());
+-            compoundTag.putInt("x", tickNextTickData.pos.getX());
+-            compoundTag.putInt("y", tickNextTickData.pos.getY());
+-            compoundTag.putInt("z", tickNextTickData.pos.getZ());
+-            compoundTag.putInt("t", (int)(tickNextTickData.triggerTick - time));
+-            compoundTag.putInt("p", tickNextTickData.priority.getValue());
+-            listTag.add(compoundTag);
++        while (iterator.hasNext()) {
++            TickNextTickData<T> nextticklistentry = (TickNextTickData) iterator.next();
++            CompoundTag nbttagcompound = new CompoundTag();
++
++            nbttagcompound.putString("i", ((ResourceLocation) identifierProvider.apply(nextticklistentry.getType())).toString());
++            nbttagcompound.putInt("x", nextticklistentry.pos.getX());
++            nbttagcompound.putInt("y", nextticklistentry.pos.getY());
++            nbttagcompound.putInt("z", nextticklistentry.pos.getZ());
++            nbttagcompound.putInt("t", (int) (nextticklistentry.triggerTick - time));
++            nbttagcompound.putInt("p", nextticklistentry.priority.getValue());
++            nbttaglist.add(nbttagcompound);
+         }
+ 
+-        return listTag;
++        return nbttaglist;
+     }
+ 
+     @Override
+     public boolean hasScheduledTick(BlockPos pos, T object) {
+-        return this.tickNextTickSet.contains(new TickNextTickData(pos, object));
++        return this.tickNextTickSet.contains(new TickNextTickData<>(pos, object));
+     }
+ 
+     @Override
+     public void scheduleTick(BlockPos pos, T object, int delay, TickPriority priority) {
+         if (!this.ignore.test(object)) {
+-            this.addTickData(new TickNextTickData<>(pos, object, (long)delay + this.level.getGameTime(), priority));
++            this.addTickData(new TickNextTickData<>(pos, object, (long) delay + this.level.getGameTime(), priority));
+         }
+ 
+     }

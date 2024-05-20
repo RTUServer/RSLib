@@ -1,0 +1,40 @@
+--- a/net/minecraft/world/level/block/SpawnerBlock.java
++++ b/net/minecraft/world/level/block/SpawnerBlock.java
+@@ -19,11 +19,12 @@
+ import net.minecraft.world.level.block.state.BlockState;
+ 
+ public class SpawnerBlock extends BaseEntityBlock {
++
+     public static final MapCodec<SpawnerBlock> CODEC = simpleCodec(SpawnerBlock::new);
+ 
+     @Override
+     public MapCodec<SpawnerBlock> codec() {
+-        return CODEC;
++        return SpawnerBlock.CODEC;
+     }
+ 
+     protected SpawnerBlock(BlockBehaviour.Properties settings) {
+@@ -44,10 +45,20 @@
+     @Override
+     public void spawnAfterBreak(BlockState state, ServerLevel world, BlockPos pos, ItemStack tool, boolean dropExperience) {
+         super.spawnAfterBreak(state, world, pos, tool, dropExperience);
+-        if (dropExperience) {
+-            int i = 15 + world.random.nextInt(15) + world.random.nextInt(15);
+-            this.popExperience(world, pos, i);
++        // CraftBukkit start - Delegate to getExpDrop
++    }
++
++    @Override
++    public int getExpDrop(BlockState iblockdata, ServerLevel worldserver, BlockPos blockposition, ItemStack itemstack, boolean flag) {
++        if (flag) {
++            int i = 15 + worldserver.random.nextInt(15) + worldserver.random.nextInt(15);
++
++            // this.popExperience(worldserver, blockposition, i);
++            return i;
+         }
++
++        return 0;
++        // CraftBukkit end
+     }
+ 
+     @Override

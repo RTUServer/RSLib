@@ -1,0 +1,130 @@
+--- a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
++++ b/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
+@@ -18,8 +18,15 @@
+ import net.minecraft.world.item.armortrim.TrimPattern;
+ import net.minecraft.world.item.armortrim.TrimPatterns;
+ import net.minecraft.world.level.Level;
++// CraftBukkit start
++import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftRecipe;
++import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftSmithingTrimRecipe;
++import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
++import org.bukkit.inventory.Recipe;
++// CraftBukkit end
+ 
+ public class SmithingTrimRecipe implements SmithingRecipe {
++
+     private final ResourceLocation id;
+     final Ingredient template;
+     final Ingredient base;
+@@ -39,21 +46,26 @@
+ 
+     @Override
+     public ItemStack assemble(Container inventory, RegistryAccess registryManager) {
+-        ItemStack itemStack = inventory.getItem(1);
+-        if (this.base.test(itemStack)) {
++        ItemStack itemstack = inventory.getItem(1);
++
++        if (this.base.test(itemstack)) {
+             Optional<Holder.Reference<TrimMaterial>> optional = TrimMaterials.getFromIngredient(registryManager, inventory.getItem(2));
+-            Optional<Holder.Reference<TrimPattern>> optional2 = TrimPatterns.getFromTemplate(registryManager, inventory.getItem(0));
+-            if (optional.isPresent() && optional2.isPresent()) {
+-                Optional<ArmorTrim> optional3 = ArmorTrim.getTrim(registryManager, itemStack);
+-                if (optional3.isPresent() && optional3.get().hasPatternAndMaterial(optional2.get(), optional.get())) {
++            Optional<Holder.Reference<TrimPattern>> optional1 = TrimPatterns.getFromTemplate(registryManager, inventory.getItem(0));
++
++            if (optional.isPresent() && optional1.isPresent()) {
++                Optional<ArmorTrim> optional2 = ArmorTrim.getTrim(registryManager, itemstack);
++
++                if (optional2.isPresent() && ((ArmorTrim) optional2.get()).hasPatternAndMaterial((Holder) optional1.get(), (Holder) optional.get())) {
+                     return ItemStack.EMPTY;
+                 }
+ 
+-                ItemStack itemStack2 = itemStack.copy();
+-                itemStack2.setCount(1);
+-                ArmorTrim armorTrim = new ArmorTrim(optional.get(), optional2.get());
+-                if (ArmorTrim.setTrim(registryManager, itemStack2, armorTrim)) {
+-                    return itemStack2;
++                ItemStack itemstack1 = itemstack.copy();
++
++                itemstack1.setCount(1);
++                ArmorTrim armortrim = new ArmorTrim((Holder) optional.get(), (Holder) optional1.get());
++
++                if (ArmorTrim.setTrim(registryManager, itemstack1, armortrim)) {
++                    return itemstack1;
+                 }
+             }
+         }
+@@ -63,17 +75,20 @@
+ 
+     @Override
+     public ItemStack getResultItem(RegistryAccess registryManager) {
+-        ItemStack itemStack = new ItemStack(Items.IRON_CHESTPLATE);
++        ItemStack itemstack = new ItemStack(Items.IRON_CHESTPLATE);
+         Optional<Holder.Reference<TrimPattern>> optional = registryManager.registryOrThrow(Registries.TRIM_PATTERN).holders().findFirst();
++
+         if (optional.isPresent()) {
+-            Optional<Holder.Reference<TrimMaterial>> optional2 = registryManager.registryOrThrow(Registries.TRIM_MATERIAL).getHolder(TrimMaterials.REDSTONE);
+-            if (optional2.isPresent()) {
+-                ArmorTrim armorTrim = new ArmorTrim(optional2.get(), optional.get());
+-                ArmorTrim.setTrim(registryManager, itemStack, armorTrim);
++            Optional<Holder.Reference<TrimMaterial>> optional1 = registryManager.registryOrThrow(Registries.TRIM_MATERIAL).getHolder(TrimMaterials.REDSTONE);
++
++            if (optional1.isPresent()) {
++                ArmorTrim armortrim = new ArmorTrim((Holder) optional1.get(), (Holder) optional.get());
++
++                ArmorTrim.setTrim(registryManager, itemstack, armortrim);
+             }
+         }
+ 
+-        return itemStack;
++        return itemstack;
+     }
+ 
+     @Override
+@@ -106,24 +121,35 @@
+         return Stream.of(this.template, this.base, this.addition).anyMatch(Ingredient::isEmpty);
+     }
+ 
++    // CraftBukkit start
++    @Override
++    public Recipe toBukkitRecipe() {
++        return new CraftSmithingTrimRecipe(CraftNamespacedKey.fromMinecraft(this.id), CraftRecipe.toBukkit(this.template), CraftRecipe.toBukkit(this.base), CraftRecipe.toBukkit(this.addition));
++    }
++    // CraftBukkit end
++
+     public static class Serializer implements RecipeSerializer<SmithingTrimRecipe> {
++
++        public Serializer() {}
++
+         @Override
+-        public SmithingTrimRecipe fromJson(ResourceLocation resourceLocation, JsonObject jsonObject) {
+-            Ingredient ingredient = Ingredient.fromJson(GsonHelper.getAsJsonObject(jsonObject, "template"));
+-            Ingredient ingredient2 = Ingredient.fromJson(GsonHelper.getAsJsonObject(jsonObject, "base"));
+-            Ingredient ingredient3 = Ingredient.fromJson(GsonHelper.getAsJsonObject(jsonObject, "addition"));
+-            return new SmithingTrimRecipe(resourceLocation, ingredient, ingredient2, ingredient3);
++        public SmithingTrimRecipe fromJson(ResourceLocation id, JsonObject json) {
++            Ingredient recipeitemstack = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "template"));
++            Ingredient recipeitemstack1 = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "base"));
++            Ingredient recipeitemstack2 = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "addition"));
++
++            return new SmithingTrimRecipe(id, recipeitemstack, recipeitemstack1, recipeitemstack2);
+         }
+ 
+         @Override
+-        public SmithingTrimRecipe fromNetwork(ResourceLocation resourceLocation, FriendlyByteBuf friendlyByteBuf) {
+-            Ingredient ingredient = Ingredient.fromNetwork(friendlyByteBuf);
+-            Ingredient ingredient2 = Ingredient.fromNetwork(friendlyByteBuf);
+-            Ingredient ingredient3 = Ingredient.fromNetwork(friendlyByteBuf);
+-            return new SmithingTrimRecipe(resourceLocation, ingredient, ingredient2, ingredient3);
++        public SmithingTrimRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
++            Ingredient recipeitemstack = Ingredient.fromNetwork(buf);
++            Ingredient recipeitemstack1 = Ingredient.fromNetwork(buf);
++            Ingredient recipeitemstack2 = Ingredient.fromNetwork(buf);
++
++            return new SmithingTrimRecipe(id, recipeitemstack, recipeitemstack1, recipeitemstack2);
+         }
+ 
+-        @Override
+         public void toNetwork(FriendlyByteBuf buf, SmithingTrimRecipe recipe) {
+             recipe.template.toNetwork(buf);
+             recipe.base.toNetwork(buf);

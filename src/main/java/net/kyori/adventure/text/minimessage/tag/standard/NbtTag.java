@@ -40,94 +40,94 @@ import org.jetbrains.annotations.Nullable;
  * @since 4.13.0
  */
 final class NbtTag {
-  private static final String NBT = "nbt";
-  private static final String DATA = "data";
+    private static final String NBT = "nbt";
+    private static final String DATA = "data";
 
-  private static final String BLOCK = "block";
-  private static final String ENTITY = "entity";
-  private static final String STORAGE = "storage";
-  private static final String INTERPRET = "interpret";
+    private static final String BLOCK = "block";
+    private static final String ENTITY = "entity";
+    private static final String STORAGE = "storage";
+    private static final String INTERPRET = "interpret";
 
-  static final TagResolver RESOLVER = SerializableResolver.claimingComponent(
-    StandardTags.names(NBT, DATA),
-    NbtTag::resolve,
-    NbtTag::emit
-  );
+    static final TagResolver RESOLVER = SerializableResolver.claimingComponent(
+            StandardTags.names(NBT, DATA),
+            NbtTag::resolve,
+            NbtTag::emit
+    );
 
-  private NbtTag() {
-  }
-
-  // syntax intended to match the /data command in vanilla MC
-  static Tag resolve(final ArgumentQueue args, final Context ctx) throws ParsingException {
-    final String type = args.popOr("a type of block, entity, or storage is required").lowerValue();
-    final NBTComponentBuilder<?, ?> builder;
-    if (BLOCK.equals(type)) {
-      final String pos = args.popOr("A position is required").value();
-      try {
-        builder = Component.blockNBT()
-          .pos(BlockNBTComponent.Pos.fromString(pos));
-      } catch (final IllegalArgumentException ex) {
-        throw ctx.newException(ex.getMessage(), args);
-      }
-    } else if (ENTITY.equals(type)) {
-      builder = Component.entityNBT()
-        .selector(args.popOr("A selector is required").value());
-    } else if (STORAGE.equals(type)) {
-      builder = Component.storageNBT()
-        .storage(Key.key(args.popOr("A storage key is required").value()));
-    } else {
-      throw ctx.newException("Unknown nbt tag type '" + type + "'", args);
+    private NbtTag() {
     }
 
-    builder.nbtPath(args.popOr("An NBT path is required").value());
-
-    if (args.hasNext()) {
-      final String popped = args.pop().value();
-
-      if (INTERPRET.equalsIgnoreCase(popped)) {
-        builder.interpret(true);
-      } else {
-        builder.separator(ctx.deserialize(popped));
-
-        if (args.hasNext() && args.pop().value().equalsIgnoreCase(INTERPRET)) {
-          builder.interpret(true);
+    // syntax intended to match the /data command in vanilla MC
+    static Tag resolve(final ArgumentQueue args, final Context ctx) throws ParsingException {
+        final String type = args.popOr("a type of block, entity, or storage is required").lowerValue();
+        final NBTComponentBuilder<?, ?> builder;
+        if (BLOCK.equals(type)) {
+            final String pos = args.popOr("A position is required").value();
+            try {
+                builder = Component.blockNBT()
+                        .pos(BlockNBTComponent.Pos.fromString(pos));
+            } catch (final IllegalArgumentException ex) {
+                throw ctx.newException(ex.getMessage(), args);
+            }
+        } else if (ENTITY.equals(type)) {
+            builder = Component.entityNBT()
+                    .selector(args.popOr("A selector is required").value());
+        } else if (STORAGE.equals(type)) {
+            builder = Component.storageNBT()
+                    .storage(Key.key(args.popOr("A storage key is required").value()));
+        } else {
+            throw ctx.newException("Unknown nbt tag type '" + type + "'", args);
         }
-      }
+
+        builder.nbtPath(args.popOr("An NBT path is required").value());
+
+        if (args.hasNext()) {
+            final String popped = args.pop().value();
+
+            if (INTERPRET.equalsIgnoreCase(popped)) {
+                builder.interpret(true);
+            } else {
+                builder.separator(ctx.deserialize(popped));
+
+                if (args.hasNext() && args.pop().value().equalsIgnoreCase(INTERPRET)) {
+                    builder.interpret(true);
+                }
+            }
+        }
+
+        return Tag.inserting(builder.build());
     }
 
-    return Tag.inserting(builder.build());
-  }
+    static @Nullable Emitable emit(final Component comp) {
+        final String type;
+        final String id;
+        if (comp instanceof BlockNBTComponent) {
+            type = BLOCK;
+            id = ((BlockNBTComponent) comp).pos().asString();
+        } else if (comp instanceof EntityNBTComponent) {
+            type = ENTITY;
+            id = ((EntityNBTComponent) comp).selector();
+        } else if (comp instanceof StorageNBTComponent) {
+            type = STORAGE;
+            id = ((StorageNBTComponent) comp).storage().asString();
+        } else {
+            return null;
+        }
 
-  static @Nullable Emitable emit(final Component comp) {
-    final String type;
-    final String id;
-    if (comp instanceof BlockNBTComponent) {
-      type = BLOCK;
-      id = ((BlockNBTComponent) comp).pos().asString();
-    } else if (comp instanceof EntityNBTComponent) {
-      type = ENTITY;
-      id = ((EntityNBTComponent) comp).selector();
-    } else if (comp instanceof StorageNBTComponent) {
-      type = STORAGE;
-      id = ((StorageNBTComponent) comp).storage().asString();
-    } else {
-      return null;
+        return out -> {
+            final NBTComponent<?, ?> nbt = (NBTComponent<?, ?>) comp;
+            out.tag(NBT)
+                    .argument(type)
+                    .argument(id)
+                    .argument(nbt.nbtPath());
+
+            if (nbt.separator() != null) {
+                out.argument(nbt.separator());
+            }
+
+            if (nbt.interpret()) {
+                out.argument(INTERPRET);
+            }
+        };
     }
-
-    return out -> {
-      final NBTComponent<?, ?> nbt = (NBTComponent<?, ?>) comp;
-      out.tag(NBT)
-        .argument(type)
-        .argument(id)
-        .argument(nbt.nbtPath());
-
-      if (nbt.separator() != null) {
-        out.argument(nbt.separator());
-      }
-
-      if (nbt.interpret()) {
-        out.argument(INTERPRET);
-      }
-    };
-  }
 }

@@ -1,0 +1,11 @@
+--- a/net/minecraft/network/protocol/game/ClientboundChunksBiomesPacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundChunksBiomesPacket.java
+@@ -64,7 +64,7 @@
+ 
+         public static void extractChunkData(FriendlyByteBuf buf, LevelChunk chunk) {
+             for(LevelChunkSection levelChunkSection : chunk.getSections()) {
+-                levelChunkSection.getBiomes().write(buf);
++                levelChunkSection.getBiomes().write(buf, null, levelChunkSection.bottomBlockY()); // Paper - Anti-Xray
+             }
+ 
+         }

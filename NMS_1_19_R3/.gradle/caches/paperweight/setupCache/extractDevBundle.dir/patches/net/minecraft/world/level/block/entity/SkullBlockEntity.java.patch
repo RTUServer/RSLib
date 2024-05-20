@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/level/block/entity/SkullBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/SkullBlockEntity.java
+@@ -137,7 +137,7 @@
+     public static void updateGameprofile(@Nullable GameProfile owner, Consumer<GameProfile> callback) {
+         if (owner != null && !StringUtil.isNullOrEmpty(owner.getName()) && (!owner.isComplete() || !owner.getProperties().containsKey("textures")) && profileCache != null && sessionService != null) {
+             profileCache.getAsync(owner.getName(), (profile) -> {
+-                Util.backgroundExecutor().execute(() -> {
++                Util.PROFILE_EXECUTOR.execute(() -> { // Paper - not a good idea to use BLOCKING OPERATIONS on the worldgen executor
+                     Util.ifElse(profile, (profilex) -> {
+                         Property property = Iterables.getFirst(profilex.getProperties().get("textures"), (Property)null);
+                         if (property == null) {

@@ -1,0 +1,51 @@
+--- a/net/minecraft/world/level/block/CoralWallFanBlock.java
++++ b/net/minecraft/world/level/block/CoralWallFanBlock.java
+@@ -6,11 +6,13 @@
+ import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.level.LevelAccessor;
++import net.minecraft.world.level.LevelReader;
+ import net.minecraft.world.level.block.state.BlockBehaviour;
+ import net.minecraft.world.level.block.state.BlockState;
+ import net.minecraft.world.level.material.Fluids;
+ 
+ public class CoralWallFanBlock extends BaseCoralWallFanBlock {
++
+     private final Block deadBlock;
+ 
+     protected CoralWallFanBlock(Block deadCoralBlock, BlockBehaviour.Properties settings) {
+@@ -20,24 +22,29 @@
+ 
+     @Override
+     public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+-        this.tryScheduleDieTick(state, world, pos);
++        this.tryScheduleDieTick(state, (LevelAccessor) world, pos);
+     }
+ 
+     @Override
+     public void tick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
+         if (!scanForWater(state, world, pos)) {
+-            world.setBlock(pos, this.deadBlock.defaultBlockState().setValue(WATERLOGGED, Boolean.valueOf(false)).setValue(FACING, state.getValue(FACING)), 2);
++            // CraftBukkit start
++            if (org.bukkit.craftbukkit.v1_17_R1.event.CraftEventFactory.callBlockFadeEvent(world, pos, this.deadBlock.defaultBlockState().setValue(CoralWallFanBlock.WATERLOGGED, false).setValue(CoralWallFanBlock.FACING, state.getValue(CoralWallFanBlock.FACING))).isCancelled()) {
++                return;
++            }
++            // CraftBukkit end
++            world.setBlock(pos, (BlockState) ((BlockState) this.deadBlock.defaultBlockState().setValue(CoralWallFanBlock.WATERLOGGED, false)).setValue(CoralWallFanBlock.FACING, (Direction) state.getValue(CoralWallFanBlock.FACING)), 2);
+         }
+ 
+     }
+ 
+     @Override
+     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+-        if (direction.getOpposite() == state.getValue(FACING) && !state.canSurvive(world, pos)) {
++        if (direction.getOpposite() == state.getValue(CoralWallFanBlock.FACING) && !state.canSurvive(world, pos)) {
+             return Blocks.AIR.defaultBlockState();
+         } else {
+-            if (state.getValue(WATERLOGGED)) {
+-                world.getLiquidTicks().scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
++            if ((Boolean) state.getValue(CoralWallFanBlock.WATERLOGGED)) {
++                world.getLiquidTicks().scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay((LevelReader) world));
+             }
+ 
+             this.tryScheduleDieTick(state, world, pos);

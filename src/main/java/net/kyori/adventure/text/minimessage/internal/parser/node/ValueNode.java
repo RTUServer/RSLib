@@ -36,43 +36,43 @@ import java.util.Objects;
  */
 
 public abstract class ValueNode extends ElementNode {
-  private final String value;
+    private final String value;
 
-  /**
-   * Creates a new element node.
-   *
-   * @param parent the parent of this node
-   * @param token the token that created this node
-   * @param sourceMessage the source message
-   * @param value the value of this text node
-   * @since 4.10.0
-   */
-  ValueNode(final @Nullable ElementNode parent, final @Nullable Token token, final @NotNull String sourceMessage, final @NotNull String value) {
-    super(parent, token, sourceMessage);
-    this.value = value;
-  }
+    /**
+     * Creates a new element node.
+     *
+     * @param parent        the parent of this node
+     * @param token         the token that created this node
+     * @param sourceMessage the source message
+     * @param value         the value of this text node
+     * @since 4.10.0
+     */
+    ValueNode(final @Nullable ElementNode parent, final @Nullable Token token, final @NotNull String sourceMessage, final @NotNull String value) {
+        super(parent, token, sourceMessage);
+        this.value = value;
+    }
 
-  abstract String valueName();
+    abstract String valueName();
 
-  /**
-   * Returns the value of this text node.
-   *
-   * @return the value
-   * @since 4.10.0
-   */
-  public @NotNull String value() {
-    return this.value;
-  }
+    /**
+     * Returns the value of this text node.
+     *
+     * @return the value
+     * @since 4.10.0
+     */
+    public @NotNull String value() {
+        return this.value;
+    }
 
-  @Override
-  public @NotNull Token token() {
-    return Objects.requireNonNull(super.token(), "token is not set");
-  }
+    @Override
+    public @NotNull Token token() {
+        return Objects.requireNonNull(super.token(), "token is not set");
+    }
 
-  @Override
-  public @NotNull StringBuilder buildToString(final @NotNull StringBuilder sb, final int indent) {
-    final char[] in = this.ident(indent);
-    sb.append(in).append(this.valueName()).append("('").append(this.value).append("')\n");
-    return sb;
-  }
+    @Override
+    public @NotNull StringBuilder buildToString(final @NotNull StringBuilder sb, final int indent) {
+        final char[] in = this.ident(indent);
+        sb.append(in).append(this.valueName()).append("('").append(this.value).append("')\n");
+        return sb;
+    }
 }

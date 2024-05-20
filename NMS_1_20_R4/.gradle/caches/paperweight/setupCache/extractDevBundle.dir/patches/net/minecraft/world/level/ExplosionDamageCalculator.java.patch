@@ -1,0 +1,21 @@
+--- a/net/minecraft/world/level/ExplosionDamageCalculator.java
++++ b/net/minecraft/world/level/ExplosionDamageCalculator.java
+@@ -22,11 +22,17 @@
+         return true;
+     }
+ 
++    @io.papermc.paper.annotation.DoNotUse @Deprecated // Paper
+     public float getEntityDamageAmount(Explosion explosion, Entity entity) {
++        // Paper start - actually optimise explosions
++        return this.getEntityDamageAmount(explosion, entity, Explosion.getSeenPercent(explosion.center(), entity));
++    }
++    public float getEntityDamageAmount(Explosion explosion, Entity entity, double seenPercent) {
++        // Paper end - actually optimise explosions
+         float f = explosion.radius() * 2.0F;
+         Vec3 vec3 = explosion.center();
+         double d = Math.sqrt(entity.distanceToSqr(vec3)) / (double)f;
+-        double e = (1.0 - d) * (double)Explosion.getSeenPercent(vec3, entity);
++        double e = (1.0 - d) * seenPercent; // Paper - actually optimise explosions
+         return (float)((e * e + e) / 2.0 * 7.0 * (double)f + 1.0);
+     }
+ }

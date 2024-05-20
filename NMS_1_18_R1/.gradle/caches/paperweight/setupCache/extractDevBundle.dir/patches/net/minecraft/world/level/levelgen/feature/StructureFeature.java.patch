@@ -1,0 +1,10 @@
+--- a/net/minecraft/world/level/levelgen/feature/StructureFeature.java
++++ b/net/minecraft/world/level/levelgen/feature/StructureFeature.java
+@@ -168,6 +168,7 @@
+                         int o = j + i * m;
+                         int p = k + i * n;
+                         ChunkPos chunkPos = this.getPotentialFeatureChunk(config, worldSeed, o, p);
++                        if (!world.getWorldBorder().isChunkInBounds(chunkPos.x, chunkPos.z)) { continue; } // Paper
+                         StructureCheckResult structureCheckResult = structureAccessor.checkStructurePresence(chunkPos, this, skipExistingChunks);
+                         if (structureCheckResult != StructureCheckResult.START_NOT_PRESENT) {
+                             if (!skipExistingChunks && structureCheckResult == StructureCheckResult.START_PRESENT) {

@@ -37,58 +37,58 @@ import java.util.function.Supplier;
  */
 @ApiStatus.NonExtendable
 public interface ArgumentQueue {
-  /**
-   * Pop an argument, throwing an exception if no argument was present.
-   *
-   * <p>After an invocation of {@code pop()}, the internal argument pointer will be advanced to the next argument.</p>
-   *
-   * @return the popped argument
-   * @since 4.10.0
-   */
-  Tag.@NotNull Argument pop();
+    /**
+     * Pop an argument, throwing an exception if no argument was present.
+     *
+     * <p>After an invocation of {@code pop()}, the internal argument pointer will be advanced to the next argument.</p>
+     *
+     * @return the popped argument
+     * @since 4.10.0
+     */
+    Tag.@NotNull Argument pop();
 
-  /**
-   * Pop an argument, throwing an exception if no argument was present.
-   *
-   * <p>After an invocation of {@code popOr()}, the internal argument pointer will be advanced to the next argument.</p>
-   *
-   * @param errorMessage the error to throw if the argument is not present
-   * @return the popped argument
-   * @since 4.10.0
-   */
-  Tag.@NotNull Argument popOr(final @NotNull String errorMessage);
+    /**
+     * Pop an argument, throwing an exception if no argument was present.
+     *
+     * <p>After an invocation of {@code popOr()}, the internal argument pointer will be advanced to the next argument.</p>
+     *
+     * @param errorMessage the error to throw if the argument is not present
+     * @return the popped argument
+     * @since 4.10.0
+     */
+    Tag.@NotNull Argument popOr(final @NotNull String errorMessage);
 
-  /**
-   * Pop an argument, throwing an exception if no argument was present.
-   *
-   * <p>After an invocation of {@code popOr()}, the internal argument pointer will be advanced to the next argument.</p>
-   *
-   * @param errorMessage the error to throw if the argument is not present
-   * @return the popped argument
-   * @since 4.10.0
-   */
-  Tag.@NotNull Argument popOr(final @NotNull Supplier<String> errorMessage);
+    /**
+     * Pop an argument, throwing an exception if no argument was present.
+     *
+     * <p>After an invocation of {@code popOr()}, the internal argument pointer will be advanced to the next argument.</p>
+     *
+     * @param errorMessage the error to throw if the argument is not present
+     * @return the popped argument
+     * @since 4.10.0
+     */
+    Tag.@NotNull Argument popOr(final @NotNull Supplier<String> errorMessage);
 
-  /**
-   * Peek at the next argument without advancing the iteration pointer.
-   *
-   * @return the next argument, if any is available.
-   * @since 4.10.0
-   */
-  Tag.@Nullable Argument peek();
+    /**
+     * Peek at the next argument without advancing the iteration pointer.
+     *
+     * @return the next argument, if any is available.
+     * @since 4.10.0
+     */
+    Tag.@Nullable Argument peek();
 
-  /**
-   * Get whether another argument is available to be popped.
-   *
-   * @return whether another argument is available
-   * @since 4.10.0
-   */
-  boolean hasNext();
+    /**
+     * Get whether another argument is available to be popped.
+     *
+     * @return whether another argument is available
+     * @since 4.10.0
+     */
+    boolean hasNext();
 
-  /**
-   * Reset index to the beginning, to begin another attempt.
-   *
-   * @since 4.10.0
-   */
-  void reset();
+    /**
+     * Reset index to the beginning, to begin another attempt.
+     *
+     * @since 4.10.0
+     */
+    void reset();
 }

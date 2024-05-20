@@ -41,38 +41,37 @@ import org.jetbrains.annotations.Nullable;
  * @since 4.11.0
  */
 final class SelectorTag {
-  private static final String SEL = "sel";
-  private static final String SELECTOR = "selector";
+    private static final String SEL = "sel";
+    private static final String SELECTOR = "selector";
 
-  static final TagResolver RESOLVER = SerializableResolver.claimingComponent(
-    StandardTags.names(SEL, SELECTOR),
-    SelectorTag::create,
-    SelectorTag::claim
-  );
+    static final TagResolver RESOLVER = SerializableResolver.claimingComponent(
+            StandardTags.names(SEL, SELECTOR),
+            SelectorTag::create,
+            SelectorTag::claim
+    );
 
-  private SelectorTag() {
-  }
-
-  static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
-    final String key = args.popOr("A selection key is required").value();
-    ComponentLike separator = null;
-    if (args.hasNext()) {
-      separator = ctx.deserialize(args.pop().value());
+    private SelectorTag() {
     }
 
-    return Tag.inserting(Component.selector(key, separator));
-  }
+    static Tag create(final ArgumentQueue args, final Context ctx) throws ParsingException {
+        final String key = args.popOr("A selection key is required").value();
+        ComponentLike separator = null;
+        if (args.hasNext()) {
+            separator = ctx.deserialize(args.pop().value());
+        }
 
-  static @Nullable Emitable claim(final Component input) {
-    if (!(input instanceof SelectorComponent)) return null;
+        return Tag.inserting(Component.selector(key, separator));
+    }
 
-    final SelectorComponent st = (SelectorComponent) input;
-    return emit -> {
-      emit.tag(SEL);
-      emit.argument(st.pattern());
-      if (st.separator() != null) {
-        emit.argument(st.separator());
-      }
-    };
-  }
+    static @Nullable Emitable claim(final Component input) {
+        if (!(input instanceof SelectorComponent st)) return null;
+
+        return emit -> {
+            emit.tag(SEL);
+            emit.argument(st.pattern());
+            if (st.separator() != null) {
+                emit.argument(st.separator());
+            }
+        };
+    }
 }

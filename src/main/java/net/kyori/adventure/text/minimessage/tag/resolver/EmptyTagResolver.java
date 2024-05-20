@@ -34,27 +34,27 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 final class EmptyTagResolver implements TagResolver, MappableResolver, SerializableResolver {
-  static final EmptyTagResolver INSTANCE = new EmptyTagResolver();
+    static final EmptyTagResolver INSTANCE = new EmptyTagResolver();
 
-  private EmptyTagResolver() {
-  }
+    private EmptyTagResolver() {
+    }
 
-  @Override
-  public @Nullable Tag resolve(final @NotNull String name, final @NotNull ArgumentQueue arguments, final @NotNull Context ctx) {
-    return null;
-  }
+    @Override
+    public @Nullable Tag resolve(final @NotNull String name, final @NotNull ArgumentQueue arguments, final @NotNull Context ctx) {
+        return null;
+    }
 
-  @Override
-  public boolean has(final @NotNull String name) {
-    return false;
-  }
+    @Override
+    public boolean has(final @NotNull String name) {
+        return false;
+    }
 
-  @Override
-  public boolean contributeToMap(final @NotNull Map<String, Tag> map) {
-    return true;
-  }
+    @Override
+    public boolean contributeToMap(final @NotNull Map<String, Tag> map) {
+        return true;
+    }
 
-  @Override
-  public void handle(final @NotNull Component serializable, final @NotNull ClaimConsumer consumer) {
-  }
+    @Override
+    public void handle(final @NotNull Component serializable, final @NotNull ClaimConsumer consumer) {
+    }
 }
