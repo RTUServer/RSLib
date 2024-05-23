@@ -3,6 +3,7 @@ package com.github.ipecter.rtuserver.lib.util.common;
 import com.github.ipecter.rtuserver.lib.RSLib;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.CommandSender;
@@ -29,4 +30,16 @@ public class ComponentUtil {
     public static String toString(char legacyCharacter, Component component) {
         return LegacyComponentSerializer.legacy(legacyCharacter).serialize(component);
     }
+
+    public static Component systemMessage(CommandSender sender, String miniMessage) {
+        Component lore = formatted(sender, RSLib.getInstance().getModules().getSystemMessageModule().getLore());
+        return formatted(miniMessage).hoverEvent(HoverEvent.showText(lore));
+    }
+
+    public static Component systemMessage(CommandSender sender, Component component) {
+        Component lore = formatted(sender, RSLib.getInstance().getModules().getSystemMessageModule().getLore());
+        return component.hoverEvent(HoverEvent.showText(lore));
+    }
+
+
 }

@@ -11,7 +11,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
 
 @Getter
-@RequiredArgsConstructor
 public abstract class RSListener implements Listener {
 
     private final RSPlugin plugin;

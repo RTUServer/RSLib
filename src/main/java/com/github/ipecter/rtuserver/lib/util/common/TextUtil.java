@@ -33,11 +33,11 @@ public class TextUtil {
         Audience audience = RSLib.getInstance().getAdventure().player(player);
         DataNameType dataNameType = checkType(list, name);
         switch (dataNameType) {
-            case ALL -> audience.sendMessage(ComponentUtil.formatted(message.getTranslation("dataNameType.all")));
-            case WRONG -> audience.sendMessage(ComponentUtil.formatted(message.getTranslation("dataNameType.wrong")));
-            case LONG -> audience.sendMessage(ComponentUtil.formatted(message.getTranslation("dataNameType.long")));
-            case EXIST -> audience.sendMessage(ComponentUtil.formatted(message.getTranslation("dataNameType.exist")));
-            default -> audience.sendMessage(ComponentUtil.formatted(message.getTranslation("")));
+            case ALL -> audience.sendMessage(ComponentUtil.formatted(message.get("dataNameType.all")));
+            case WRONG -> audience.sendMessage(ComponentUtil.formatted(message.get("dataNameType.wrong")));
+            case LONG -> audience.sendMessage(ComponentUtil.formatted(message.get("dataNameType.long")));
+            case EXIST -> audience.sendMessage(ComponentUtil.formatted(message.get("dataNameType.exist")));
+            default -> audience.sendMessage(ComponentUtil.formatted(message.get("")));
         }
         return dataNameType;
     }

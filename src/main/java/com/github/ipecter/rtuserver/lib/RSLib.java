@@ -15,7 +15,6 @@ import com.github.ipecter.rtuserver.lib.nms.v1_20_r3.NMS_1_20_R3;
 import com.github.ipecter.rtuserver.lib.nms.v1_20_r4.NMS_1_20_R4;
 import com.github.ipecter.rtuserver.lib.plugin.RSPlugin;
 import com.github.ipecter.rtuserver.lib.plugin.inventory.RSInventoryListener;
-import com.github.ipecter.rtuserver.lib.translation.CommonTranslation;
 import com.github.ipecter.rtuserver.lib.util.common.ComponentUtil;
 import com.github.ipecter.rtuserver.lib.util.common.VersionUtil;
 import lombok.Getter;
@@ -29,15 +28,13 @@ public class RSLib extends RSPlugin {
     @Getter
     private static RSLib instance;
     @Getter
-    private static com.github.ipecter.rtuserver.lib.nms.NMS NMS;
+    private com.github.ipecter.rtuserver.lib.nms.NMS NMS;
     @Getter
     private final Map<String, RSPlugin> plugins = new HashMap<>();
     private final Map<String, Boolean> hooks = new HashMap<>();
     private String nmsVersion;
     @Getter
     private Modules modules;
-    @Getter
-    private CommonTranslation translation;
 
     public RSLib() {
         super(ComponentUtil.miniMessage("<gradient:#00f260:#057eff>RSLib » </gradient>"));
@@ -91,7 +88,6 @@ public class RSLib extends RSPlugin {
     public void enable() {
         console(ComponentUtil.miniMessage("<white>NMS: " + nmsVersion + "</white>"));
         modules = new Modules();
-        translation = new CommonTranslation();
         registerEvent(new MotdOnJoin());
         registerEvent(new RSInventoryListener());
         registerCommand(new Command());

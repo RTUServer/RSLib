@@ -11,7 +11,7 @@ public class SettingConfiguration extends RSConfiguration {
 
     private boolean verbose = false;
     private boolean enablePlugin = true;
-    private boolean motd = true;
+    private boolean motd = false;
     private String locale = "KR";
     private StorageType storage = StorageType.JSON;
 

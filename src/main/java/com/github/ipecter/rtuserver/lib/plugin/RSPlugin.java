@@ -97,7 +97,7 @@ public abstract class RSPlugin extends JavaPlugin {
     }
 
     public void registerCommand(RSCommand command) {
-        RSLib.getNMS().commandMap().register(command.getName(), command);
+        RSLib.getInstance().getNMS().commandMap().register(command.getName(), command);
     }
 
     public void registerPermission(String name, PermissionDefault permissionDefault) {

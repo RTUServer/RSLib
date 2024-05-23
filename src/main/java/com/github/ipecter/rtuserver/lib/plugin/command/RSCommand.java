@@ -5,7 +5,6 @@ import com.github.ipecter.rtuserver.lib.plugin.RSPlugin;
 import com.github.ipecter.rtuserver.lib.plugin.config.CommandConfiguration;
 import com.github.ipecter.rtuserver.lib.plugin.config.Configurations;
 import com.github.ipecter.rtuserver.lib.plugin.config.MessageConfiguration;
-import com.github.ipecter.rtuserver.lib.translation.CommonTranslation;
 import com.github.ipecter.rtuserver.lib.util.common.ComponentUtil;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
@@ -28,7 +27,6 @@ public abstract class RSCommand extends Command implements Runnable, Listener {
 
     private final RSLib lib = RSLib.getInstance();
     private final Configurations config = lib.getConfigurations();
-    private final CommonTranslation translation = RSLib.getInstance().getTranslation();
 
     private final RSPlugin plugin;
     private final MessageConfiguration message;
@@ -118,7 +116,7 @@ public abstract class RSCommand extends Command implements Runnable, Listener {
 //        if (sender instanceof Player player) {
 //            if (cooldownMap.getOrDefault(player.getUniqueId(), 0) <= 0) cooldownMap.put(player.getUniqueId(), cooldown);
 //            else {
-//                sendMessage(ComponentUtil.miniMessage(translation.getMessage("prefix") + translation.getMessage("command.cooldown")));
+//                sendMessage(ComponentUtil.miniMessage(message.getCommon("prefix") + message.getCommon("command.cooldown")));
 //                return true;
 //            }
 //        }
@@ -142,7 +140,7 @@ public abstract class RSCommand extends Command implements Runnable, Listener {
         if (sender instanceof Player player) {
             if (cooldownMap.getOrDefault(player.getUniqueId(), 0) <= 0) cooldownMap.put(player.getUniqueId(), cooldown);
             else {
-                sendAnnounce(message.getTranslation("command.cooldown"));
+                sendAnnounce(message.get("command.cooldown"));
                 return true;
             }
         }
@@ -152,24 +150,29 @@ public abstract class RSCommand extends Command implements Runnable, Listener {
         if (type != CommandType.SINGLE) {
             if (!data.isEmpty()) {
                 if (type == CommandType.MAIN) {
-                    if (data.equals(0, translation.getCommand("reload"))) {
+                    if (data.equals(0, command.getCommon("reload"))) {
                         if (hasPermission(plugin.getName() + ".reload")) {
                             plugin.getConfigurations().reload();
                             reload(data);
-                            sendAnnounce(translation.getMessage("reload"));
-                        } else sendAnnounce(translation.getMessage("noPermission"));
+                            sendAnnounce(message.getCommon("reload"));
+                        } else sendAnnounce(message.getCommon("noPermission"));
                         return true;
                     }
                 }
             } else {
-                sendAnnounce(translation.getMessage("wrongUsage"));
+                sendAnnounce(message.getCommon("wrongUsage"));
                 if (hasPermission(plugin.getName() + ".reload"))
-                    sendMessage(String.format("<gray> - </gray> /%s %s", getName(), translation.getCommand("reload")));
+                    sendMessage(String.format("<gray> - </gray> /%s %s", getName(), command.getCommon("reload")));
                 wrongUsage(data);
                 return true;
             }
         }
-        command(data);
+        if (!command(data)) {
+            sendAnnounce(message.getCommon("wrongUsage"));
+            if (hasPermission(plugin.getName() + ".reload"))
+                sendMessage(String.format("<gray> - </gray> /%s %s", getName(), command.getCommon("reload")));
+            wrongUsage(data);
+        }
         return true;
     }
 
@@ -180,12 +183,12 @@ public abstract class RSCommand extends Command implements Runnable, Listener {
         CommandData data = new CommandData(args);
         List<String> list = new ArrayList<>(tabComplete(data));
         if (type == CommandType.MAIN && data.length(1)) {
-            list.add(translation.getCommand("reload"));
+            list.add(command.getCommon("reload"));
         }
         return list;
     }
 
-    public abstract void command(CommandData command);
+    public abstract boolean command(CommandData command);
 
     public abstract List<String> tabComplete(CommandData command);
 

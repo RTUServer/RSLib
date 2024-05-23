@@ -20,6 +20,7 @@ public class MessageConfiguration extends RSConfiguration {
     }
 
     private void init() {
+        getString("prefix", "<gradient:#00f260:#057eff>Festival » </gradient>");
         for (String key : getConfig().getKeys(true)) {
             if (getConfig().isString(key)) {
                 map.put(key, getString(key, ""));
@@ -28,18 +29,16 @@ public class MessageConfiguration extends RSConfiguration {
     }
 
     public Component getPrefix() {
-        String prefix = getTranslation("prefix");
+        String prefix = get("prefix");
         if (prefix.isEmpty()) return getPlugin().getPrefix();
         else return ComponentUtil.miniMessage(prefix);
     }
 
-    public String getTranslation(String key) {
-        if (key.startsWith("common.")) {
-            RSPlugin lib = RSLib.getInstance();
-            if (lib != getPlugin()) {
-                return lib.getConfigurations().getMessage().getTranslation(key);
-            }
-        }
+    public String get(String key) {
         return map.getOrDefault(key, "").toString();
+    }
+
+    public String getCommon(String key) {
+        return RSLib.getInstance().getConfigurations().getMessage().get("common." + key);
     }
 }

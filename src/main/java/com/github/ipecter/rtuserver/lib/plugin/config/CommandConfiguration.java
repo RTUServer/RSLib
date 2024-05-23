@@ -1,5 +1,6 @@
 package com.github.ipecter.rtuserver.lib.plugin.config;
 
+import com.github.ipecter.rtuserver.lib.RSLib;
 import com.github.ipecter.rtuserver.lib.plugin.RSPlugin;
 import lombok.Getter;
 
@@ -26,7 +27,11 @@ public class CommandConfiguration extends RSConfiguration {
         }
     }
 
-    public String getTranslation(String key) {
+    public String get(String key) {
         return map.getOrDefault(key, "null").toString();
+    }
+
+    public String getCommon(String key) {
+        return RSLib.getInstance().getConfigurations().getCommand().get("common." + key);
     }
 }
