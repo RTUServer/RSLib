@@ -59,7 +59,7 @@ public abstract class RSInventory implements InventoryHolder, Listener {
     public void sendMessage(CommandSender sender, Component component) {
         if (component.hoverEvent() == null) {
             Component lore = ComponentUtil.formatted(sender, RSLib.getInstance().getModules().getSystemMessageModule().getLore());
-            component.
+            component = component.hoverEvent(HoverEvent.showText(lore));
         }
         plugin.getAdventure().sender(sender).sendMessage(component);
     }

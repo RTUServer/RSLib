@@ -33,48 +33,48 @@ public abstract class RSCommand extends Command implements Runnable, Listener {
     private final CommandConfiguration command;
 
     private final String name;
-    private final CommandType type;
+    private final boolean isMain;
     private final int cooldown;
     private final Map<UUID, Integer> cooldownMap = new ConcurrentHashMap<>();
     private CommandSender sender;
     private Audience audience;
 
     public RSCommand(RSPlugin plugin, @NotNull String name) {
-        this(plugin, name, CommandType.NORMAL, RSLib.getInstance().getModules().getCommandModule().getCooldown());
+        this(plugin, name, false, RSLib.getInstance().getModules().getCommandModule().getCooldown());
     }
 
     public RSCommand(RSPlugin plugin, @NotNull List<String> name) {
-        this(plugin, name, CommandType.NORMAL, RSLib.getInstance().getModules().getCommandModule().getCooldown());
+        this(plugin, name, false, RSLib.getInstance().getModules().getCommandModule().getCooldown());
     }
 
     public RSCommand(RSPlugin plugin, @NotNull String name, int cooldown) {
-        this(plugin, name, CommandType.NORMAL, cooldown);
+        this(plugin, name, false, cooldown);
     }
 
     public RSCommand(RSPlugin plugin, @NotNull List<String> name, int cooldown) {
-        this(plugin, name, CommandType.NORMAL, cooldown);
+        this(plugin, name, false, cooldown);
     }
 
-    public RSCommand(RSPlugin plugin, @NotNull String name, CommandType type) {
-        this(plugin, name, type, RSLib.getInstance().getModules().getCommandModule().getCooldown());
+    public RSCommand(RSPlugin plugin, @NotNull String name, boolean isMain) {
+        this(plugin, name, isMain, RSLib.getInstance().getModules().getCommandModule().getCooldown());
     }
 
-    public RSCommand(RSPlugin plugin, @NotNull List<String> name, CommandType type) {
-        this(plugin, name, type, RSLib.getInstance().getModules().getCommandModule().getCooldown());
+    public RSCommand(RSPlugin plugin, @NotNull List<String> name, boolean isMain) {
+        this(plugin, name, isMain, RSLib.getInstance().getModules().getCommandModule().getCooldown());
     }
 
-    public RSCommand(RSPlugin plugin, @NotNull String name, CommandType type, int cooldown) {
-        this(plugin, List.of(name), type, cooldown);
+    public RSCommand(RSPlugin plugin, @NotNull String name, boolean isMain, int cooldown) {
+        this(plugin, List.of(name), isMain, cooldown);
     }
 
-    public RSCommand(RSPlugin plugin, List<String> names, CommandType type, int cooldown) {
+    public RSCommand(RSPlugin plugin, List<String> names, boolean isMain, int cooldown) {
         super(names.get(0));
         this.plugin = plugin;
         this.message = plugin.getConfigurations().getMessage();
         this.command = plugin.getConfigurations().getCommand();
         this.name = names.get(0);
         if (names.size() > 1) setAliases(names);
-        this.type = type;
+        this.isMain = isMain;
         this.cooldown = cooldown;
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this, 0, 1);
     }
@@ -147,23 +147,13 @@ public abstract class RSCommand extends Command implements Runnable, Listener {
         this.sender = sender;
         this.audience = plugin.getAdventure().sender(sender);
         CommandData data = new CommandData(args);
-        if (type != CommandType.SINGLE) {
-            if (!data.isEmpty()) {
-                if (type == CommandType.MAIN) {
-                    if (data.equals(0, command.getCommon("reload"))) {
-                        if (hasPermission(plugin.getName() + ".reload")) {
-                            plugin.getConfigurations().reload();
-                            reload(data);
-                            sendAnnounce(message.getCommon("reload"));
-                        } else sendAnnounce(message.getCommon("noPermission"));
-                        return true;
-                    }
-                }
-            } else {
-                sendAnnounce(message.getCommon("wrongUsage"));
-                if (hasPermission(plugin.getName() + ".reload"))
-                    sendMessage(String.format("<gray> - </gray> /%s %s", getName(), command.getCommon("reload")));
-                wrongUsage(data);
+        if (isMain) {
+            if (data.equals(0, command.getCommon("reload"))) {
+                if (hasPermission(plugin.getName() + ".reload")) {
+                    plugin.getConfigurations().reload();
+                    reload(data);
+                    sendAnnounce(message.getCommon("reload"));
+                } else sendAnnounce(message.getCommon("noPermission"));
                 return true;
             }
         }
@@ -182,7 +172,7 @@ public abstract class RSCommand extends Command implements Runnable, Listener {
         this.audience = plugin.getAdventure().sender(sender);
         CommandData data = new CommandData(args);
         List<String> list = new ArrayList<>(tabComplete(data));
-        if (type == CommandType.MAIN && data.length(1)) {
+        if (isMain && data.length(1)) {
             list.add(command.getCommon("reload"));
         }
         return list;

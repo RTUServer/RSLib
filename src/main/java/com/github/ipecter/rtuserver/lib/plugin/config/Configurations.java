@@ -29,6 +29,7 @@ public class Configurations {
     private PostgreSQLConfig postgresql;
     private SQLiteConfig sqlite;
     private boolean useStorage;
+    private boolean isUpdated;
 
     public Configurations(RSPlugin plugin) {
         this.plugin = plugin;
@@ -38,23 +39,27 @@ public class Configurations {
     }
 
     public void initStorage(String... list) {
-        if (useStorage || list == null || list.length == 0) return;
+        this.list.clear();
         this.list.addAll(List.of(list));
+        isUpdated = true;
         storage();
     }
 
     public void initStorage(List<String> list) {
-        if (useStorage || list == null || list.isEmpty()) return;
+        this.list.clear();
         this.list.addAll(list);
+        isUpdated = true;
         storage();
     }
 
     private void storage() {
         this.useStorage = true;
-        json = new JsonConfig(plugin);
-        mongodb = new MongoDBConfig(plugin);
-        sqlite = new SQLiteConfig(plugin);
-        mysql = new MySQLConfig(plugin);
+        if (!list.isEmpty()) {
+            json = new JsonConfig(plugin);
+            mongodb = new MongoDBConfig(plugin);
+            sqlite = new SQLiteConfig(plugin);
+            mysql = new MySQLConfig(plugin);
+        }
         loadStorage();
     }
 
@@ -83,7 +88,7 @@ public class Configurations {
         Storage storage = plugin.getStorage();
         switch (type) {
             case JSON -> {
-                if (!(storage instanceof Json) || json.isChanged()) {
+                if (!(storage instanceof Json) || json.isChanged() || isUpdated) {
                     for (String name : list) FileUtil.getResource(plugin.getDataFolder() + "/Data", name + ".json");
                     File[] files = FileUtil.getResourceFolder(plugin.getDataFolder() + "/Data").listFiles();
                     assert files != null;
@@ -93,40 +98,41 @@ public class Configurations {
                 }
             }
             case MARIADB -> {
-                if (!(storage instanceof MariaDB) || mariadb.isChanged()) {
+                if (!(storage instanceof MariaDB) || mariadb.isChanged() || isUpdated) {
                     if (storage != null) storage.close();
-                    plugin.setStorage(new MariaDB(plugin));
+                    plugin.setStorage(new MariaDB(plugin, list));
                     plugin.console(ComponentUtil.miniMessage("Storage: MariaDB"));
                 }
             }
             case MONGODB -> {
-                if (!(storage instanceof MongoDB) || mongodb.isChanged()) {
+                if (!(storage instanceof MongoDB) || mongodb.isChanged() || isUpdated) {
                     if (storage != null) storage.close();
                     plugin.setStorage(new MongoDB(plugin));
                     plugin.console(ComponentUtil.miniMessage("Storage: MongoDB"));
                 }
             }
             case MYSQL -> {
-                if (!(storage instanceof MySQL) || mysql.isChanged()) {
+                if (!(storage instanceof MySQL) || mysql.isChanged() || isUpdated) {
                     if (storage != null) storage.close();
                     plugin.setStorage(new MySQL(plugin, list));
                     plugin.console(ComponentUtil.miniMessage("Storage: MySQL"));
                 }
             }
             case POSTGRESQL -> {
-                if (!(storage instanceof PostgreSQL) || postgresql.isChanged()) {
+                if (!(storage instanceof PostgreSQL) || postgresql.isChanged() || isUpdated) {
                     if (storage != null) storage.close();
                     plugin.setStorage(new PostgreSQL(plugin));
                     plugin.console(ComponentUtil.miniMessage("Storage: PostgreSQL"));
                 }
             }
             case SQLITE -> {
-                if (!(storage instanceof SQLite) || sqlite.isChanged()) {
+                if (!(storage instanceof SQLite) || sqlite.isChanged() || isUpdated) {
                     if (storage != null) storage.close();
-                    plugin.setStorage(new SQLite(plugin));
+                    plugin.setStorage(new SQLite(plugin, list));
                     plugin.console(ComponentUtil.miniMessage("Storage: SQLite"));
                 }
             }
         }
+        isUpdated = false;
     }
 }

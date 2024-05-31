@@ -4,7 +4,7 @@ main: com.github.ipecter.rtuserver.lib.RSLib
 description: RSLib - Library Plugin for RSPlugins
 api-version: 1.17
 authors: [ IPECTER ]
-softdepend: [ PlaceholderAPI, Oraxen, ItemsAdder ]
+softdepend: [ PlaceholderAPI, Oraxen, ItemsAdder, ProtocolLib, LuckPerms, Vault ]
 libraries:
   - net.kyori:adventure-platform-bukkit:4.3.2
   - net.kyori:adventure-text-minimessage:4.16.0
@@ -14,3 +14,9 @@ libraries:
   - org.apache.commons:commons-lang3:3.14.0
   - org.xerial.snappy:snappy-java:1.1.10.5
   - org.quartz-scheduler:quartz:2.5.0-rc1
+  - com.zaxxer:HikariCP:5.1.0
+  - org.mongodb:mongodb-driver-sync:4.11.1
+  - mysql:mysql-connector-java:8.0.33
+  - org.xerial:sqlite-jdbc:3.45.3.0
+  - org.mariadb.jdbc:mariadb-java-client:3.3.3
+  - org.postgresql:postgresql:42.7.3

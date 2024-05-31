@@ -86,11 +86,12 @@ dependencies {
     compileOnly 'org.xerial.snappy:snappy-java:1.1.10.5'
     implementation 'com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4'
 
-    implementation 'org.mongodb:mongodb-driver-sync:4.11.1'
-    implementation 'mysql:mysql-connector-java:8.0.33'
-    implementation 'org.xerial:sqlite-jdbc:3.45.3.0'
-    implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.3'
-    implementation 'org.postgresql:postgresql:42.7.3'
+    compileOnly 'org.mongodb:mongodb-driver-sync:4.11.1'
+    compileOnly 'mysql:mysql-connector-java:8.0.33'
+    compileOnly 'org.xerial:sqlite-jdbc:3.45.3.0'
+    compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.3.3'
+    compileOnly 'org.postgresql:postgresql:42.7.3'
+    compileOnly 'com.zaxxer:HikariCP:5.1.0'
 
     compileOnly 'me.clip:placeholderapi:2.11.2'
     compileOnly 'io.th0rgal:oraxen:1.168.0'

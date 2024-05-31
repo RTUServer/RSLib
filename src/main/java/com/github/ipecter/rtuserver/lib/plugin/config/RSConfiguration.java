@@ -83,7 +83,7 @@ public class RSConfiguration {
         init();
     }
 
-    private void load() {
+    public void load() {
         changed = false;
         try {
             final String previous = config.dump();
@@ -114,12 +114,14 @@ public class RSConfiguration {
         }
     }
 
-    private void save() {
-        try {
-            config.save(file);
-        } catch (IOException ex) {
-            Bukkit.getLogger().log(Level.SEVERE, "Could not save " + file, ex);
-        }
+    public void save() {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                config.save(file);
+            } catch (IOException ex) {
+                Bukkit.getLogger().log(Level.SEVERE, "Could not save " + file, ex);
+            }
+        });
     }
 
     protected void set(String path, Object val) {
