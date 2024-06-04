@@ -38,6 +38,10 @@ public abstract class RSPlugin extends JavaPlugin {
     @Setter
     private Storage storage;
 
+    public RSPlugin() {
+        this.prefix = ComponentUtil.miniMessage("<gradient:#00f260:#057eff>" + getName() + " » </gradient>");
+    }
+
 
     @Override
     public void onEnable() {

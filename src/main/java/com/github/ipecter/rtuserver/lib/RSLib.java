@@ -42,10 +42,6 @@ public class RSLib extends RSPlugin {
     @Getter
     private Dependencies dependencies;
 
-    public RSLib() {
-        super(ComponentUtil.miniMessage("<gradient:#00f260:#057eff>RSLib » </gradient>"));
-    }
-
     public void loadPlugin(RSPlugin plugin) {
         console(ComponentUtil.miniMessage("<white>loading RSPlugin: " + plugin.getName() + "</white>"));
         plugins.put(plugin.getName(), plugin);
