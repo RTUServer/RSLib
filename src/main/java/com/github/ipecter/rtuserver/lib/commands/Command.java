@@ -1,6 +1,7 @@
 package com.github.ipecter.rtuserver.lib.commands;
 
 import com.github.ipecter.rtuserver.lib.RSLib;
+import com.github.ipecter.rtuserver.lib.plugin.RSPlugin;
 import com.github.ipecter.rtuserver.lib.plugin.command.CommandData;
 import com.github.ipecter.rtuserver.lib.plugin.command.RSCommand;
 
@@ -10,8 +11,8 @@ public class Command extends RSCommand {
 
     private final RSLib lib = RSLib.getInstance();
 
-    public Command() {
-        super(RSLib.getInstance(), "rslib", true);
+    public Command(RSPlugin plugin) {
+        super(plugin, "rslib", true);
     }
 
     @Override

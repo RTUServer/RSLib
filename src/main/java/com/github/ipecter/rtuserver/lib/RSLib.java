@@ -1,6 +1,7 @@
 package com.github.ipecter.rtuserver.lib;
 
 import com.github.ipecter.rtuserver.lib.commands.Command;
+import com.github.ipecter.rtuserver.lib.dependencies.Dependencies;
 import com.github.ipecter.rtuserver.lib.listeners.MotdOnJoin;
 import com.github.ipecter.rtuserver.lib.modules.Modules;
 import com.github.ipecter.rtuserver.lib.nms.v1_17_r1.NMS_1_17_R1;
@@ -14,6 +15,7 @@ import com.github.ipecter.rtuserver.lib.nms.v1_20_r2.NMS_1_20_R2;
 import com.github.ipecter.rtuserver.lib.nms.v1_20_r3.NMS_1_20_R3;
 import com.github.ipecter.rtuserver.lib.nms.v1_20_r4.NMS_1_20_R4;
 import com.github.ipecter.rtuserver.lib.plugin.RSPlugin;
+import com.github.ipecter.rtuserver.lib.plugin.command.CommandLimit;
 import com.github.ipecter.rtuserver.lib.plugin.inventory.RSInventoryListener;
 import com.github.ipecter.rtuserver.lib.util.common.ComponentUtil;
 import com.github.ipecter.rtuserver.lib.util.common.VersionUtil;
@@ -35,6 +37,10 @@ public class RSLib extends RSPlugin {
     private String nmsVersion;
     @Getter
     private Modules modules;
+    @Getter
+    private CommandLimit commandLimit;
+    @Getter
+    private Dependencies dependencies;
 
     public RSLib() {
         super(ComponentUtil.miniMessage("<gradient:#00f260:#057eff>RSLib » </gradient>"));
@@ -87,13 +93,11 @@ public class RSLib extends RSPlugin {
     @Override
     public void enable() {
         console(ComponentUtil.miniMessage("<white>NMS: " + nmsVersion + "</white>"));
-        modules = new Modules();
-        registerEvent(new MotdOnJoin());
-        registerEvent(new RSInventoryListener());
-        registerCommand(new Command());
-    }
-
-    @Override
-    public void disable() {
+        modules = new Modules(this);
+        dependencies = new Dependencies(this);
+        commandLimit = new CommandLimit(this);
+        registerEvent(new MotdOnJoin(this));
+        registerEvent(new RSInventoryListener(this));
+        registerCommand(new Command(this));
     }
 }

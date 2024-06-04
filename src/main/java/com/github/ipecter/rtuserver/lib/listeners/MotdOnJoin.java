@@ -13,8 +13,8 @@ import java.util.Map;
 
 public class MotdOnJoin extends RSListener {
 
-    public MotdOnJoin() {
-        super(RSLib.getInstance());
+    public MotdOnJoin(RSPlugin plugin) {
+        super(plugin);
     }
 
     @EventHandler

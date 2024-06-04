@@ -9,7 +9,6 @@ import com.github.ipecter.rtuserver.lib.util.common.ComponentUtil;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -20,10 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
-public abstract class RSCommand extends Command implements Runnable, Listener {
+public abstract class RSCommand extends Command implements Listener {
 
     private final RSLib lib = RSLib.getInstance();
     private final Configurations config = lib.getConfigurations();
@@ -35,16 +33,15 @@ public abstract class RSCommand extends Command implements Runnable, Listener {
     private final String name;
     private final boolean isMain;
     private final int cooldown;
-    private final Map<UUID, Integer> cooldownMap = new ConcurrentHashMap<>();
     private CommandSender sender;
     private Audience audience;
 
     public RSCommand(RSPlugin plugin, @NotNull String name) {
-        this(plugin, name, false, RSLib.getInstance().getModules().getCommandModule().getCooldown());
+        this(plugin, name, false, RSLib.getInstance().getModules().getCommandModule().getExecuteLimit());
     }
 
     public RSCommand(RSPlugin plugin, @NotNull List<String> name) {
-        this(plugin, name, false, RSLib.getInstance().getModules().getCommandModule().getCooldown());
+        this(plugin, name, false, RSLib.getInstance().getModules().getCommandModule().getExecuteLimit());
     }
 
     public RSCommand(RSPlugin plugin, @NotNull String name, int cooldown) {
@@ -56,11 +53,11 @@ public abstract class RSCommand extends Command implements Runnable, Listener {
     }
 
     public RSCommand(RSPlugin plugin, @NotNull String name, boolean isMain) {
-        this(plugin, name, isMain, RSLib.getInstance().getModules().getCommandModule().getCooldown());
+        this(plugin, name, isMain, RSLib.getInstance().getModules().getCommandModule().getExecuteLimit());
     }
 
     public RSCommand(RSPlugin plugin, @NotNull List<String> name, boolean isMain) {
-        this(plugin, name, isMain, RSLib.getInstance().getModules().getCommandModule().getCooldown());
+        this(plugin, name, isMain, RSLib.getInstance().getModules().getCommandModule().getExecuteLimit());
     }
 
     public RSCommand(RSPlugin plugin, @NotNull String name, boolean isMain, int cooldown) {
@@ -76,15 +73,6 @@ public abstract class RSCommand extends Command implements Runnable, Listener {
         if (names.size() > 1) setAliases(names);
         this.isMain = isMain;
         this.cooldown = cooldown;
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this, 0, 1);
-    }
-
-    @Override
-    public void run() {
-        for (UUID uuid : cooldownMap.keySet()) {
-            if (cooldownMap.get(uuid) > 0) cooldownMap.put(uuid, cooldownMap.get(uuid) - 1);
-            else cooldownMap.remove(uuid);
-        }
     }
 
     public boolean isOp() {
@@ -138,6 +126,7 @@ public abstract class RSCommand extends Command implements Runnable, Listener {
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
         if (sender instanceof Player player) {
+            Map<UUID, Integer> cooldownMap = lib.getCommandLimit().getExecuteLimit();
             if (cooldownMap.getOrDefault(player.getUniqueId(), 0) <= 0) cooldownMap.put(player.getUniqueId(), cooldown);
             else {
                 sendAnnounce(message.get("command.cooldown"));

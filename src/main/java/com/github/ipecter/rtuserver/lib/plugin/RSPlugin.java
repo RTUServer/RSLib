@@ -3,6 +3,7 @@ package com.github.ipecter.rtuserver.lib.plugin;
 import com.github.ipecter.rtuserver.lib.RSLib;
 import com.github.ipecter.rtuserver.lib.plugin.command.RSCommand;
 import com.github.ipecter.rtuserver.lib.plugin.config.Configurations;
+import com.github.ipecter.rtuserver.lib.plugin.listener.RSListener;
 import com.github.ipecter.rtuserver.lib.plugin.storage.Storage;
 import com.github.ipecter.rtuserver.lib.util.common.ComponentUtil;
 import com.github.ipecter.rtuserver.lib.util.common.VersionUtil;
@@ -78,7 +79,7 @@ public abstract class RSPlugin extends JavaPlugin {
         getAdventure().console().sendMessage(getPrefix().append(Component.text(" ")).append(message));
     }
 
-    public void registerEvent(Listener listener) {
+    public void registerEvent(RSListener listener) {
         this.registeredListeners.add(listener);
         Bukkit.getPluginManager().registerEvents(listener, this);
     }

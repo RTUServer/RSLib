@@ -1,6 +1,8 @@
 package com.github.ipecter.rtuserver.lib.plugin.inventory;
 
 import com.github.ipecter.rtuserver.lib.RSLib;
+import com.github.ipecter.rtuserver.lib.plugin.RSPlugin;
+import com.github.ipecter.rtuserver.lib.plugin.listener.RSListener;
 import com.github.ipecter.rtuserver.lib.util.common.ComponentUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,7 +11,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
-public class RSInventoryListener implements Listener {
+public class RSInventoryListener extends RSListener {
+
+    public RSInventoryListener(RSPlugin plugin) {
+        super(plugin);
+    }
 
     @EventHandler
     private void onClick(InventoryClickEvent e) {
