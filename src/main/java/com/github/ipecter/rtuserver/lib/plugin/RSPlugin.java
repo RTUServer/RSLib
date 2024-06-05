@@ -42,7 +42,6 @@ public abstract class RSPlugin extends JavaPlugin {
         this.prefix = ComponentUtil.miniMessage("<gradient:#00f260:#057eff>" + getName() + " » </gradient>");
     }
 
-
     @Override
     public void onEnable() {
         if (VersionUtil.isSupportVersion("1.17.1")) {
