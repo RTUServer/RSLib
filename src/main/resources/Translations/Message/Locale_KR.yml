@@ -1,5 +1,5 @@
-#비어있다면 플러그인의 내장 기본 Prefix를 씁니다
-#MiniMessage 형식: https://webui.advntr.dev/
+# 비어있다면 플러그인의 내장 기본 Prefix를 씁니다
+# MiniMessage 형식: https://webui.advntr.dev/
 prefix: ""
 
 common:
@@ -13,7 +13,7 @@ common:
     offlinePlayer: "<red>존재하지 않는 유저입니다</red>"
 
 wrongUsage:
-  reload: "<gray> - </gray><white>/hslib reload</white>"
+  reload: "<gray> - </gray><white>/rslib 구성</white>"
 
 dataNameType:
   black: "<red>사용할 수 없는 이름입니다</red>"

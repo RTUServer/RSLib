@@ -99,9 +99,6 @@ public abstract class RSCommand extends Command implements Listener {
         sendMessage(ComponentUtil.formatted(getSender(), miniMessage));
     }
 
-    public void sendWrongUsage(String commandKey) {
-        sendMessage(String.format("<gray> - </gray> /%s %s", getName(), command.get(commandKey)));
-    }
 //    @Override
 //    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
 //        if (sender instanceof Player player) {
@@ -151,7 +148,7 @@ public abstract class RSCommand extends Command implements Listener {
         }
         if (!command(data)) {
             sendAnnounce(message.getCommon("wrongUsage"));
-            if (hasPermission(plugin.getName() + ".reload")) sendWrongUsage("reload");
+            if (hasPermission(plugin.getName() + ".reload"))  sendMessage(String.format("<gray> - </gray> /%s %s", getName(), command.getCommon("reload")));
             wrongUsage(data);
         }
         return true;

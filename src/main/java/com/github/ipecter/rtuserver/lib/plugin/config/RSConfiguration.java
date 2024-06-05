@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.comments.CommentType;
 import org.simpleyaml.configuration.file.YamlFile;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +35,7 @@ public class RSConfiguration {
     private final RSPlugin plugin;
     private final File file;
     @Getter
-    private final YamlFile config = new YamlFile();
+    private final YamlFile config;
     @Getter
     private final int version;
     @Getter
@@ -48,6 +49,7 @@ public class RSConfiguration {
     public RSConfiguration(RSPlugin plugin, String folder, String name, Integer version) {
         this.plugin = plugin;
         this.file = FileUtil.getResourceWithCopy(plugin, folder, name);
+        this.config = new YamlFile(file);
         load();
         if (version != null) set("version", version);
         this.version = version != null ? version : 1;
@@ -87,7 +89,7 @@ public class RSConfiguration {
         changed = false;
         try {
             final String previous = config.dump();
-            config.load(file);
+            config.loadWithComments();
             String dump = config.dump();
             if (!previous.isEmpty()) if (!previous.equalsIgnoreCase(dump)) changed = true;
         } catch (IOException ignore) {

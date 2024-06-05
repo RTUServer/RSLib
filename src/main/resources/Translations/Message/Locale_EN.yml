@@ -1,5 +1,5 @@
-#if Empty, Plugin uses default prefix
-#MiniMessage format: https://webui.advntr.dev/
+# if Empty, Plugin uses default prefix
+# MiniMessage format: https://webui.advntr.dev/
 prefix: ""
 
 common:
@@ -13,7 +13,7 @@ common:
     offlinePlayer: "<red>This player does not exist</red>"
 
 wrongUsage:
-  reload: "<gray> - </gray><white>/hslib reload</white>"
+  reload: "<gray> - </gray><white>/rslib reload</white>"
 
 dataNameType:
   black: "<red>You can't use this name</red>"
