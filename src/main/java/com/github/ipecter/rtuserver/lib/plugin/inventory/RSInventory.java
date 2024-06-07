@@ -31,26 +31,26 @@ public abstract class RSInventory extends RSListener implements InventoryHolder 
         this.command = plugin.getConfigurations().getCommand();
     }
 
-    public boolean onClick(Event event, Click click) {
+    public boolean onClick(Event<InventoryClickEvent> event, Click click) {
         return true;
     }
 
-    public boolean onDrag(Event event, Drag drag) {
+    public boolean onDrag(Event<InventoryDragEvent> event, Drag drag) {
         return true;
     }
 
-    public void onClose(Event event) {
+    public void onClose(Event<InventoryCloseEvent> event, Close close) {
     }
 
-    public record Event(InventoryEvent event, Inventory inventory, Player player, boolean isInventory) {
+    public record Event<T extends InventoryEvent>(T event, Inventory inventory, Player player, boolean isInventory) {
     }
 
-    public record Drag(InventoryDragEvent event, Map<Integer, ItemStack> items, ItemStack cursor, ItemStack oldCursor, DragType type) {
+    public record Drag(Map<Integer, ItemStack> items, ItemStack cursor, ItemStack oldCursor, DragType type) {
     }
 
-    public record Click(InventoryClickEvent event, int slot, InventoryType.SlotType slotType, ClickType type) {
+    public record Click(int slot, InventoryType.SlotType slotType, ClickType type) {
     }
 
-    public record Close(InventoryCloseEvent event, InventoryCloseEvent.Reason reason) {
+    public record Close(InventoryCloseEvent.Reason reason) {
     }
 }

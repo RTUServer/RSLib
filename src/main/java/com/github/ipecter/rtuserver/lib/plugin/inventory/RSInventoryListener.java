@@ -24,8 +24,8 @@ public class RSInventoryListener extends RSListener {
         Player player = (Player) e.getWhoClicked();
         if (e.getView().getTopInventory().getHolder() instanceof RSInventory rsInventory) {
             boolean isPlayerInventory = inv != null && !(inv.getHolder() instanceof RSInventory);
-            RSInventory.Event event = new RSInventory.Event(e, inv, player, isPlayerInventory);
-            RSInventory.Click click = new RSInventory.Click(e, e.getSlot(), e.getSlotType(), e.getClick());
+            RSInventory.Event<InventoryClickEvent> event = new RSInventory.Event<>(e, inv, player, isPlayerInventory);
+            RSInventory.Click click = new RSInventory.Click(e.getSlot(), e.getSlotType(), e.getClick());
             try {
                 e.setCancelled(!rsInventory.onClick(event, click));
             } catch (Exception exception) {
@@ -43,8 +43,8 @@ public class RSInventoryListener extends RSListener {
         Player player = (Player) e.getWhoClicked();
         if (e.getView().getTopInventory().getHolder() instanceof RSInventory rsInventory) {
             boolean isPlayerInventory = inv != null && !(inv.getHolder() instanceof RSInventory);
-            RSInventory.Event event = new RSInventory.Event(e, inv, player, isPlayerInventory);
-            RSInventory.Drag click = new RSInventory.Drag(e, e.getNewItems(), e.getCursor(), e.getOldCursor(), e.getType());
+            RSInventory.Event<InventoryDragEvent> event = new RSInventory.Event<>(e, inv, player, isPlayerInventory);
+            RSInventory.Drag click = new RSInventory.Drag(e.getNewItems(), e.getCursor(), e.getOldCursor(), e.getType());
             try {
                 e.setCancelled(!rsInventory.onDrag(event, click));
             } catch (Exception exception) {
@@ -62,9 +62,9 @@ public class RSInventoryListener extends RSListener {
         Player player = (Player) e.getPlayer();
         if (inv.getHolder() instanceof RSInventory rsInventory) {
             boolean isPlayerInventory = !(inv.getHolder() instanceof RSInventory);
-            RSInventory.Event event = new RSInventory.Event(e, inv, player, isPlayerInventory);
-            RSInventory.Close close = new RSInventory.Close(e, e.getReason());
-            rsInventory.onClose(event);
+            RSInventory.Event<InventoryCloseEvent> event = new RSInventory.Event<>(e, inv, player, isPlayerInventory);
+            RSInventory.Close close = new RSInventory.Close(e.getReason());
+            rsInventory.onClose(event, close);
         }
     }
 
