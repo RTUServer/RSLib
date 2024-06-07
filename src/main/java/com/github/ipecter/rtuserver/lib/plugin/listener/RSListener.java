@@ -1,5 +1,6 @@
 package com.github.ipecter.rtuserver.lib.plugin.listener;
 
+import com.github.ipecter.rtuserver.lib.RSLib;
 import com.github.ipecter.rtuserver.lib.plugin.RSPlugin;
 import com.github.ipecter.rtuserver.lib.plugin.config.CommandConfiguration;
 import com.github.ipecter.rtuserver.lib.plugin.config.MessageConfiguration;
@@ -7,6 +8,7 @@ import com.github.ipecter.rtuserver.lib.util.common.ComponentUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
 
@@ -40,6 +42,10 @@ public abstract class RSListener implements Listener {
     }
 
     public void sendMessage(CommandSender sender, Component component) {
+        if (component.hoverEvent() == null) {
+            Component lore = ComponentUtil.formatted(sender, RSLib.getInstance().getModules().getSystemMessageModule().getLore());
+            component = component.hoverEvent(HoverEvent.showText(lore));
+        }
         plugin.getAdventure().sender(sender).sendMessage(component);
     }
 

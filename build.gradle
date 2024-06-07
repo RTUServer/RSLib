@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.github.ipecter.rtuserver'
-version = '2.2.0'
+version = '2.2.3'
 
 ConfigurableFileTree libsImplementation = fileTree(dir: 'libs-implementation', include: ['*.jar'])
 

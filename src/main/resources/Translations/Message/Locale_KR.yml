@@ -9,7 +9,7 @@ common:
   onlyPlayer: "<red>플레이어만 사용 가능한 명령어입니다</red>"
   onlyConsole: "<red>콘솔에서만 사용 가능한 명령어입니다</red>"
   notFound:
-    onlinePLayer: "<red>존재하지 않는 유저이거나 오프라인입니다</red>"
+    onlinePlayer: "<red>존재하지 않는 유저이거나 오프라인입니다</red>"
     offlinePlayer: "<red>존재하지 않는 유저입니다</red>"
 
 wrongUsage:

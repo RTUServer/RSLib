@@ -148,7 +148,7 @@ public abstract class RSCommand extends Command implements Listener {
         }
         if (!command(data)) {
             sendAnnounce(message.getCommon("wrongUsage"));
-            if (hasPermission(plugin.getName() + ".reload"))  sendMessage(String.format("<gray> - </gray> /%s %s", getName(), command.getCommon("reload")));
+            if (hasPermission(plugin.getName() + ".reload"))  sendMessage(String.format("<gray> - </gray>/%s %s", getName(), command.getCommon("reload")));
             wrongUsage(data);
         }
         return true;
