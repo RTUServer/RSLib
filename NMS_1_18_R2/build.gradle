@@ -1,8 +1,0 @@
-plugins {
-    id 'io.papermc.paperweight.userdev' version "1.7.0"
-}
-
-dependencies {
-    implementation project(path: ':NMS')
-    paperweight.paperDevBundle("1.18.2-R0.1-SNAPSHOT")
-}

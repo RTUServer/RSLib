@@ -2,126 +2,90 @@ plugins {
     id 'java'
     id 'io.freefair.lombok' version '8.6'
     id "io.github.goooler.shadow" version "8.1.7"
-    id 'xyz.jpenilla.run-paper' version '2.1.0'
+    id 'xyz.jpenilla.run-paper' version '2.3.0'
+    id 'xyz.jpenilla.run-velocity' version '2.3.0'
 }
 
 group = 'com.github.ipecter.rtuserver'
 version = '2.2.4'
 
-ConfigurableFileTree libsImplementation = fileTree(dir: 'libs-implementation', include: ['*.jar'])
-
 runServer {
-    minecraftVersion("1.20.4")
+    minecraftVersion("1.20.6")
 }
-subprojects {
+runVelocity {
+    velocityVersion("3.3.0-SNAPSHOT")
+}
 
+allprojects {
     apply {
         plugin("java")
+        plugin("io.freefair.lombok")
+        plugin("io.github.goooler.shadow")
     }
-
-    java {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
-        }
-    }
-
     repositories {
         mavenCentral()
         maven {
-            name = "minecraft-libraries"
-            url = "https://libraries.minecraft.net/"
+            name = 'spigotmc-repo'
+            url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
         }
         maven {
-            name = "spigotmc-repo"
-            url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+            name = 'sonatype'
+            url = 'https://oss.sonatype.org/content/groups/public/'
         }
         maven {
-            name = "nms-repo"
-            url = "https://repo.codemc.io/repository/nms-local/"
+            url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
         }
-    }
-
-    dependencies {
-        compileOnly "org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT"
+        maven {
+            url = 'https://mvnrepository.com/artifact/org.projectlombok/lombok'
+        }
+        maven {
+            url = 'https://jitpack.io'
+        }
+        maven {
+            url = 'https://repo.oraxen.com/releases'
+        }
+        maven {
+            url = "https://repo.dmulloy2.net/repository/public/"
+        }
+        maven {
+            url = 'https://papermc.io/repo/repository/maven-public/'
+        }
+        maven {
+            url = 'https://maven.mrnavastar.rocks/releases'
+        }
     }
 }
-repositories {
-    mavenCentral()
-    maven {
-        name = 'spigotmc-repo'
-        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-    }
-    maven {
-        name = 'sonatype'
-        url = 'https://oss.sonatype.org/content/groups/public/'
-    }
-    maven {
-        url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
-    }
-    maven {
-        url = 'https://mvnrepository.com/artifact/org.projectlombok/lombok'
-    }
-    maven {
-        url = 'https://repo.oraxen.com/releases'
-    }
-    maven {
-        url = 'https://jitpack.io'
-    }
-    maven {
-        url = "https://repo.dmulloy2.net/repository/public/"
-    }
-    maven {
-        url = 'https://papermc.io/repo/repository/maven-public/'
+
+subprojects {
+
+    dependencies {
+        compileOnly 'org.quartz-scheduler:quartz:2.5.0-rc1'
+
+        compileOnly "net.kyori:adventure-text-minimessage:4.16.0"
+        compileOnly 'com.google.code.gson:gson:2.10.1'
+        compileOnly 'com.google.guava:guava:33.0.0-jre'
+        compileOnly 'org.apache.commons:commons-lang3:3.14.0'
+        compileOnly 'org.xerial.snappy:snappy-java:1.1.10.5'
+
+        compileOnly 'org.mongodb:mongodb-driver-sync:4.11.1'
+        compileOnly 'mysql:mysql-connector-java:8.0.33'
+        compileOnly 'org.xerial:sqlite-jdbc:3.45.3.0'
+        compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.3.3'
+        compileOnly 'org.postgresql:postgresql:42.7.3'
+        compileOnly 'com.zaxxer:HikariCP:5.1.0'
     }
 }
 
 dependencies {
-    compileOnly 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'
-    compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
-
-    compileOnly 'org.quartz-scheduler:quartz:2.5.0-rc1'
-
-    implementation "io.papermc:paperlib:1.0.7"
-    compileOnly "net.kyori:adventure-platform-bukkit:4.3.2"
-    compileOnly "net.kyori:adventure-text-minimessage:4.16.0"
-    compileOnly 'com.google.code.gson:gson:2.10.1'
-    compileOnly 'com.google.guava:guava:33.0.0-jre'
-    compileOnly 'org.apache.commons:commons-lang3:3.14.0'
-    compileOnly 'org.xerial.snappy:snappy-java:1.1.10.5'
-    implementation 'com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4'
-
-    compileOnly 'org.mongodb:mongodb-driver-sync:4.11.1'
-    compileOnly 'mysql:mysql-connector-java:8.0.33'
-    compileOnly 'org.xerial:sqlite-jdbc:3.45.3.0'
-    compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.3.3'
-    compileOnly 'org.postgresql:postgresql:42.7.3'
-    compileOnly 'com.zaxxer:HikariCP:5.1.0'
-
-    compileOnly 'me.clip:placeholderapi:2.11.2'
-    compileOnly 'io.th0rgal:oraxen:1.168.0'
-    compileOnly 'com.github.LoneDev6:API-ItemsAdder:3.6.2-beta-r3-b'
-
-    compileOnly "com.github.MilkBowl:VaultAPI:1.7.1"
-    compileOnly 'com.comphenix.protocol:ProtocolLib:5.1.0'
-    compileOnly 'net.luckperms:api:5.4'
+    implementation project(":Common:MiniMessage")
+    implementation project(":Common:ProtoWeaver")
+    implementation project(":Platform:Bukkit")
+    implementation project(":Platform:Bungee")
+    implementation project(":Platform:Velocity")
 
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
-
-    implementation project(path: ':NMS')
-    implementation project(path: ':NMS_1_17_R1', configuration: 'reobf')
-    implementation project(path: ':NMS_1_18_R1', configuration: 'reobf')
-    implementation project(path: ':NMS_1_18_R2', configuration: 'reobf')
-    implementation project(path: ':NMS_1_19_R1', configuration: 'reobf')
-    implementation project(path: ':NMS_1_19_R2', configuration: 'reobf')
-    implementation project(path: ':NMS_1_19_R3', configuration: 'reobf')
-    implementation project(path: ':NMS_1_20_R1', configuration: 'reobf')
-    implementation project(path: ':NMS_1_20_R2', configuration: 'reobf')
-    implementation project(path: ':NMS_1_20_R3', configuration: 'reobf')
-    implementation project(path: ':NMS_1_20_R4', configuration: 'reobf')
-    implementation libsImplementation
 }
-
 tasks {
     runServer {
         dependsOn(shadowJar)
@@ -131,35 +95,10 @@ tasks {
     }
     shadowJar {
         setArchiveClassifier("")
-        relocate("io.papermc.lib", "com.github.ipecter.rtuserver.lib.paperlib")
         doLast {
             copy {
                 from archiveFile.get().asFile into file("$projectDir/builds")
             }
         }
-    }
-}
-
-def targetJavaVersion = 17
-
-java {
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.release = targetJavaVersion
-}
-
-processResources {
-    def props = [version: version]
-    inputs.properties props
-    filteringCharset 'UTF-8'
-    filesMatching('plugin.yml') {
-        expand props
     }
 }
