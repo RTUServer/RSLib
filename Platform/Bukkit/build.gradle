@@ -1,8 +1,15 @@
+plugins {
+    id 'xyz.jpenilla.run-paper' version '2.3.0'
+}
+
+runServer {
+    dependsOn(shadowJar)
+    minecraftVersion("1.20.6")
+}
+
 subprojects {
     dependencies {
         compileOnly project(":Common:ProtoWeaver")
-        compileOnly 'me.mrnavastar.protoweaver:common:1.0.7'
-        compileOnly 'me.mrnavastar.protoweaver:client:1.0.7'
         compileOnly "io.papermc:paperlib:1.0.7"
         compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
     }
@@ -29,7 +36,6 @@ dependencies {
     compileOnly 'net.luckperms:api:5.4'
 
     implementation 'com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4'
-    implementation 'me.mrnavastar.protoweaver:common:1.0.7'
 
     implementation project(path: 'NMS:NMS')
     implementation project(path: 'NMS:1_17_R1', configuration: 'reobf')

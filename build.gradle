@@ -1,26 +1,17 @@
 plugins {
     id 'java'
     id 'io.freefair.lombok' version '8.6'
-    id "io.github.goooler.shadow" version "8.1.7"
-    id 'xyz.jpenilla.run-paper' version '2.3.0'
-    id 'xyz.jpenilla.run-velocity' version '2.3.0'
+    id "com.gradleup.shadow" version "8.3.0"
 }
 
 group = 'com.github.ipecter.rtuserver'
-version = '2.2.4'
-
-runServer {
-    minecraftVersion("1.20.6")
-}
-runVelocity {
-    velocityVersion("3.3.0-SNAPSHOT")
-}
+version = '3.0.0-pre1'
 
 allprojects {
     apply {
         plugin("java")
         plugin("io.freefair.lombok")
-        plugin("io.github.goooler.shadow")
+        plugin("com.gradleup.shadow")
     }
     repositories {
         mavenCentral()
@@ -54,9 +45,6 @@ allprojects {
             url = 'https://maven.mrnavastar.rocks/releases'
         }
     }
-}
-
-subprojects {
 
     dependencies {
         compileOnly 'org.quartz-scheduler:quartz:2.5.0-rc1'
@@ -87,9 +75,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
 }
 tasks {
-    runServer {
-        dependsOn(shadowJar)
-    }
     build {
         dependsOn(shadowJar)
     }

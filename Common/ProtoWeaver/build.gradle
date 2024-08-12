@@ -1,18 +1,9 @@
 dependencies {
-    implementation 'me.mrnavastar.protoweaver:common:1.0.7'
-    implementation 'me.mrnavastar.protoweaver:client:1.0.7'
-
+    compileOnly "io.netty:netty-all:4.1.111.Final" // 4.1.97.Final = 1.20.6
     implementation 'com.esotericsoftware:kryo5:5.6.0'
-    implementation 'io.netty:netty-codec-http:4.1.100.Final'
-    implementation 'io.netty:netty-codec-http2:4.1.100.final'
     implementation 'org.bouncycastle:bcpkix-jdk18on:1.78.1'
 }
 
-processResources {
-    def props = [version: version]
-    inputs.properties props
-    filteringCharset 'UTF-8'
-    filesMatching('velocity-plugin.json') {
-        expand props
-    }
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
 }

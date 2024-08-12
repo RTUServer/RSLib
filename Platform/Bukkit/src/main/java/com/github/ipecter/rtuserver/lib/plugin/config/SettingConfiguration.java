@@ -32,10 +32,10 @@ public class SettingConfiguration extends RSConfiguration {
                 플러그인의 기능을 활성화할지 설정합니다
                 비활성화할시 이벤트 리스너와 스케듈러가 비활성화됩니다""");
         motd = getBoolean("motd", motd, """
-                Control Whether Send Motd to All User
-                If disabled, Send Motd to only ops
-                Motd를 모든 유저에게 보낼지 조정합니다
-                비활성화할시 Motd를 OP에게만 보냅니다""");
+                Control Whether Send Motd to OP
+                If disabled, Not send
+                Motd를 OP에게 보낼지 조정합니다
+                비활성화할시 Motd를 보내지 않습니다""");
         locale = getString("locale", locale, """
                 Message Locale, You can make new Locale File, Locale_KR.yml = KR
                 Internal Locale: KR, EN (Locale file is automatically created when the configuration is loaded)

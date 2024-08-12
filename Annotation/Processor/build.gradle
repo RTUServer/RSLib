@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.github.ipecter.rtuserver'
+version = '3.0.0-pre1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
+    compileOnly 'com.google.auto.service:auto-service:1.1.1'
+    compileOnly project(':Annotation:Annotation')
+    compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
+    //annotationProcessor project(':Platform:Bukkit:AnnotationProcessor')
+}
+
+test {
+    useJUnitPlatform()
+}

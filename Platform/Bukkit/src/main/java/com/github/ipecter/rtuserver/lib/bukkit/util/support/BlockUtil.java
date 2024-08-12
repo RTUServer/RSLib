@@ -10,6 +10,10 @@ import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
+
 public class BlockUtil {
 
     @Nullable
@@ -29,9 +33,12 @@ public class BlockUtil {
                 } else return null;
             }
             default -> {
-                String id = split.length > 1 ? split[1] : split[0];
-                Material material = Material.getMaterial(id);
-                return material != null ? material.createBlockData() : null;
+                return Arrays.stream(split)
+                        .skip(split.length - 1)
+                        .findFirst()
+                        .map(Material::getMaterial)
+                        .map(Material::createBlockData)
+                        .orElse(null);
             }
         }
     }

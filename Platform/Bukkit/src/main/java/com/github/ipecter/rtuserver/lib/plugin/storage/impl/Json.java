@@ -169,7 +169,19 @@ public class Json implements Storage {
                 if (find != null) {
                     JsonElement get = object.get(find.getKey());
                     if (get == null || get.isJsonNull()) continue;
-                    if (!gson.fromJson(get, Object.class).equals(find.getValue())) continue;
+                    Object findObj = find.getValue();
+                    if (findObj instanceof JsonElement element) {
+                        if (!get.equals(element)) continue;
+                    } else if (findObj instanceof Number number) {
+                        if (!get.getAsJsonPrimitive().equals(new JsonPrimitive(number))) continue;
+                    } else if (findObj instanceof Boolean bool) {
+                        if (!get.getAsJsonPrimitive().equals(new JsonPrimitive(bool))) continue;
+                    } else if (findObj instanceof String str) {
+                        if (!get.getAsJsonPrimitive().equals(new JsonPrimitive(str))) continue;
+                    } else {
+                        //plugin.console(ComponentUtil.miniMessage("<red>Unsupported type of data tried to be saved! Only supports JsonElement, Number, Boolean, and String</red>"));
+                        //plugin.console(ComponentUtil.miniMessage("<red>지원하지 않는 타입의 데이터가 저장되려고 했습니다! JsonElement, Number, Boolean, String만 지원합니다</red>"));
+                    }
                 }
                 result.put(i, object);
             }

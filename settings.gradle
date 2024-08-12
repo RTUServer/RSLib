@@ -3,6 +3,8 @@ rootProject.name = 'RSLib'
 include 'Common:MiniMessage',
         'Common:ProtoWeaver'
 
+include 'Dependency'
+
 include 'Platform:Bukkit',
         'Platform:Velocity',
         'Platform:Bungee'
@@ -19,3 +21,8 @@ include 'Platform:Bukkit:NMS:NMS',
         'Platform:Bukkit:NMS:1_20_R3',
         'Platform:Bukkit:NMS:1_20_R4',
         'Platform:Bukkit:NMS:1_21_R1'
+include 'Dependency'
+include 'Annotation:Processor'
+include 'Annotation:Annotation'
+findProject(':Platform:Bukkit:AnnotationProcessor')?.name = 'AnnotationProcessor'
+

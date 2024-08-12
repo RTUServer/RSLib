@@ -1,0 +1,8 @@
+plugins {
+    id 'io.papermc.paperweight.userdev' version "1.7.1"
+}
+
+dependencies {
+    compileOnly project(':Platform:Bukkit:NMS:NMS')
+    paperweight.paperDevBundle("1.19.2-R0.1-SNAPSHOT")
+}

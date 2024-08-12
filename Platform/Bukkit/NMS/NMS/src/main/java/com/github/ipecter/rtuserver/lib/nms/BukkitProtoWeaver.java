@@ -1,7 +1,7 @@
 package com.github.ipecter.rtuserver.lib.nms;
 
-public interface BukkitProtoWeaver {
+import me.mrnavastar.protoweaver.core.util.ProtoLogger;
 
-
+public interface BukkitProtoWeaver extends ProtoLogger.IProtoLogger {
 
 }

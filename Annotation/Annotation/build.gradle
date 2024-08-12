@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.github.ipecter.rtuserver'
+version = '3.0.0-pre1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+}
+
+test {
+    useJUnitPlatform()
+}

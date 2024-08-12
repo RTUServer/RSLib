@@ -30,6 +30,7 @@ public class ProtoProxy {
 
     @ApiStatus.Internal
     public ProtoProxy(ServerSupplier serverSupplier, Path dir) {
+        System.out.println("A1");
         this.hostsFile = dir.toAbsolutePath().toString();
         serverSupplier.getServers().forEach(server -> servers.put(server, new ArrayList<>()));
         ProtoWeaver.PROTOCOL_LOADED.register(this::startProtocol);
@@ -58,6 +59,7 @@ public class ProtoProxy {
             connectClient(protocol, address, clients);
         }).onConnectionEstablished(connection -> ProtoLogger.info("Connected to: " + address + " with protocol: " + protocol));
         clients.add(client);
+        System.out.println("Connected to: " + address + " with protocol: " + protocol);
     }
 
     @ApiStatus.Internal
@@ -70,7 +72,13 @@ public class ProtoProxy {
      * Sends a packet to every server running protoweaver with the correct protocol.
      */
     public static void sendAll(@NonNull Object packet) {
-        servers.values().forEach(clients -> clients.forEach(client -> client.send(packet)));
+        servers.values().forEach(clients -> {
+            System.out.println("Sending packet1: " + clients.toString());
+            clients.forEach(client -> {
+                System.out.println("Sending packet2: " + client.toString());
+                client.send(packet);
+            });
+        });
     }
 
     /**
@@ -79,6 +87,7 @@ public class ProtoProxy {
      */
     public static boolean send(@NonNull InetSocketAddress address, @NonNull Object packet) {
         for (ProtoClient client : servers.get(address)) {
+            System.out.println(client.getAddress());
             Sender s = client.send(packet);
             if (s.isSuccess()) return true;
         }
