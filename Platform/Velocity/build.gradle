@@ -8,9 +8,11 @@ runVelocity {
 }
 
 dependencies {
-    compileOnly project(":Common:ProtoWeaver")
-
+    implementation project(":Library:MiniMessage")
+    implementation project(":Library:ProtoWeaver:Common")
+    implementation project(":Library:ProtoWeaver:Velocity")
     implementation 'com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4'
+
     compileOnly("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
     annotationProcessor("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
 }

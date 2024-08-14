@@ -45,7 +45,7 @@ public class VersionUtil {
     }
 
     public static boolean isPaper() {
-        return hasClass("com.destroystokyo.paper.PaperConfig") || hasClass("com.github.ipecter.rtuserver.lib.plugin.configuration.Configuration");
+        return hasClass("com.destroystokyo.paper.PaperConfig");
     }
 
     private static boolean hasClass(String className) {

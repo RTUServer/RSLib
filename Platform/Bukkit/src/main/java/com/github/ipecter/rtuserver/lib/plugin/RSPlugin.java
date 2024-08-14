@@ -10,6 +10,9 @@ import com.github.ipecter.rtuserver.lib.bukkit.util.common.VersionUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
+import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
+import me.mrnavastar.protoweaver.impl.bukkit.BukkitProtoWeaver;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -108,13 +111,24 @@ public abstract class RSPlugin extends JavaPlugin {
         Bukkit.getPluginManager().addPermission(new Permission(name, permissionDefault));
     }
 
-    public void load() {
+    protected void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
+        RSLib.getInstance().getProtoWeaver().registerProtocol(namespace, key, packetType, protocolHandler, null);
     }
 
-    public void enable() {
+    protected void load() {
     }
 
-    public void disable() {
+    protected void enable() {
+    }
+
+    protected void disable() {
+    }
+
+    /***
+     * Listener of Proxy Packet using Internal ProtoWeaver
+     * 내장 ProtoWeaver를 사용한 프록시 패킷 리스너
+     */
+    protected void onPacket(ProtoConnection connection, Object object) {
     }
 
 }

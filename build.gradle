@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'io.freefair.lombok' version '8.6'
     id "com.gradleup.shadow" version "8.3.0"
+    id 'io.papermc.paperweight.userdev' version "1.7.2"
 }
 
 group = 'com.github.ipecter.rtuserver'
@@ -65,14 +66,13 @@ allprojects {
 }
 
 dependencies {
-    implementation project(":Common:MiniMessage")
-    implementation project(":Common:ProtoWeaver")
-    implementation project(":Platform:Bukkit")
-    implementation project(":Platform:Bungee")
-    implementation project(":Platform:Velocity")
+    implementation project(":Library")
+    implementation project(":Platform")
 
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
+
+    paperweight.paperDevBundle("1.17.1-R0.1-SNAPSHOT")
 }
 tasks {
     build {

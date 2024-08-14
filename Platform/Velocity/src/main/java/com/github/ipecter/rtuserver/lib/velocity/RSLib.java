@@ -2,29 +2,25 @@ package com.github.ipecter.rtuserver.lib.velocity;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
-import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
-import me.mrnavastar.protoweaver.core.util.ProtoLogger;
-import me.mrnavastar.protoweaver.proxy.ServerSupplier;
-import me.mrnavastar.protoweaver.proxy.api.ProtoProxy;
+import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
+import me.mrnavastar.protoweaver.impl.PacketCallback;
+import me.mrnavastar.protoweaver.impl.velocity.VelocityProtoWeaver;
 import org.slf4j.Logger;
 
-import java.net.SocketAddress;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Collectors;
 
-public class RSLib implements ServerSupplier, ProtoLogger.IProtoLogger {
+public class RSLib {
 
     private final ProxyServer server;
     private final Logger logger;
     private final Path dir;
 
-    private ProtoProxy protoProxy;
+    private VelocityProtoWeaver protoWeaver;
+
+    private final PacketCallback callable = new PacketCallback(this::onPacket);
 
     @Inject
     public RSLib(ProxyServer server, Logger logger, @DataDirectory Path dir) {
@@ -32,52 +28,18 @@ public class RSLib implements ServerSupplier, ProtoLogger.IProtoLogger {
         this.logger = logger;
         this.dir = dir;
         logger.info("RSLib Velocity loaded.");
-        ProtoLogger.setLogger(this);
-    }
 
-    private ProtoConnectionHandler handler;
-
-    @Subscribe
-    public void onProxyInitialize(ProxyInitializeEvent event) {
-        protoProxy = new ProtoProxy(this, dir);
-        getServers().forEach(socketAddress -> System.out.println("??: " + socketAddress));
-        handler = new Tesr();
+        protoWeaver = new VelocityProtoWeaver(callable, server, dir.toAbsolutePath().getParent().getParent());
     }
 
     @Subscribe
-    public void onServer(ServerPreConnectEvent event) {
-        System.out.println("Server Connection");
-        ProtoProxy.sendAll("hi!!!");
+    public void onInitialize(ProxyInitializeEvent event) {
+        server.getEventManager().register(this, protoWeaver);
+        protoWeaver.onProxyInitialize();
     }
 
 
-    @Subscribe
-    public void onProxyShutdown(ProxyShutdownEvent event) {
-        protoProxy.shutdown();
-        protoProxy = null;
+    private void onPacket(ProtoConnection connection, Object object) {
+        System.out.println("onPacket: " + connection.getRemoteAddress() + " / " + object);
     }
-
-
-    @Override
-    public List<SocketAddress> getServers() {
-        return server.getAllServers().stream()
-                .map(server -> server.getServerInfo().getAddress())
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void info(String message) {
-        logger.info(message);
-    }
-
-    @Override
-    public void warn(String message) {
-        logger.warn(message);
-    }
-
-    @Override
-    public void error(String message) {
-        logger.error(message);
-    }
-
 }

@@ -1,0 +1,11 @@
+{
+  "id": "rslib",
+  "name": "RSLib",
+  "version": "${version}",
+  "description": "RSLib - Library Plugin for RSPlugins",
+  "authors": [
+    "IPECTER"
+  ],
+  "dependencies": [],
+  "main": "com.github.ipecter.rtuserver.lib.velocity.RSLib"
+}

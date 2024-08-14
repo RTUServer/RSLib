@@ -1,0 +1,15 @@
+plugins {
+    id 'xyz.jpenilla.run-velocity' version '2.3.0'
+}
+
+runVelocity {
+    dependsOn(shadowJar)
+    velocityVersion("3.3.0-SNAPSHOT")
+}
+
+dependencies {
+    compileOnly project(":Library:ProtoWeaver:Common")
+    compileOnly("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
+
+    implementation 'com.moandjiezana.toml:toml4j:0.7.2'
+}
