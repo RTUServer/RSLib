@@ -128,7 +128,7 @@ public class ProtoDeterminer extends ByteToMessageDecoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        ProtoLogger.warn("Client rejected ssl certificate. Closing connection");
+        ProtoLogger.warn("Client rejected ssl certificate. Closing connection: " + cause.toString());
         ctx.close();
     }
 }
