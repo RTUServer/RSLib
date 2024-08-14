@@ -92,6 +92,7 @@ public class RSLib extends RSPlugin {
                 this.getServer().getPluginManager().disablePlugin(this);
             }
         }
+        protoWeaver = new BukkitProtoWeaver(callable, getDataFolder().getPath(), nmsVersion);
     }
 
     @Override

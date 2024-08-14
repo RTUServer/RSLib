@@ -18,6 +18,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public class ProtoWeaver_1_21_R1 implements IProtoWeaver {
 
     public ProtoWeaver_1_21_R1(String folder) {
+        info("hi");
         ProtoWeaver.PROTOCOL_LOADED.register(protocol -> {
             info("SSL 등록중.. " + protocol.getName());
             ProtoLogger.setLogger(this);
