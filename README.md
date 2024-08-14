@@ -3,8 +3,8 @@
 2. `./gradlew build`
 ## How to Run Server and Proxy?
 1. `./gradlew reobfJar`
-2. `./gradlew runServer -p ./Platform/Bukkit`
-3. `./gradlew runProxy -p ./Platform/Velocity`
+2. `./gradlew runVelocity -p ./Platform/Velocity`
+3. `./gradlew runServer -p ./Platform/Bukkit`
 4. Don't forget. You should setup config of Bukkit:`config/paper-global.yml` and Velocity:`velocity.toml`
 ## JDK Version
 - for 1.17.1 ~ 1.20.4, Java 17

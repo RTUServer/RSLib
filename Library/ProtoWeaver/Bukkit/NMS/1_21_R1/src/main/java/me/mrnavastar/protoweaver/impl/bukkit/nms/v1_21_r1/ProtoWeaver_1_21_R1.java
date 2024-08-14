@@ -18,7 +18,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public class ProtoWeaver_1_21_R1 implements IProtoWeaver {
 
     public ProtoWeaver_1_21_R1(String folder) {
-        //ProtoWeaver.PROTOCOL_LOADED.register(protocol -> {
+        ProtoWeaver.PROTOCOL_LOADED.register(protocol -> {
+            info("SSL 등록중.. " + protocol.getName());
             ProtoLogger.setLogger(this);
             SSLContext.initKeystore(folder);
             SSLContext.genKeys();
@@ -29,7 +30,7 @@ public class ProtoWeaver_1_21_R1 implements IProtoWeaver {
                 ChannelInitializeListenerHolder.addListener(Key.key("protoweaver", "internal"), new Paper());
                 VelocityAuth.setSecret(GlobalConfiguration.get().proxies.velocity.secret);
             }
-       // });
+       });
     }
 
     static class Paper implements ChannelInitializeListener {
