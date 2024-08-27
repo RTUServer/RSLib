@@ -1,7 +1,6 @@
 package me.mrnavastar.protoweaver.core.protocol.protoweaver;
 
 import lombok.Getter;
-import me.mrnavastar.protoweaver.api.ProtoWeaver;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
 import me.mrnavastar.protoweaver.api.netty.Sender;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;

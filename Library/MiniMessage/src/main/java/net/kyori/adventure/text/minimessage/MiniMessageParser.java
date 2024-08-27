@@ -60,7 +60,8 @@ final class MiniMessageParser {
         this.tagResolver = tagResolver;
     }
 
-    @NotNull String escapeTokens(final @NotNull ContextImpl context) {
+    @NotNull
+    String escapeTokens(final @NotNull ContextImpl context) {
         final StringBuilder sb = new StringBuilder(context.message().length());
         this.escapeTokens(sb, context);
         return sb.toString();
@@ -87,7 +88,8 @@ final class MiniMessageParser {
         });
     }
 
-    @NotNull String stripTokens(final @NotNull ContextImpl context) {
+    @NotNull
+    String stripTokens(final @NotNull ContextImpl context) {
         final StringBuilder sb = new StringBuilder(context.message().length());
         this.processTokens(sb, context, (token, builder) -> {
         });
@@ -127,7 +129,8 @@ final class MiniMessageParser {
         }
     }
 
-    @NotNull RootNode parseToTree(final @NotNull ContextImpl context) {
+    @NotNull
+    RootNode parseToTree(final @NotNull ContextImpl context) {
         final TagResolver combinedResolver = TagResolver.resolver(this.tagResolver, context.extraTags());
         final String processedMessage = context.preProcessor().apply(context.message());
         final Consumer<String> debug = context.debugOutput();
@@ -206,12 +209,14 @@ final class MiniMessageParser {
         return root;
     }
 
-    @NotNull Component parseFormat(final @NotNull ContextImpl context) {
+    @NotNull
+    Component parseFormat(final @NotNull ContextImpl context) {
         final ElementNode root = this.parseToTree(context);
         return Objects.requireNonNull(context.postProcessor().apply(this.treeToComponent(root, context)), "Post-processor must not return null");
     }
 
-    @NotNull Component treeToComponent(final @NotNull ElementNode node, final @NotNull ContextImpl context) {
+    @NotNull
+    Component treeToComponent(final @NotNull ElementNode node, final @NotNull ContextImpl context) {
         Component comp = Component.empty();
         Tag tag = null;
         if (node instanceof ValueNode) {

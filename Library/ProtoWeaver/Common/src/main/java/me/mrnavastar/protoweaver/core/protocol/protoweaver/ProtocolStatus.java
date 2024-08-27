@@ -9,6 +9,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProtocolStatus {
 
+    private String currentProtocol;
+    private String nextProtocol;
+    private int nextProtocolHash;
+    private Status status;
     public enum Status {
         MISSING,
         MISMATCH,
@@ -16,9 +20,4 @@ public class ProtocolStatus {
         START,
         UPGRADE
     }
-
-    private String currentProtocol;
-    private String nextProtocol;
-    private int nextProtocolHash;
-    private Status status;
 }

@@ -5,7 +5,6 @@ import io.netty.channel.Channel;
 import io.papermc.paper.network.ChannelInitializeListener;
 import io.papermc.paper.network.ChannelInitializeListenerHolder;
 import lombok.extern.slf4j.Slf4j;
-import me.mrnavastar.protoweaver.api.ProtoWeaver;
 import me.mrnavastar.protoweaver.api.protocol.velocity.VelocityAuth;
 import me.mrnavastar.protoweaver.core.util.ProtoLogger;
 import me.mrnavastar.protoweaver.impl.bukkit.nms.IProtoWeaver;
@@ -14,28 +13,18 @@ import me.mrnavastar.protoweaver.loader.netty.SSLContext;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@Slf4j(topic = "ProtoWeaver")
+@Slf4j(topic = "RSLib/ProtoWeaver")
 public class ProtoWeaver_1_17_R1 implements IProtoWeaver {
 
     public ProtoWeaver_1_17_R1(String folder) {
-        ProtoWeaver.PROTOCOL_LOADED.register(protocol -> {
-            ProtoLogger.setLogger(this);
-            SSLContext.initKeystore(folder);
-            SSLContext.genKeys();
-            SSLContext.initContext();
-            if (isModernProxy()) {
-                info("Detected modern proxy.");
-                info("모던 프록시가 감지되었습니다.");
-                ChannelInitializeListenerHolder.addListener(Key.key("protoweaver", "internal"), new Paper());
-                VelocityAuth.setSecret(new String(PaperConfig.velocitySecretKey));
-            }
-        });
-    }
-
-    static class Paper implements ChannelInitializeListener {
-        @Override
-        public void afterInitChannel(@NonNull Channel channel) {
-            ProtoDeterminer.registerToPipeline(channel);
+        ProtoLogger.setLogger(this);
+        SSLContext.initKeystore(folder);
+        SSLContext.genKeys();
+        SSLContext.initContext();
+        if (isModernProxy()) {
+            info("Detected modern proxy.");
+            ChannelInitializeListenerHolder.addListener(Key.key("protoweaver", "internal"), new Paper());
+            VelocityAuth.setSecret(new String(PaperConfig.velocitySecretKey));
         }
     }
 
@@ -62,5 +51,12 @@ public class ProtoWeaver_1_17_R1 implements IProtoWeaver {
     @Override
     public void error(String message) {
         log.error(message);
+    }
+
+    static class Paper implements ChannelInitializeListener {
+        @Override
+        public void afterInitChannel(@NonNull Channel channel) {
+            ProtoDeterminer.registerToPipeline(channel);
+        }
     }
 }

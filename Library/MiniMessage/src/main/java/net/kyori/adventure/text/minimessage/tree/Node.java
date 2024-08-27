@@ -45,7 +45,8 @@ public interface Node {
      * @since 4.10.0
      */
     @Override
-    @NotNull String toString();
+    @NotNull
+    String toString();
 
     /**
      * Get children of this node.
@@ -55,7 +56,8 @@ public interface Node {
      * @return a list of children
      * @since 4.10.0
      */
-    @NotNull List<? extends Node> children();
+    @NotNull
+    List<? extends Node> children();
 
     /**
      * Get the parent of this node.
@@ -65,7 +67,8 @@ public interface Node {
      * @return this node's parent
      * @since 4.10.0
      */
-    @Nullable Node parent();
+    @Nullable
+    Node parent();
 
     /**
      * The root node of a parse.
@@ -80,6 +83,7 @@ public interface Node {
          * @return the input message
          * @since 4.10.0
          */
-        @NotNull String input();
+        @NotNull
+        String input();
     }
 }

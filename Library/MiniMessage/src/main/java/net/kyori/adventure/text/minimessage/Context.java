@@ -48,7 +48,8 @@ public interface Context {
      * @return the target, if provided
      * @since 4.17.0
      */
-    @Nullable Pointered target();
+    @Nullable
+    Pointered target();
 
     /**
      * The target of the parse context.
@@ -59,7 +60,8 @@ public interface Context {
      * @return the target, if provided
      * @since 4.17.0
      */
-    @NotNull Pointered targetOrThrow();
+    @NotNull
+    Pointered targetOrThrow();
 
     /**
      * The target of the parse context, casted to a provided type.
@@ -82,7 +84,8 @@ public interface Context {
      * @return the parsed message
      * @since 4.10.0
      */
-    @NotNull Component deserialize(final @NotNull String message);
+    @NotNull
+    Component deserialize(final @NotNull String message);
 
     /**
      * Deserializes a MiniMessage string using all the settings of this context.
@@ -92,7 +95,8 @@ public interface Context {
      * @return the parsed message
      * @since 4.10.0
      */
-    @NotNull Component deserialize(final @NotNull String message, final @NotNull TagResolver resolver);
+    @NotNull
+    Component deserialize(final @NotNull String message, final @NotNull TagResolver resolver);
 
     /**
      * Deserializes a MiniMessage string using all the settings of this context.
@@ -102,7 +106,8 @@ public interface Context {
      * @return the parsed message
      * @since 4.10.0
      */
-    @NotNull Component deserialize(final @NotNull String message, final @NotNull TagResolver @NotNull ... resolvers);
+    @NotNull
+    Component deserialize(final @NotNull String message, final @NotNull TagResolver @NotNull ... resolvers);
 
     /**
      * Create a new parsing exception.
@@ -112,7 +117,8 @@ public interface Context {
      * @return the new parsing exception
      * @since 4.10.0
      */
-    @NotNull ParsingException newException(
+    @NotNull
+    ParsingException newException(
             final @NotNull String message,
             final @NotNull ArgumentQueue tags
     );
@@ -124,7 +130,8 @@ public interface Context {
      * @return the new parsing exception
      * @since 4.10.0
      */
-    @NotNull ParsingException newException(final @NotNull String message);
+    @NotNull
+    ParsingException newException(final @NotNull String message);
 
     /**
      * Create a new parsing exception.
@@ -135,7 +142,8 @@ public interface Context {
      * @return the new parsing exception
      * @since 4.10.0
      */
-    @NotNull ParsingException newException(
+    @NotNull
+    ParsingException newException(
             final @NotNull String message,
             final @Nullable Throwable cause,
             final @NotNull ArgumentQueue args

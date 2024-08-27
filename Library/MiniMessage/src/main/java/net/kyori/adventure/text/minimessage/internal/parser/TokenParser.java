@@ -682,7 +682,8 @@ public final class TokenParser {
          * @return a tag
          * @since 4.10.0
          */
-        @Nullable Tag resolve(final @NotNull String name, final @NotNull List<? extends Tag.Argument> trimmedArgs, final @Nullable Token token);
+        @Nullable
+        Tag resolve(final @NotNull String name, final @NotNull List<? extends Tag.Argument> trimmedArgs, final @Nullable Token token);
 
         /**
          * Resolve by sanitized name.

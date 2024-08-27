@@ -1,11 +1,11 @@
 package me.mrnavastar.protoweaver.api.protocol.velocity;
 
-import me.mrnavastar.protoweaver.api.auth.ClientAuthHandler;
-import me.mrnavastar.protoweaver.api.auth.ServerAuthHandler;
-import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
+import me.mrnavastar.protoweaver.api.auth.ClientAuthHandler;
+import me.mrnavastar.protoweaver.api.auth.ServerAuthHandler;
+import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
 
 import java.io.BufferedReader;
 import java.io.File;

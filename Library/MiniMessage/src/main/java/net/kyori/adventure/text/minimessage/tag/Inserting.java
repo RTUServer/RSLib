@@ -38,7 +38,8 @@ public /* non-sealed */ interface Inserting extends Tag {
      * @return the component this tag produces
      * @since 4.10.0
      */
-    @NotNull Component value();
+    @NotNull
+    Component value();
 
     /**
      * Get whether this tag allows children.

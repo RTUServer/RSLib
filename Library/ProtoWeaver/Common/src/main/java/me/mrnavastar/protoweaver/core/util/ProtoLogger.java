@@ -1,15 +1,7 @@
 package me.mrnavastar.protoweaver.core.util;
 
 
-import lombok.Setter;
-
 public class ProtoLogger {
-
-    public interface IProtoLogger {
-        void info(String message);
-        void warn(String message);
-        void error(String message);
-    }
 
     private static IProtoLogger logger;
 
@@ -31,5 +23,13 @@ public class ProtoLogger {
     public static void error(String message) {
         if (logger != null) logger.error(message);
         else System.out.println("ERR: " + message);
+    }
+
+    public interface IProtoLogger {
+        void info(String message);
+
+        void warn(String message);
+
+        void error(String message);
     }
 }

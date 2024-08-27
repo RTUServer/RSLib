@@ -219,7 +219,8 @@ public interface TagResolver {
      * @throws ParsingException if the provided arguments are invalid
      * @since 4.10.0
      */
-    @Nullable Tag resolve(@TagPattern final @NotNull String name, final @NotNull ArgumentQueue arguments, final @NotNull Context ctx) throws ParsingException;
+    @Nullable
+    Tag resolve(@TagPattern final @NotNull String name, final @NotNull ArgumentQueue arguments, final @NotNull Context ctx) throws ParsingException;
 
     /**
      * Get whether this resolver handles tags with a certain name.
@@ -248,7 +249,8 @@ public interface TagResolver {
          * @return the key
          * @since 4.10.0
          */
-        @NotNull String key();
+        @NotNull
+        String key();
 
         /**
          * The tag returned by this resolver when the key is matching.
@@ -256,7 +258,8 @@ public interface TagResolver {
          * @return the tag
          * @since 4.10.0
          */
-        @NotNull Tag tag();
+        @NotNull
+        Tag tag();
 
         @Override
         default @Nullable Tag resolve(@TagPattern final @NotNull String name) {
@@ -286,7 +289,8 @@ public interface TagResolver {
          * @return a tag, if any is known.
          * @since 4.10.0
          */
-        @Nullable Tag resolve(@TagPattern final @NotNull String name);
+        @Nullable
+        Tag resolve(@TagPattern final @NotNull String name);
 
         /**
          * Check if this resolver knows of a tag.
@@ -326,7 +330,8 @@ public interface TagResolver {
          * @return this builder
          * @since 4.10.0
          */
-        @NotNull Builder tag(@TagPattern final @NotNull String name, final @NotNull Tag tag);
+        @NotNull
+        Builder tag(@TagPattern final @NotNull String name, final @NotNull Tag tag);
 
         /**
          * Add a single dynamically created tag to this resolver.
@@ -359,7 +364,8 @@ public interface TagResolver {
          * @return this builder
          * @since 4.10.0
          */
-        @NotNull Builder resolver(final @NotNull TagResolver resolver);
+        @NotNull
+        Builder resolver(final @NotNull TagResolver resolver);
 
         /**
          * Add placeholder resolvers to those queried by the result of this builder.
@@ -368,7 +374,8 @@ public interface TagResolver {
          * @return this builder
          * @since 4.10.0
          */
-        @NotNull Builder resolvers(final @NotNull TagResolver @NotNull ... resolvers);
+        @NotNull
+        Builder resolvers(final @NotNull TagResolver @NotNull ... resolvers);
 
         /**
          * Add placeholder resolvers to those queried by the result of this builder.
@@ -377,7 +384,8 @@ public interface TagResolver {
          * @return this builder
          * @since 4.10.0
          */
-        @NotNull Builder resolvers(final @NotNull Iterable<? extends TagResolver> resolvers);
+        @NotNull
+        Builder resolvers(final @NotNull Iterable<? extends TagResolver> resolvers);
 
         /**
          * Add a resolver that dynamically queries and caches based on the provided function.
@@ -398,6 +406,7 @@ public interface TagResolver {
          * @return the resolver
          * @since 4.10.0
          */
-        @NotNull TagResolver build();
+        @NotNull
+        TagResolver build();
     }
 }

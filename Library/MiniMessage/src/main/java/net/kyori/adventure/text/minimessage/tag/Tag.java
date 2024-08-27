@@ -152,7 +152,8 @@ public /* sealed */ interface Tag /* permits Inserting, Modifying, ParserDirecti
          * @return the value
          * @since 4.10.0
          */
-        @NotNull String value();
+        @NotNull
+        String value();
 
         /**
          * Returns the value of this argument, lower-cased in the root locale.

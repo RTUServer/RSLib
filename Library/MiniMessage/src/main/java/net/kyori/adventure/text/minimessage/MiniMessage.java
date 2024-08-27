@@ -77,7 +77,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
      * @return the output, with escaped tags
      * @since 4.10.0
      */
-    @NotNull String escapeTags(final @NotNull String input);
+    @NotNull
+    String escapeTags(final @NotNull String input);
 
     /**
      * Escapes all known tags in the input message, so that they are ignored in deserialization.
@@ -89,7 +90,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
      * @return the output, with escaped tags
      * @since 4.10.0
      */
-    @NotNull String escapeTags(final @NotNull String input, final @NotNull TagResolver tagResolver);
+    @NotNull
+    String escapeTags(final @NotNull String input, final @NotNull TagResolver tagResolver);
 
     /**
      * Escapes all known tags in the input message, so that they are ignored in deserialization.
@@ -116,7 +118,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
      * @return the output, without tags
      * @since 4.10.0
      */
-    @NotNull String stripTags(final @NotNull String input);
+    @NotNull
+    String stripTags(final @NotNull String input);
 
     /**
      * Removes all known tags in the input message, so that they are ignored in deserialization.
@@ -128,7 +131,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
      * @return the output, without tags
      * @since 4.10.0
      */
-    @NotNull String stripTags(final @NotNull String input, final @NotNull TagResolver tagResolver);
+    @NotNull
+    String stripTags(final @NotNull String input, final @NotNull TagResolver tagResolver);
 
     /**
      * Removes all known tags in the input message, so that they are ignored in deserialization.
@@ -152,7 +156,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
      * @return the output component
      * @since 4.17.0
      */
-    @NotNull Component deserialize(final @NotNull String input, final @NotNull Pointered target);
+    @NotNull
+    Component deserialize(final @NotNull String input, final @NotNull Pointered target);
 
     /**
      * Deserializes a string into a component, with a tag resolver to parse tags of the form {@code <key>}.
@@ -164,7 +169,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
      * @return the output component
      * @since 4.10.0
      */
-    @NotNull Component deserialize(final @NotNull String input, final @NotNull TagResolver tagResolver);
+    @NotNull
+    Component deserialize(final @NotNull String input, final @NotNull TagResolver tagResolver);
 
     /**
      * Deserializes a string into a component, with a tag resolver to parse tags of the form {@code <key>} and a target.
@@ -177,7 +183,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
      * @return the output component
      * @since 4.17.0
      */
-    @NotNull Component deserialize(final @NotNull String input, final @NotNull Pointered target, final @NotNull TagResolver tagResolver);
+    @NotNull
+    Component deserialize(final @NotNull String input, final @NotNull Pointered target, final @NotNull TagResolver tagResolver);
 
     /**
      * Deserializes a string into a component, with tag resolvers to parse tags of the form {@code <key>}.
@@ -302,7 +309,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
      * @return the base tag resolver
      * @since 4.15.0
      */
-    @NotNull TagResolver tags();
+    @NotNull
+    TagResolver tags();
 
     /**
      * A builder for {@link MiniMessage}.
@@ -321,7 +329,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
          * @return this builder
          * @since 4.10.0
          */
-        @NotNull Builder tags(final @NotNull TagResolver tags);
+        @NotNull
+        Builder tags(final @NotNull TagResolver tags);
 
         /**
          * Add to the set of known tags this MiniMessage instance can use.
@@ -330,7 +339,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
          * @return this builder
          * @since 4.10.0
          */
-        @NotNull Builder editTags(final @NotNull Consumer<TagResolver.Builder> adder);
+        @NotNull
+        Builder editTags(final @NotNull Consumer<TagResolver.Builder> adder);
 
         /**
          * Enables strict mode (disabled by default).
@@ -345,7 +355,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
          * @return this builder
          * @since 4.10.0
          */
-        @NotNull Builder strict(final boolean strict);
+        @NotNull
+        Builder strict(final boolean strict);
 
         /**
          * Print debug information to the given output (disabled by default).
@@ -359,7 +370,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
          * @return this builder
          * @since 4.10.0
          */
-        @NotNull Builder debug(final @Nullable Consumer<String> debugOutput);
+        @NotNull
+        Builder debug(final @Nullable Consumer<String> debugOutput);
 
         /**
          * Specify a function that takes the component at the end of the parser process.
@@ -369,7 +381,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
          * @return this builder
          * @since 4.10.0
          */
-        @NotNull Builder postProcessor(final @NotNull UnaryOperator<Component> postProcessor);
+        @NotNull
+        Builder postProcessor(final @NotNull UnaryOperator<Component> postProcessor);
 
         /**
          * Specify a function that takes the string at the start of the parser process.
@@ -379,7 +392,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
          * @return this builder
          * @since 4.11.0
          */
-        @NotNull Builder preProcessor(final @NotNull UnaryOperator<String> preProcessor);
+        @NotNull
+        Builder preProcessor(final @NotNull UnaryOperator<String> preProcessor);
 
         /**
          * Builds the serializer.
@@ -388,7 +402,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
          * @since 4.10.0
          */
         @Override
-        @NotNull MiniMessage build();
+        @NotNull
+        MiniMessage build();
     }
 
     /**
@@ -408,7 +423,8 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
          */
         @ApiStatus.Internal
         @PlatformAPI
-        @NotNull MiniMessage miniMessage();
+        @NotNull
+        MiniMessage miniMessage();
 
         /**
          * Initialize a {@link Builder} before it is returned to the API caller.
@@ -418,6 +434,7 @@ public interface MiniMessage extends ComponentSerializer<Component, Component, S
          */
         @ApiStatus.Internal
         @PlatformAPI
-        @NotNull Consumer<Builder> builder();
+        @NotNull
+        Consumer<Builder> builder();
     }
 }

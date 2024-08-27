@@ -18,7 +18,11 @@ dependencies {
 }
 
 processResources {
-    def props = [version: version]
+    def props = [
+            version: version,
+            name   : name,
+            author : author
+    ]
     inputs.properties props
     filteringCharset 'UTF-8'
     filesMatching('velocity-plugin.json') {

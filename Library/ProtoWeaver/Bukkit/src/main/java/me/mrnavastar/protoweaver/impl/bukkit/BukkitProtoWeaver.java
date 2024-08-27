@@ -23,9 +23,9 @@ import me.mrnavastar.protoweaver.impl.bukkit.nms.v1_21_r1.ProtoWeaver_1_21_R1;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j(topic = "ProtoWeaver")
+@Slf4j(topic = "RSLib/ProtoWeaver")
 @Getter
-public class BukkitProtoWeaver  {
+public class BukkitProtoWeaver {
 
     private final IProtoWeaver protoWeaver;
     private final boolean isModernProxy;

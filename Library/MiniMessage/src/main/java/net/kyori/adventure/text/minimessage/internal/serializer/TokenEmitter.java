@@ -39,7 +39,8 @@ public interface TokenEmitter {
      * @return this emitter
      * @since 4.10.0
      */
-    @NotNull TokenEmitter tag(final @NotNull String token); // TODO: some sort of TagFlags, with things like SELF_CLOSING, CLOSE_WITH_ARGUMENTS, etc?
+    @NotNull
+    TokenEmitter tag(final @NotNull String token); // TODO: some sort of TagFlags, with things like SELF_CLOSING, CLOSE_WITH_ARGUMENTS, etc?
 
     /**
      * Open a tag with or without arguments that cannot have children.
@@ -50,7 +51,8 @@ public interface TokenEmitter {
      * @return this emitter
      * @since 4.10.0
      */
-    @NotNull TokenEmitter selfClosingTag(final @NotNull String token); // TODO: some sort of TagFlags, with things like SELF_CLOSING, CLOSE_WITH_ARGUMENTS, etc?
+    @NotNull
+    TokenEmitter selfClosingTag(final @NotNull String token); // TODO: some sort of TagFlags, with things like SELF_CLOSING, CLOSE_WITH_ARGUMENTS, etc?
 
     /**
      * Add arguments to the current tag.
@@ -77,7 +79,8 @@ public interface TokenEmitter {
      * @return this emitter
      * @since 4.10.0
      */
-    @NotNull TokenEmitter argument(final @NotNull String arg);
+    @NotNull
+    TokenEmitter argument(final @NotNull String arg);
 
     /**
      * Add a single argument to the current tag.
@@ -89,7 +92,8 @@ public interface TokenEmitter {
      * @return this emitter
      * @since 4.10.0
      */
-    @NotNull TokenEmitter argument(final @NotNull String arg, final @NotNull QuotingOverride quotingPreference);
+    @NotNull
+    TokenEmitter argument(final @NotNull String arg, final @NotNull QuotingOverride quotingPreference);
 
     /**
      * Add a single argument to the current tag.
@@ -100,7 +104,8 @@ public interface TokenEmitter {
      * @return this emitter
      * @since 4.10.0
      */
-    @NotNull TokenEmitter argument(final @NotNull Component arg);
+    @NotNull
+    TokenEmitter argument(final @NotNull Component arg);
 
     /**
      * Emit literal text.
@@ -111,7 +116,8 @@ public interface TokenEmitter {
      * @return this emitter
      * @since 4.10.0
      */
-    @NotNull TokenEmitter text(final @NotNull String text);
+    @NotNull
+    TokenEmitter text(final @NotNull String text);
 
     /**
      * Explicitly end a token, only needed if there are multiple tokens within an {@link Emitable} for some reason.
@@ -121,5 +127,6 @@ public interface TokenEmitter {
      * @return this emitter
      * @since 4.10.0
      */
-    @NotNull TokenEmitter pop();
+    @NotNull
+    TokenEmitter pop();
 }

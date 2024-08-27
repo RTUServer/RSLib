@@ -39,5 +39,6 @@ public /* non-sealed */ interface PreProcess extends Tag {
      * @return the value to insert
      * @since 4.10.0
      */
-    @NotNull String value();
+    @NotNull
+    String value();
 }

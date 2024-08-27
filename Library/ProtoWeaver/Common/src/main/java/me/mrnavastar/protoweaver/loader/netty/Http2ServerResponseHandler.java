@@ -6,11 +6,7 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http2.DefaultHttp2DataFrame;
-import io.netty.handler.codec.http2.DefaultHttp2Headers;
-import io.netty.handler.codec.http2.DefaultHttp2HeadersFrame;
-import io.netty.handler.codec.http2.Http2Headers;
-import io.netty.handler.codec.http2.Http2HeadersFrame;
+import io.netty.handler.codec.http2.*;
 import io.netty.util.CharsetUtil;
 
 @Sharable
@@ -30,7 +26,7 @@ public class Http2ServerResponseHandler extends ChannelDuplexHandler {
         if (msg instanceof Http2HeadersFrame msgHeader) {
             if (msgHeader.isEndStream()) {
                 ByteBuf content = ctx.alloc()
-                    .buffer();
+                        .buffer();
                 content.writeBytes(RESPONSE_BYTES.duplicate());
 
                 Http2Headers headers = new DefaultHttp2Headers().status(HttpResponseStatus.OK.codeAsText());

@@ -36,6 +36,31 @@ public class ProtoProxy {
         ProtoWeaver.getLoadedProtocols().forEach(this::startProtocol);
     }
 
+    /**
+     * Sends a packet to every server running protoweaver with the correct protocol.
+     */
+    public static void sendAll(@NonNull Object packet) {
+        servers.values().forEach(clients -> {
+            clients.forEach(client -> {
+                client.send(packet);
+            });
+        });
+    }
+
+    /**
+     * Sends a packet to a specific server.
+     *
+     * @return true if success, false if failure or the server doesn't have the relevant protocol loaded
+     */
+    public static boolean send(@NonNull InetSocketAddress address, @NonNull Object packet) {
+        for (ProtoClient client : servers.get(address)) {
+            System.out.println(client.getAddress());
+            Sender s = client.send(packet);
+            if (s.isSuccess()) return true;
+        }
+        return false;
+    }
+
     private void startProtocol(Protocol protocol) {
         if (protocol.toString().equals("protoweaver:internal")) return;
 
@@ -56,7 +81,7 @@ public class ProtoProxy {
             if (connection.getDisconnecter().equals(Side.CLIENT)) return;
             Thread.sleep(serverPollRate);
             connectClient(protocol, address, clients);
-        }).onConnectionEstablished(connection -> ProtoLogger.info("Connected to: " + address + " with protocol: " + protocol));
+        }).onConnectionEstablished(connection -> ProtoLogger.info("Connected to Server(" + address + ") with protocol: " + protocol));
         clients.add(client);
     }
 
@@ -64,29 +89,5 @@ public class ProtoProxy {
     public void shutdown() {
         servers.values().forEach(clients -> clients.forEach(ProtoClient::disconnect));
         servers.clear();
-    }
-
-    /**
-     * Sends a packet to every server running protoweaver with the correct protocol.
-     */
-    public static void sendAll(@NonNull Object packet) {
-        servers.values().forEach(clients -> {
-            clients.forEach(client -> {
-                client.send(packet);
-            });
-        });
-    }
-
-    /**
-     * Sends a packet to a specific server.
-     * @return true if success, false if failure or the server doesn't have the relevant protocol loaded
-     */
-    public static boolean send(@NonNull InetSocketAddress address, @NonNull Object packet) {
-        for (ProtoClient client : servers.get(address)) {
-            System.out.println(client.getAddress());
-            Sender s = client.send(packet);
-            if (s.isSuccess()) return true;
-        }
-        return false;
     }
 }

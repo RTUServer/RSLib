@@ -7,29 +7,27 @@ import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
 import me.mrnavastar.protoweaver.impl.PacketCallback;
 
-@Slf4j(topic = "ProtoHandler")
+@Slf4j(topic = "RSLib/ProtoHandler")
 @NoArgsConstructor(force = true)
 @RequiredArgsConstructor
 public class VelocityProtoHandler implements ProtoConnectionHandler {
 
     private static ProtoConnection server;
+    private final PacketCallback callable;
 
     public static ProtoConnection getServer() {
         if (server == null || !server.isOpen()) return null;
         return server;
     }
 
-    private final PacketCallback callable;
-
     @Override
     public void onReady(ProtoConnection protoConnection) {
         server = protoConnection;
-        log.info("Connected to {}", protoConnection.getRemoteAddress());
+        log.info("Connected to Server({})", protoConnection.getRemoteAddress());
     }
 
     @Override
     public void handlePacket(ProtoConnection protoConnection, Object packet) {
-        log.info("Packet! {}", packet.toString());
         if (callable != null) callable.handlePacket(protoConnection, packet);
     }
 }

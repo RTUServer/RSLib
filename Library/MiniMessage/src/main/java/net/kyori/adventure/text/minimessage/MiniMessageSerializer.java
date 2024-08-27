@@ -91,7 +91,8 @@ final class MiniMessageSerializer {
         private final SerializableResolver resolver;
         private final boolean strict;
         private final StringBuilder consumer;
-        @Nullable Emitable componentClaim;
+        @Nullable
+        Emitable componentClaim;
         private String[] activeTags = new String[4];
         private int tagLevel = 0;
         private TagState tagState = TagState.TEXT;

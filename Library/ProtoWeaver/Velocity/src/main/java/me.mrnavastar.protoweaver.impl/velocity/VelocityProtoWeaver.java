@@ -2,7 +2,6 @@ package me.mrnavastar.protoweaver.impl.velocity;
 
 import com.moandjiezana.toml.Toml;
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
@@ -23,7 +22,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j(topic = "ProtoWeaver")
+@Slf4j(topic = "RSLib/ProtoWeaver")
 @Getter
 public class VelocityProtoWeaver implements ProtoLogger.IProtoLogger, ServerSupplier {
 
@@ -37,16 +36,14 @@ public class VelocityProtoWeaver implements ProtoLogger.IProtoLogger, ServerSupp
     public VelocityProtoWeaver(PacketCallback callable, ProxyServer server, Path dir) {
         this.server = server;
         this.dir = dir;
-        velocityConfig = new Toml().read(new File(dir.toFile(), "velocity.toml"));
-        System.out.println(velocityConfig.getString("player-info-forwarding-mode"));
         ProtoLogger.setLogger(this);
+        velocityConfig = new Toml().read(new File(dir.toFile(), "velocity.toml"));
         protocol = Protocol.create("rslib", "internal");
         protocol.setCompression(CompressionType.SNAPPY);
         protocol.setMaxPacketSize(67108864); // 64mb
         protocol.addPacket(Object.class);
         if (isModernProxy()) {
             info("Detected modern proxy.");
-            info("모던 프록시가 감지되었습니다.");
             protocol.setServerAuthHandler(VelocityAuth.class);
             protocol.setClientAuthHandler(VelocityAuth.class);
         }
@@ -70,15 +67,7 @@ public class VelocityProtoWeaver implements ProtoLogger.IProtoLogger, ServerSupp
 
     public void onProxyInitialize() {
         protoProxy = new ProtoProxy(this, dir);
-        getServers().forEach(socketAddress -> System.out.println("??: " + socketAddress));
     }
-
-    @Subscribe
-    public void onServer(ServerPreConnectEvent event) {
-        System.out.println("Server Connection");
-        ProtoProxy.sendAll("hi!!!");
-    }
-
 
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {

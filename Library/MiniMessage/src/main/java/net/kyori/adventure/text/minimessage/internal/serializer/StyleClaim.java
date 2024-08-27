@@ -80,7 +80,8 @@ public interface StyleClaim<V> {
      * @return the key to claim
      * @since 4.10.0
      */
-    @NotNull String claimKey(); // TODO: multiple claim keys? for custom styling tags?
+    @NotNull
+    String claimKey(); // TODO: multiple claim keys? for custom styling tags?
 
     /**
      * Prepare an emitable to apply this claim based on the style.
@@ -89,5 +90,6 @@ public interface StyleClaim<V> {
      * @return an emitable for this style claim, if it is applicable to the provided style
      * @since 4.10.0
      */
-    @Nullable Emitable apply(final @NotNull Style style);
+    @Nullable
+    Emitable apply(final @NotNull Style style);
 }

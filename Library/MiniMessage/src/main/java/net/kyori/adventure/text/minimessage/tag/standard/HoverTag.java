@@ -101,7 +101,8 @@ final class HoverTag {
     }
 
     interface ActionHandler<V> {
-        @NotNull V parse(final @NotNull ArgumentQueue args, final @NotNull Context ctx) throws ParsingException;
+        @NotNull
+        V parse(final @NotNull ArgumentQueue args, final @NotNull Context ctx) throws ParsingException;
 
         void emit(final V event, final TokenEmitter emit);
     }

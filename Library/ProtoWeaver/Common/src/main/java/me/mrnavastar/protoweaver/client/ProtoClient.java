@@ -27,24 +27,13 @@ import java.util.ArrayList;
 
 public class ProtoClient {
 
-    @FunctionalInterface
-    public interface ConnectionEstablishedHandler {
-        void handle(ProtoConnection connection) throws Exception;
-    }
-
-    @FunctionalInterface
-    public interface ConnectionLostHandler {
-        void handle(ProtoConnection connection) throws Exception;
-    }
-
     @Getter
     private final InetSocketAddress address;
-    private EventLoopGroup workerGroup = null;
-    private ProtoConnection connection = null;
     private final SslContext sslContext;
     private final ArrayList<ConnectionEstablishedHandler> connectionEstablishedHandlers = new ArrayList<>();
     private final ArrayList<ConnectionLostHandler> connectionLostHandlers = new ArrayList<>();
-
+    private EventLoopGroup workerGroup = null;
+    private ProtoConnection connection = null;
     public ProtoClient(@NonNull InetSocketAddress address, @NonNull String hostsFile) {
         try {
             this.address = address;
@@ -54,7 +43,6 @@ public class ProtoClient {
             throw new RuntimeException(e);
         }
     }
-
     public ProtoClient(@NonNull InetSocketAddress address) {
         this(address.getHostName(), address.getPort());
     }
@@ -149,5 +137,15 @@ public class ProtoClient {
 
     public Protocol getCurrentProtocol() {
         return connection == null ? null : connection.getProtocol();
+    }
+
+    @FunctionalInterface
+    public interface ConnectionEstablishedHandler {
+        void handle(ProtoConnection connection) throws Exception;
+    }
+
+    @FunctionalInterface
+    public interface ConnectionLostHandler {
+        void handle(ProtoConnection connection) throws Exception;
     }
 }

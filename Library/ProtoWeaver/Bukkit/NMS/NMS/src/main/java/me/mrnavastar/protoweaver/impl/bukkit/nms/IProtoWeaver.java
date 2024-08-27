@@ -4,6 +4,7 @@ import me.mrnavastar.protoweaver.core.util.ProtoLogger;
 
 public interface IProtoWeaver extends ProtoLogger.IProtoLogger {
     boolean isModernProxy();
+
     default boolean isPaper() {
         try {
             Class.forName("com.destroystokyo.paper.PaperConfig");
