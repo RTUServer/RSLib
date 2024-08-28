@@ -24,7 +24,7 @@ processResources {
     ]
     inputs.properties props
     filteringCharset 'UTF-8'
-    filesMatching('velocity-plugin.json') {
+    filesMatching('bungee.yml') {
         expand props
     }
 }
