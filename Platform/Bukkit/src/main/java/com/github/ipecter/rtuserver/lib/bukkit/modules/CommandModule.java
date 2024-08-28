@@ -1,7 +1,7 @@
 package com.github.ipecter.rtuserver.lib.bukkit.modules;
 
-import com.github.ipecter.rtuserver.lib.bukkit.plugin.RSPlugin;
-import com.github.ipecter.rtuserver.lib.bukkit.plugin.config.RSConfiguration;
+import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
+import com.github.ipecter.rtuserver.lib.bukkit.api.config.RSConfiguration;
 import lombok.Getter;
 
 @Getter

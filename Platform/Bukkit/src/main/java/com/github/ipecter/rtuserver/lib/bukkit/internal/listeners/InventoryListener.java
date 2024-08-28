@@ -1,11 +1,9 @@
 package com.github.ipecter.rtuserver.lib.bukkit.internal.listeners;
 
 import com.github.ipecter.rtuserver.lib.bukkit.RSLib;
-import com.github.ipecter.rtuserver.lib.bukkit.plugin.RSPlugin;
-import com.github.ipecter.rtuserver.lib.bukkit.plugin.inventory.RSInventory;
-import com.github.ipecter.rtuserver.lib.bukkit.plugin.listener.RSListener;
-import com.github.ipecter.rtuserver.lib.bukkit.plugin.util.format.ComponentFormatter;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import com.github.ipecter.rtuserver.lib.bukkit.api.inventory.RSInventory;
+import com.github.ipecter.rtuserver.lib.bukkit.api.listener.RSListener;
+import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,7 +13,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 
 public class InventoryListener extends RSListener {
-    
+
     private final RSLib lib;
 
     public InventoryListener(RSLib plugin) {

@@ -1,13 +1,13 @@
 package com.github.ipecter.rtuserver.lib.bukkit;
 
+import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
+import com.github.ipecter.rtuserver.lib.bukkit.api.util.platform.MinecraftVersion;
+import com.github.ipecter.rtuserver.lib.bukkit.api.util.platform.SystemEnviroment;
 import com.github.ipecter.rtuserver.lib.bukkit.commands.RSLibCommand;
 import com.github.ipecter.rtuserver.lib.bukkit.internal.listeners.InventoryListener;
 import com.github.ipecter.rtuserver.lib.bukkit.internal.listeners.JoinListener;
 import com.github.ipecter.rtuserver.lib.bukkit.internal.runnable.CommandLimit;
 import com.github.ipecter.rtuserver.lib.bukkit.modules.Modules;
-import com.github.ipecter.rtuserver.lib.bukkit.plugin.RSPlugin;
-import com.github.ipecter.rtuserver.lib.bukkit.plugin.util.platform.SystemEnviroment;
-import com.github.ipecter.rtuserver.lib.bukkit.plugin.util.platform.MinecraftVersion;
 import com.github.ipecter.rtuserver.lib.nms.v1_17_r1.NMS_1_17_R1;
 import com.github.ipecter.rtuserver.lib.nms.v1_18_r1.NMS_1_18_R1;
 import com.github.ipecter.rtuserver.lib.nms.v1_18_r2.NMS_1_18_R2;
@@ -30,6 +30,7 @@ import org.bukkit.permissions.PermissionDefault;
 
 import java.util.HashMap;
 import java.util.Map;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RSLib extends RSPlugin {
 
@@ -137,7 +138,7 @@ public class RSLib extends RSPlugin {
                 ╚══════════════════════════════════════════════════════════════════════════════════════════╝
                 """
                 .replace("%version%", getDescription().getVersion())
-                .replace("%bukkit%",  Bukkit.getName() + "-" + MinecraftVersion.getAsText())
+                .replace("%bukkit%", Bukkit.getName() + "-" + MinecraftVersion.getAsText())
                 .replace("%nms%", nmsVersion)
                 .replace("%os%", SystemEnviroment.getOS())
                 .replace("%jdk%", SystemEnviroment.getJDKVersion());
