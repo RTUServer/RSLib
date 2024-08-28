@@ -131,7 +131,7 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
                 return true;
             }
         }
-        if (!command(data)) {
+        if (!execute(data)) {
             announce(message.getCommon("wrongUsage"));
             if (hasPermission(plugin.getName() + ".reload"))
                 announce(String.format("<gray> - </gray>/%s %s", getName(), command.getCommon("reload")));
@@ -152,7 +152,7 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
         return list;
     }
 
-    protected abstract boolean command(CommandData command);
+    protected abstract boolean execute(CommandData command);
 
     protected abstract List<String> tabComplete(CommandData command);
 

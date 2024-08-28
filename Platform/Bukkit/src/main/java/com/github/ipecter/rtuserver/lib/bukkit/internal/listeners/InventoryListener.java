@@ -5,6 +5,8 @@ import com.github.ipecter.rtuserver.lib.bukkit.plugin.RSPlugin;
 import com.github.ipecter.rtuserver.lib.bukkit.plugin.inventory.RSInventory;
 import com.github.ipecter.rtuserver.lib.bukkit.plugin.listener.RSListener;
 import com.github.ipecter.rtuserver.lib.bukkit.plugin.util.format.ComponentFormatter;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -13,9 +15,12 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 
 public class InventoryListener extends RSListener {
+    
+    private final RSLib lib;
 
-    public InventoryListener(RSPlugin plugin) {
+    public InventoryListener(RSLib plugin) {
         super(plugin);
+        lib = plugin;
     }
 
     @EventHandler
@@ -30,41 +35,43 @@ public class InventoryListener extends RSListener {
                 e.setCancelled(!rsInventory.onClick(event, click));
             } catch (Exception exception) {
                 e.setCancelled(true);
-                RSLib.getInstance().console(ComponentFormatter.mini("<red>인벤토리 클릭 이벤트를 사용하는 코드에서 결함이 발견되었습니다!</red>"));
-                RSLib.getInstance().getAdventure().player(player).sendMessage(ComponentFormatter.mini("<red>인벤토리 클릭 이벤트를 사용하는 코드에서 결함이 발견되었습니다!</red>"));
+                Component errorMessage = ComponentFormatter.mini(getMessage().get("error.inventory"));
+                lib.console(errorMessage);
+                lib.getAdventure().player(player).sendMessage(errorMessage);
                 exception.printStackTrace();
             }
         }
     }
 
     @EventHandler
-    private void onRSInventoryDrag(InventoryDragEvent e) {
-        Inventory inv = e.getInventory();
-        Player player = (Player) e.getWhoClicked();
-        if (e.getView().getTopInventory().getHolder() instanceof RSInventory rsInventory) {
+    private void onRSInventoryDrag(InventoryDragEvent event) {
+        Inventory inv = event.getInventory();
+        Player player = (Player) event.getWhoClicked();
+        if (event.getView().getTopInventory().getHolder() instanceof RSInventory rsInventory) {
             boolean isPlayerInventory = inv != null && !(inv.getHolder() instanceof RSInventory);
-            RSInventory.Event<InventoryDragEvent> event = new RSInventory.Event<>(e, inv, player, isPlayerInventory);
-            RSInventory.Drag click = new RSInventory.Drag(e.getNewItems(), e.getCursor(), e.getOldCursor(), e.getType());
+            RSInventory.Event<InventoryDragEvent> holderEvent = new RSInventory.Event<>(event, inv, player, isPlayerInventory);
+            RSInventory.Drag click = new RSInventory.Drag(event.getNewItems(), event.getCursor(), event.getOldCursor(), event.getType());
             try {
-                e.setCancelled(!rsInventory.onDrag(event, click));
+                event.setCancelled(!rsInventory.onDrag(holderEvent, click));
             } catch (Exception ex) {
-                e.setCancelled(true);
-                RSLib.getInstance().console(ComponentFormatter.mini("<red>인벤토리 드래그 이벤트를 사용하는 코드에서 결함이 발견되었습니다!</red>"));
-                RSLib.getInstance().getAdventure().player(player).sendMessage(ComponentFormatter.mini("<red>인벤토리 드래그 이벤트를 사용하는 코드에서 결함이 발견되었습니다!</red>"));
+                event.setCancelled(true);
+                Component errorMessage = ComponentFormatter.mini(getMessage().get("error.inventory"));
+                lib.console(errorMessage);
+                lib.getAdventure().player(player).sendMessage(errorMessage);
                 ex.printStackTrace();
             }
         }
     }
 
     @EventHandler
-    private void onRSInventoryClose(InventoryCloseEvent e) {
-        Inventory inv = e.getInventory();
-        Player player = (Player) e.getPlayer();
+    private void onRSInventoryClose(InventoryCloseEvent event) {
+        Inventory inv = event.getInventory();
+        Player player = (Player) event.getPlayer();
         if (inv.getHolder() instanceof RSInventory rsInventory) {
             boolean isPlayerInventory = !(inv.getHolder() instanceof RSInventory);
-            RSInventory.Event<InventoryCloseEvent> event = new RSInventory.Event<>(e, inv, player, isPlayerInventory);
-            RSInventory.Close close = new RSInventory.Close(e.getReason());
-            rsInventory.onClose(event, close);
+            RSInventory.Event<InventoryCloseEvent> holderEvent = new RSInventory.Event<>(event, inv, player, isPlayerInventory);
+            RSInventory.Close close = new RSInventory.Close(event.getReason());
+            rsInventory.onClose(holderEvent, close);
         }
     }
 

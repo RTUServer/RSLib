@@ -1,3 +1,30 @@
+plugins {
+    id 'xyz.jpenilla.run-waterfall' version '2.3.1'
+}
+
+runWaterfall {
+    dependsOn(shadowJar)
+    waterfallVersion("1.20")
+}
+
 dependencies {
-    compileOnly project(":Library:ProtoWeaver")
+    implementation project(":Library:MiniMessage")
+    implementation project(":Library:ProtoWeaver:Common")
+    implementation project(":Library:ProtoWeaver:Bungee")
+    implementation 'com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4'
+
+    compileOnly("net.md-5:bungeecord-api:1.20-R0.2")
+}
+
+processResources {
+    def props = [
+            version: version,
+            name   : name,
+            author : author
+    ]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('velocity-plugin.json') {
+        expand props
+    }
 }

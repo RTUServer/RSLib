@@ -1,6 +1,6 @@
 package com.github.ipecter.rtuserver.lib.bukkit;
 
-import com.github.ipecter.rtuserver.lib.bukkit.commands.Command;
+import com.github.ipecter.rtuserver.lib.bukkit.commands.RSLibCommand;
 import com.github.ipecter.rtuserver.lib.bukkit.internal.listeners.InventoryListener;
 import com.github.ipecter.rtuserver.lib.bukkit.internal.listeners.JoinListener;
 import com.github.ipecter.rtuserver.lib.bukkit.internal.runnable.CommandLimit;
@@ -26,6 +26,7 @@ import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
 import me.mrnavastar.protoweaver.impl.PacketCallback;
 import me.mrnavastar.protoweaver.impl.bukkit.BukkitProtoWeaver;
 import org.bukkit.Bukkit;
+import org.bukkit.permissions.PermissionDefault;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -108,8 +109,8 @@ public class RSLib extends RSPlugin {
         dependencies = new Dependencies(this);
 
         registerInternal();
-
-        registerCommand(new Command(this));
+        registerPermission(getName() + ".motd", PermissionDefault.OP);
+        registerCommand(new RSLibCommand(this));
     }
 
     private void registerInternal() {

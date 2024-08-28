@@ -7,16 +7,16 @@ import com.github.ipecter.rtuserver.lib.bukkit.plugin.command.RSCommand;
 
 import java.util.List;
 
-public class Command extends RSCommand {
+public class RSLibCommand extends RSCommand {
 
     private final RSLib lib = RSLib.getInstance();
 
-    public Command(RSPlugin plugin) {
+    public RSLibCommand(RSPlugin plugin) {
         super(plugin, "rslib", true);
     }
 
     @Override
-    public boolean command(CommandData data) {
+    public boolean execute(CommandData data) {
         return false;
     }
 

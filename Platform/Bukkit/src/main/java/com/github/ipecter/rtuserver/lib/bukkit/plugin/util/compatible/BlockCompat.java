@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
@@ -41,6 +42,7 @@ public class BlockCompat {
         }
     }
 
+    @NotNull
     public static String to(Block block) {
         if (RSLib.getInstance().isEnabledDependency("Oraxen")) {
             Mechanic oraxen = OraxenBlocks.getOraxenBlock(block.getBlockData());

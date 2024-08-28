@@ -22,15 +22,15 @@ public class JoinListener extends RSListener {
     }
 
     @EventHandler
-    public void motd(PlayerJoinEvent e) {
+    public void motdMessage(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-        if (!player.isOp()) return;
+        if (!player.hasPermission(getPlugin().getName() + ".motd")) return;
         Map<String, RSPlugin> plugins = lib.getPlugins();
         Audience audience = lib.getAdventure().player(player);
         for (RSPlugin plugin : plugins.values()) {
             if (!plugin.getConfigurations().getSetting().isMotd()) continue;
-            Component component = plugin.getPrefix().append(ComponentFormatter.mini(
-                    plugin.getName() + " developed by " + String.join(" & ", plugin.getDescription().getAuthors())));
+            String str = "%s developed by %s".formatted(player.getName(), String.join(" & ", plugin.getDescription().getAuthors()));
+            Component component = plugin.getPrefix().append(ComponentFormatter.mini(str));
             audience.sendMessage(component);
         }
     }

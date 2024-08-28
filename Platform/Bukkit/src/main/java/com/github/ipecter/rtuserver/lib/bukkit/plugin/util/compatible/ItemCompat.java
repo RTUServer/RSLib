@@ -62,6 +62,7 @@ public class ItemCompat {
     }
 
 
+    @NotNull
     public static String to(@NotNull ItemStack itemStack) {
         if (RSLib.getInstance().isEnabledDependency("Oraxen")) {
             String oraxen = OraxenItems.getIdByItem(itemStack);

@@ -24,3 +24,6 @@ dataNameType:
 
 command:
   cooldown: "<red>너무 빠릅니다! 잠시 뒤에 시도해야합니다</red>"
+
+error:
+  inventory: "<red>인벤토리 클릭 이벤트를 사용하는 코드에서 결함이 발견되었습니다!</red>"

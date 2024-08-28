@@ -24,3 +24,6 @@ dataNameType:
 
 command:
   cooldown: "<red>Too Quickly! You must try again later</red>"
+
+error:
+  inventory: "<red>Flaw was found in code using inventory click event!</red>"

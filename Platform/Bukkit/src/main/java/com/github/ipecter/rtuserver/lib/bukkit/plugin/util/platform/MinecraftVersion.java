@@ -2,6 +2,7 @@ package com.github.ipecter.rtuserver.lib.bukkit.plugin.util.platform;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ public class MinecraftVersion {
     private static final String VERSION_STR = fromAPI(Bukkit.getBukkitVersion());
     private static final Version VERSION = new Version(VERSION_STR);
 
+    @NotNull
     public static String fromAPI(String version) {
         return version.split("-")[0];
     }
@@ -57,15 +59,15 @@ public class MinecraftVersion {
         }
     }
 
-
+    @NotNull
     public static String getAsText() {
         return VERSION_STR;
     }
-
+    @NotNull
     public static Version get() {
         return VERSION;
     }
-
+    @NotNull
     public static String getNMS(String versionStr) {
         Version version = new Version(versionStr);
         return switch (version.getVersion()) {
