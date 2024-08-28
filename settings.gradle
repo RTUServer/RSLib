@@ -40,7 +40,4 @@ include 'Platform:Bukkit:NMS:NMS',
         'Platform:Bukkit:NMS:1_20_R2',
         'Platform:Bukkit:NMS:1_20_R3',
         'Platform:Bukkit:NMS:1_20_R4',
-        'Platform:Bukkit:NMS:1_21_R1'
-
-include 'Annotation:Processor'
-include 'Annotation:Annotation'
+        'Platform:Bukkit:NMS:1_21_R1
