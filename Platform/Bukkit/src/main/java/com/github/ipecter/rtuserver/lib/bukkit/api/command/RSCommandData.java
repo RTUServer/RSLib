@@ -1,6 +1,6 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.command;
 
-public record CommandData(String[] args) {
+public record RSCommandData(String[] args) {
     public String args(int argIndex) {
         if (args.length <= argIndex) return "";
         return args[argIndex];

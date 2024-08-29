@@ -22,8 +22,8 @@ dataNameType:
   long: "<red>Max length of name is 15</red>"
   exist: "<red>This name is duplicated</red>"
 
-command:
-  cooldown: "<red>Too Quickly! You must try again later</red>"
-
 error:
   inventory: "<red>Flaw was found in code using inventory click event!</red>"
+
+command:
+  cooldown: "<red>Too Quickly! You must try again later</red>"

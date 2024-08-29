@@ -8,7 +8,6 @@ import lombok.Getter;
 public class JsonConfig extends RSConfiguration {
     private int savePeriod = 10;
 
-
     public JsonConfig(RSPlugin plugin) {
         super(plugin, "Configs/Storages", "Json.yml", null);
         setup(this);

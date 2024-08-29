@@ -2,7 +2,7 @@ package com.github.ipecter.rtuserver.lib.bukkit.commands;
 
 import com.github.ipecter.rtuserver.lib.bukkit.RSLib;
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
-import com.github.ipecter.rtuserver.lib.bukkit.api.command.CommandData;
+import com.github.ipecter.rtuserver.lib.bukkit.api.command.RSCommandData;
 import com.github.ipecter.rtuserver.lib.bukkit.api.command.RSCommand;
 
 import java.util.List;
@@ -16,17 +16,17 @@ public class RSLibCommand extends RSCommand {
     }
 
     @Override
-    public boolean execute(CommandData data) {
+    public boolean execute(RSCommandData data) {
         return false;
     }
 
     @Override
-    public void reload(CommandData command) {
+    public void reload(RSCommandData data) {
         lib.getModules().reload();
     }
 
     @Override
-    public List<String> tabComplete(CommandData data) {
+    public List<String> tabComplete(RSCommandData data) {
         return List.of();
     }
 }

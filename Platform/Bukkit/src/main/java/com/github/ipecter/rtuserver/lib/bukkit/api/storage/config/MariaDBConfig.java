@@ -12,7 +12,6 @@ public class MariaDBConfig extends RSConfiguration {
     private String username = "";
     private String password = "";
 
-
     public MariaDBConfig(RSPlugin plugin) {
         super(plugin, "Configs/Storages", "MySQL.yml", null);
         setup(this);

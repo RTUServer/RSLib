@@ -1,4 +1,4 @@
 dependencies {
-    compileOnly project(":Library:MiniMessage")
-    compileOnly project(":Library:ProtoWeaver")
+    //implementation project(":Library:MiniMessage")
+    implementation project(":Library:ProtoWeaver")
 }

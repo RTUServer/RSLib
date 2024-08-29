@@ -2,11 +2,11 @@ plugins {
     id 'java'
     id 'io.freefair.lombok' version '8.6'
     id "com.gradleup.shadow" version "8.3.0"
-    id 'io.papermc.paperweight.userdev' version "1.7.2"
+    id 'io.papermc.paperweight.userdev' version "1.7.2" apply false
 }
 
 group = 'com.github.ipecter.rtuserver'
-version = '3.0.0-pre2'
+version = '3.0.0-pre3'
 
 allprojects {
     apply {
@@ -69,21 +69,25 @@ dependencies {
     implementation project(":Library")
     implementation project(":Platform")
 
+
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
-
-    paperweight.paperDevBundle("1.17.1-R0.1-SNAPSHOT")
 }
 tasks {
     build {
         dependsOn(shadowJar)
     }
     shadowJar {
-        setArchiveClassifier("")
+        setArchiveClassifier(null)
         doLast {
             copy {
                 from archiveFile.get().asFile into file("$projectDir/builds")
             }
         }
+        relocate 'io.papermc.lib', 'com.github.ipecter.rtuserver.lib.bukkit.util.paper'
+        relocate('net.kyori.adventure.platform', 'com.github.ipecter.rtuserver.lib.bukkit.util.kyori.adventure.platform')
+//        relocate('net.kyori', 'com.github.ipecter.rtuserver.lib.bukkit.util.kyori') {
+//            exclude 'net.kyori.adventure.text.minimessage.*'
+//        }
     }
 }

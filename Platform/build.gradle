@@ -1,6 +1,6 @@
 dependencies {
-    compileOnly project(":Platform:Common")
-    compileOnly project(":Platform:Bukkit")
-    compileOnly project(":Platform:Bungee")
-    compileOnly project(":Platform:Velocity")
+    implementation project(":Platform:Common")
+    implementation project(":Platform:Bukkit")
+    implementation project(":Platform:Bungee")
+    implementation project(":Platform:Velocity")
 }

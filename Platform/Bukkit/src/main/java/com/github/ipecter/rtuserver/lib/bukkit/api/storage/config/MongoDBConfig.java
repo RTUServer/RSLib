@@ -12,7 +12,6 @@ public class MongoDBConfig extends RSConfiguration {
     private String username = "";
     private String password = "";
 
-
     public MongoDBConfig(RSPlugin plugin) {
         super(plugin, "Configs/Storages", "MongoDB.yml", null);
         setup(this);

@@ -17,7 +17,7 @@ subprojects {
 }
 
 dependencies {
-    implementation project(":Library:MiniMessage")
+    //implementation project(":Library:MiniMessage")
     implementation project(":Library:ProtoWeaver:Common")
     implementation project(":Library:ProtoWeaver:Bukkit")
     implementation 'com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4'
@@ -62,6 +62,3 @@ processResources {
         expand props
     }
 }
-
-shadowJar.relocate("io.papermc.lib", "com.github.ipecter.rtuserver.lib.bukkit.util.paper")
-shadowJar.relocate("net.kyori.adventure.platform.bukkit", "com.github.ipecter.rtuserver.lib.bukkit.util.kyori")

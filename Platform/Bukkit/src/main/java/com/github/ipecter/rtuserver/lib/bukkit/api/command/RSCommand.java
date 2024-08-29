@@ -84,30 +84,6 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
         return sender.hasPermission(node);
     }
 
-//    @Override
-//    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
-//        if (sender instanceof Player player) {
-//            if (cooldownMap.getOrDefault(player.getUniqueId(), 0) <= 0) cooldownMap.put(player.getUniqueId(), cooldown);
-//            else {
-//                sendMessage(ComponentUtil.miniMessage(message.getCommon("prefix") + message.getCommon("command.cooldown")));
-//                return true;
-//            }
-//        }
-//        this.sender = sender;
-//        this.audience = RSPlugin.getPlugin().getAdventure().sender(sender);
-//        command(new CommandData(args));
-//        return true;
-//    }
-//
-//
-//    @Nullable
-//    @Override
-//    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
-//        this.sender = sender;
-//        this.audience = RSPlugin.getPlugin().getAdventure().sender(sender);
-//        return tabComplete(new CommandData(args));
-//    }
-
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
         if (sender instanceof Player player) {
@@ -120,7 +96,7 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
         }
         this.sender = sender;
         this.audience = plugin.getAdventure().sender(sender);
-        CommandData data = new CommandData(args);
+        RSCommandData data = new RSCommandData(args);
         if (isMain) {
             if (data.equals(0, command.getCommon("reload"))) {
                 if (hasPermission(plugin.getName() + ".reload")) {
@@ -144,7 +120,7 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
     public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
         this.sender = sender;
         this.audience = plugin.getAdventure().sender(sender);
-        CommandData data = new CommandData(args);
+        RSCommandData data = new RSCommandData(args);
         List<String> list = new ArrayList<>(tabComplete(data));
         if (isMain && data.length(1)) {
             list.add(command.getCommon("reload"));
@@ -152,14 +128,14 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
         return list;
     }
 
-    protected abstract boolean execute(CommandData command);
+    protected abstract boolean execute(RSCommandData data);
 
-    protected abstract List<String> tabComplete(CommandData command);
+    protected abstract List<String> tabComplete(RSCommandData data);
 
-    protected void reload(CommandData command) {
+    protected void reload(RSCommandData data) {
     }
 
-    protected void wrongUsage(CommandData command) {
+    protected void wrongUsage(RSCommandData data) {
     }
 
     protected void announce(String minimessage) {

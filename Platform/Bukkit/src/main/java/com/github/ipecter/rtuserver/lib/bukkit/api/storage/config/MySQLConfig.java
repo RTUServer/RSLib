@@ -12,7 +12,6 @@ public class MySQLConfig extends RSConfiguration {
     private String username = "";
     private String password = "";
 
-
     public MySQLConfig(RSPlugin plugin) {
         super(plugin, "Configs/Storages", "MySQL.yml", null);
         setup(this);
