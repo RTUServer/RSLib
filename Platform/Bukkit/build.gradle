@@ -62,3 +62,17 @@ processResources {
         expand props
     }
 }
+
+shadowJar {
+    relocate 'io.papermc.lib', 'com.github.ipecter.rtuserver.lib.bukkit.util.paper'
+    relocate('net.kyori.adventure.platform', 'com.github.ipecter.rtuserver.lib.bukkit.util.kyori.adventure.platform')
+}
+
+tasks {
+    build {
+        dependsOn(shadowJar)
+    }
+    shadowJar {
+        setArchiveClassifier(null)
+    }
+}

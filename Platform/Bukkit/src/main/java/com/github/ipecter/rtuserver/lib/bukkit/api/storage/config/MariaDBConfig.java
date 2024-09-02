@@ -11,9 +11,10 @@ public class MariaDBConfig extends RSConfiguration {
     private String database = "";
     private String username = "";
     private String password = "";
+    private String tablePrefix = getPlugin().getName() + "_";
 
     public MariaDBConfig(RSPlugin plugin) {
-        super(plugin, "Configs/Storages", "MySQL.yml", null);
+        super(plugin, "Configs/Storages", "MariaDB.yml", null);
         setup(this);
     }
 
@@ -23,6 +24,7 @@ public class MariaDBConfig extends RSConfiguration {
         database = getString("database", database);
         username = getString("username", username);
         password = getString("password", password);
+        tablePrefix = getString("tablePrefix", tablePrefix);
     }
 
 }

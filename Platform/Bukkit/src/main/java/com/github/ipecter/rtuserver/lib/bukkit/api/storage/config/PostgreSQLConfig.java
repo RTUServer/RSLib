@@ -11,9 +11,10 @@ public class PostgreSQLConfig extends RSConfiguration {
     private String database = "";
     private String username = "";
     private String password = "";
+    private String tablePrefix = getPlugin().getName() + "_";
 
     public PostgreSQLConfig(RSPlugin plugin) {
-        super(plugin, "Configs/Storages", "MySQL.yml", null);
+        super(plugin, "Configs/Storages", "PostgreSQL.yml", null);
         setup(this);
     }
 
@@ -23,6 +24,7 @@ public class PostgreSQLConfig extends RSConfiguration {
         database = getString("database", database);
         username = getString("username", username);
         password = getString("password", password);
+        tablePrefix = getString("tablePrefix", tablePrefix);
     }
 
 }

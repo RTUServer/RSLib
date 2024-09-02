@@ -73,6 +73,12 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
 }
+
+shadowJar {
+    relocate 'io.papermc.lib', 'com.github.ipecter.rtuserver.lib.bukkit.util.paper'
+    relocate('net.kyori.adventure.platform', 'com.github.ipecter.rtuserver.lib.bukkit.util.kyori.adventure.platform')
+}
+
 tasks {
     build {
         dependsOn(shadowJar)
@@ -84,10 +90,5 @@ tasks {
                 from archiveFile.get().asFile into file("$projectDir/builds")
             }
         }
-        relocate 'io.papermc.lib', 'com.github.ipecter.rtuserver.lib.bukkit.util.paper'
-        relocate('net.kyori.adventure.platform', 'com.github.ipecter.rtuserver.lib.bukkit.util.kyori.adventure.platform')
-//        relocate('net.kyori', 'com.github.ipecter.rtuserver.lib.bukkit.util.kyori') {
-//            exclude 'net.kyori.adventure.text.minimessage.*'
-//        }
     }
 }

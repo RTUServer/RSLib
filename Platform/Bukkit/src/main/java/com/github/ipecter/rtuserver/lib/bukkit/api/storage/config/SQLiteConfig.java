@@ -6,11 +6,11 @@ import lombok.Getter;
 
 @Getter
 public class SQLiteConfig extends RSConfiguration {
-    private String host = "127.0.0.1";
-    private String port = "5432";
+    private String file = "./Data/SQLite.sql";
     private String database = "";
     private String username = "";
     private String password = "";
+    private String tablePrefix = getPlugin().getName() + "_";
 
     public SQLiteConfig(RSPlugin plugin) {
         super(plugin, "Configs/Storages", "SQLite.yml", null);
@@ -18,10 +18,11 @@ public class SQLiteConfig extends RSConfiguration {
     }
 
     private void init() {
-        host = getString("host", host);
-        port = getString("port", port);
+        file = getString("file", file);
         database = getString("database", database);
         username = getString("username", username);
         password = getString("password", password);
+        tablePrefix = getString("tablePrefix", tablePrefix);
     }
+
 }

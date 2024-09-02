@@ -11,6 +11,7 @@ public class MongoDBConfig extends RSConfiguration {
     private String database = "";
     private String username = "";
     private String password = "";
+    private String tablePrefix = getPlugin().getName() + "_";
 
     public MongoDBConfig(RSPlugin plugin) {
         super(plugin, "Configs/Storages", "MongoDB.yml", null);
@@ -23,7 +24,7 @@ public class MongoDBConfig extends RSConfiguration {
         database = getString("database", database);
         username = getString("username", username);
         password = getString("password", password);
+        tablePrefix = getString("tablePrefix", tablePrefix);
     }
-
 
 }

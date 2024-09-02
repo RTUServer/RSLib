@@ -32,7 +32,7 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
     private final CommandConfiguration command;
 
     private final String name;
-    private final boolean isMain;
+    private final boolean useReload;
     private final int cooldown;
     private CommandSender sender;
     private Audience audience;
@@ -53,26 +53,26 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
         this(plugin, name, false, cooldown);
     }
 
-    public RSCommand(RSPlugin plugin, @NotNull String name, boolean isMain) {
-        this(plugin, name, isMain, RSLib.getInstance().getModules().getCommandModule().getExecuteLimit());
+    public RSCommand(RSPlugin plugin, @NotNull String name, boolean useReload) {
+        this(plugin, name, useReload, RSLib.getInstance().getModules().getCommandModule().getExecuteLimit());
     }
 
-    public RSCommand(RSPlugin plugin, @NotNull List<String> name, boolean isMain) {
-        this(plugin, name, isMain, RSLib.getInstance().getModules().getCommandModule().getExecuteLimit());
+    public RSCommand(RSPlugin plugin, @NotNull List<String> name, boolean useReload) {
+        this(plugin, name, useReload, RSLib.getInstance().getModules().getCommandModule().getExecuteLimit());
     }
 
-    public RSCommand(RSPlugin plugin, @NotNull String name, boolean isMain, int cooldown) {
-        this(plugin, List.of(name), isMain, cooldown);
+    public RSCommand(RSPlugin plugin, @NotNull String name, boolean useReload, int cooldown) {
+        this(plugin, List.of(name), useReload, cooldown);
     }
 
-    public RSCommand(RSPlugin plugin, List<String> names, boolean isMain, int cooldown) {
+    public RSCommand(RSPlugin plugin, List<String> names, boolean useReload, int cooldown) {
         super(names.get(0));
         this.plugin = plugin;
         this.message = plugin.getConfigurations().getMessage();
         this.command = plugin.getConfigurations().getCommand();
         this.name = names.get(0);
         if (names.size() > 1) setAliases(names);
-        this.isMain = isMain;
+        this.useReload = useReload;
         this.cooldown = cooldown;
     }
 
@@ -97,7 +97,7 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
         this.sender = sender;
         this.audience = plugin.getAdventure().sender(sender);
         RSCommandData data = new RSCommandData(args);
-        if (isMain) {
+        if (useReload) {
             if (data.equals(0, command.getCommon("reload"))) {
                 if (hasPermission(plugin.getName() + ".reload")) {
                     plugin.getConfigurations().reload();
@@ -122,7 +122,7 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
         this.audience = plugin.getAdventure().sender(sender);
         RSCommandData data = new RSCommandData(args);
         List<String> list = new ArrayList<>(tabComplete(data));
-        if (isMain && data.length(1)) {
+        if (useReload && data.length(1)) {
             list.add(command.getCommon("reload"));
         }
         return list;
