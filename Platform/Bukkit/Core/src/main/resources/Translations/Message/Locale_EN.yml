@@ -1,0 +1,29 @@
+# if Empty, Plugin uses default prefix
+# MiniMessage format: https://webui.advntr.dev/
+prefix: ""
+
+common:
+  reload: "<green>Completed reloading config</green>"
+  noPermission: "<red>You don't have permission</red>"
+  wrongUsage: "<red>Wrong Usage</red>"
+  onlyPlayer: "<red>Only players can use this command</red>"
+  onlyConsole: "<red>This command is only available on the console</red>"
+  notFound:
+    onlinePLayer: "<red>This player does not exist or offline</red>"
+    offlinePlayer: "<red>This player does not exist</red>"
+
+wrongUsage:
+  reload: "<gray> - </gray><white>/rslib reload</white>"
+
+dataNameType:
+  black: "<red>You can't use this name</red>"
+  all: "<red>All word of name is wrong format, You can use only English, Korean, Number and _</red>"
+  wrong: "<red>Name contains wrong format, You can use only English, Korean, Number and _</red>"
+  long: "<red>Max length of name is 15</red>"
+  exist: "<red>This name is duplicated</red>"
+
+error:
+  inventory: "<red>Flaw was found in code using inventory click event!</red>"
+
+command:
+  cooldown: "<red>Too Quickly! You must try again later</red>"
