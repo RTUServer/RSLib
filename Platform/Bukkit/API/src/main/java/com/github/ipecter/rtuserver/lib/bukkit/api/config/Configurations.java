@@ -6,7 +6,6 @@ import com.github.ipecter.rtuserver.lib.bukkit.api.storage.StorageType;
 import com.github.ipecter.rtuserver.lib.bukkit.api.storage.config.*;
 import com.github.ipecter.rtuserver.lib.bukkit.api.storage.impl.*;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.external.FileUtil;
-import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
 import lombok.Getter;
 
 import java.io.File;
@@ -56,9 +55,11 @@ public class Configurations {
         this.useStorage = true;
         if (!list.isEmpty()) {
             json = new JsonConfig(plugin);
+            mariadb = new MariaDBConfig(plugin);
             mongodb = new MongoDBConfig(plugin);
-            sqlite = new SQLiteConfig(plugin);
             mysql = new MySQLConfig(plugin);
+            postgresql = new PostgreSQLConfig(plugin);
+            sqlite = new SQLiteConfig(plugin);
         }
         loadStorage();
     }
@@ -94,42 +95,42 @@ public class Configurations {
                     assert files != null;
                     if (storage != null) storage.close();
                     plugin.setStorage(new Json(plugin, files));
-                    plugin.console("Storage: Json"));
+                    plugin.console("Storage: Json");
                 }
             }
             case MARIADB -> {
                 if (!(storage instanceof MariaDB) || mariadb.isChanged() || isUpdated) {
                     if (storage != null) storage.close();
                     plugin.setStorage(new MariaDB(plugin, list));
-                    plugin.console("Storage: MariaDB"));
+                    plugin.console("Storage: MariaDB");
                 }
             }
             case MONGODB -> {
                 if (!(storage instanceof MongoDB) || mongodb.isChanged() || isUpdated) {
                     if (storage != null) storage.close();
                     plugin.setStorage(new MongoDB(plugin));
-                    plugin.console(ComponentFormatter.mini("Storage: MongoDB"));
+                    plugin.console("Storage: MongoDB");
                 }
             }
             case MYSQL -> {
                 if (!(storage instanceof MySQL) || mysql.isChanged() || isUpdated) {
                     if (storage != null) storage.close();
                     plugin.setStorage(new MySQL(plugin, list));
-                    plugin.console(ComponentFormatter.mini("Storage: MySQL"));
+                    plugin.console("Storage: MySQL");
                 }
             }
             case POSTGRESQL -> {
                 if (!(storage instanceof PostgreSQL) || postgresql.isChanged() || isUpdated) {
                     if (storage != null) storage.close();
                     plugin.setStorage(new PostgreSQL(plugin));
-                    plugin.console(ComponentFormatter.mini("Storage: PostgreSQL"));
+                    plugin.console("Storage: PostgreSQL");
                 }
             }
             case SQLITE -> {
                 if (!(storage instanceof SQLite) || sqlite.isChanged() || isUpdated) {
                     if (storage != null) storage.close();
-                    plugin.setStorage(new SQLite(plugin, list);
-                    plugin.console(ComponentFormatter.mini("Storage: SQLite");
+                    plugin.setStorage(new SQLite(plugin, list));
+                    plugin.console("Storage: SQLite");
                 }
             }
         }

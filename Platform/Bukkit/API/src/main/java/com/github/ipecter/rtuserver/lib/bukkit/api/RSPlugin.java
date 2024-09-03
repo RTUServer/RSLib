@@ -1,6 +1,5 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api;
 
-import com.github.ipecter.rtuserver.lib.bukkit.RSLib;
 import com.github.ipecter.rtuserver.lib.bukkit.api.command.RSCommand;
 import com.github.ipecter.rtuserver.lib.bukkit.api.config.Configurations;
 import com.github.ipecter.rtuserver.lib.bukkit.api.listener.RSListener;
@@ -17,7 +16,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -56,19 +54,19 @@ public abstract class RSPlugin extends JavaPlugin {
             return;
         }
         registerPermission(plugin.getName() + ".reload", PermissionDefault.OP);
-        for (String plugin : this.getDescription().getSoftDepend()) RSLib.getInstance().hookDependency(plugin);
+        //for (String plugin : this.getDescription().getSoftDepend()) RSLib.getInstance().hookDependency(plugin); TODO: RSFramework
         configurations = new Configurations(this);
         enable();
-        console("<green>활성화!</green>"));
-        RSLib.getInstance().loadPlugin(this);
+        console("<green>활성화!</green>");
+        //RSLib.getInstance().loadPlugin(this); TODO: RSFramework
     }
 
     @Override
     public void onDisable() {
         disable();
         if (storage != null) storage.close();
-        RSLib.getInstance().unloadPlugin(this);
-        console("<red>비활성화!</red>"));
+        //RSLib.getInstance().unloadPlugin(this); TODO: RSFramework
+        console("<red>비활성화!</red>");
         if (adventure != null) {
             adventure.close();
             adventure = null;
@@ -85,7 +83,7 @@ public abstract class RSPlugin extends JavaPlugin {
     }
 
     public void console(String minimessage) {
-        getAdventure().console().sendMessage(getPrefix().append(Component.text(" ")).append(ComponentFormatter.mini(minimessage));
+        getAdventure().console().sendMessage(getPrefix().append(Component.text(" ")).append(ComponentFormatter.mini(minimessage)));
     }
 
     public void registerEvent(RSListener listener) {
@@ -107,15 +105,15 @@ public abstract class RSPlugin extends JavaPlugin {
     }
 
     public void registerCommand(RSCommand command) {
-        RSLib.getInstance().getNMS().commandMap().register(command.getName(), command);
+        //TODO: RSFramework
     }
 
     public void registerPermission(String name, PermissionDefault permissionDefault) {
-        Bukkit.getPluginManager().addPermission(new Permission(name, permissionDefault
+        //TODO: RSFramework
     }
 
     protected void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
-        RSLib.getInstance().getProtoWeaver().registerProtocol(namespace, key, packetType, protocolHandler, null);
+        //TODO: RSFramework
     }
 
     protected void load() {

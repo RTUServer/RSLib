@@ -7,7 +7,19 @@ runServer {
     minecraftVersion("1.21")
 }
 
+subprojects {
+    dependencies {
+        compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
+    }
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 dependencies {
     implementation project(":Platform:Bukkit:Core")
     implementation project(":Platform:Bukkit:API")
+    implementation project(":Platform:Bukkit:Framework")
+    implementation project(":Platform:Bukkit:NMS")
+    implementation 'org.springframework:spring-context-support:6.1.12'
 }
