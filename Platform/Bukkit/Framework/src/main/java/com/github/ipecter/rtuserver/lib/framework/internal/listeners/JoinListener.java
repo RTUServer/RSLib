@@ -14,11 +14,8 @@ import java.util.Map;
 
 public class JoinListener extends RSListener {
 
-    private final RSFramework lib;
-
-    public JoinListener(RSFramework plugin) {
+    public JoinListener(RSPlugin plugin) {
         super(plugin);
-        this.lib = plugin;
     }
 
     @EventHandler

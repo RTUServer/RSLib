@@ -1,6 +1,6 @@
 package com.github.ipecter.rtuserver.lib.framework.internal.runnable;
 
-import com.github.ipecter.rtuserver.lib.framework.RSFramework;
+import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 
@@ -13,7 +13,7 @@ public class CommandLimit implements Runnable {
     @Getter
     private final Map<UUID, Integer> executeLimit = new ConcurrentHashMap<>();
 
-    public CommandLimit(RSFramework plugin) {
+    public CommandLimit(RSPlugin plugin) {
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this, 0, 1);
     }
 

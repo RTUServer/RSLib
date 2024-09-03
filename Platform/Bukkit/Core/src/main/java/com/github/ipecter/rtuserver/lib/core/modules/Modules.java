@@ -1,6 +1,6 @@
-package com.github.ipecter.rtuserver.lib.bukkit.modules;
+package com.github.ipecter.rtuserver.lib.core.modules;
 
-import com.github.ipecter.rtuserver.lib.bukkit.RSLib;
+import com.github.ipecter.rtuserver.lib.core.RSLib;
 import lombok.Getter;
 
 @Getter

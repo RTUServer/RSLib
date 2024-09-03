@@ -106,21 +106,21 @@ public class RSFramework {
     protected void enable(RSPlugin plugin) {
         printStartUp(plugin);
 
-        registerInternal();
+        registerInternal(plugin);
     }
 
-    private void registerInternal() {
-        registerInternalRunnable();
-        registerInternalListener();
+    private void registerInternal(RSPlugin plugin) {
+        registerInternalRunnable(plugin);
+        registerInternalListener(plugin);
     }
 
-    private void registerInternalRunnable() {
-        commandLimit = new CommandLimit(this);
+    private void registerInternalRunnable(RSPlugin plugin) {
+        commandLimit = new CommandLimit(plugin);
     }
 
-    private void registerInternalListener() {
-        registerEvent(new JoinListener(this));
-        registerEvent(new InventoryListener(this));
+    private void registerInternalListener(RSPlugin plugin) {
+        registerEvent(new JoinListener(plugin));
+        registerEvent(new InventoryListener(plugin));
     }
 
     private void printStartUp(RSPlugin plugin) {

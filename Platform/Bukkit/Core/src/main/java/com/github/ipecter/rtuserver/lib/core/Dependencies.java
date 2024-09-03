@@ -1,4 +1,4 @@
-package com.github.ipecter.rtuserver.lib.bukkit;
+package com.github.ipecter.rtuserver.lib.core;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;

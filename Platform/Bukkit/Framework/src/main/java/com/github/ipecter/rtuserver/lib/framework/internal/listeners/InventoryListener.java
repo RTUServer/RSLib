@@ -1,5 +1,6 @@
 package com.github.ipecter.rtuserver.lib.framework.internal.listeners;
 
+import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
 import com.github.ipecter.rtuserver.lib.framework.RSFramework;
 import com.github.ipecter.rtuserver.lib.bukkit.api.inventory.RSInventory;
 import com.github.ipecter.rtuserver.lib.bukkit.api.listener.RSListener;
@@ -14,11 +15,8 @@ import org.bukkit.inventory.Inventory;
 
 public class InventoryListener extends RSListener {
 
-    private final RSFramework lib;
-
-    public InventoryListener(RSFramework plugin) {
+    public InventoryListener(RSPlugin plugin) {
         super(plugin);
-        lib = plugin;
     }
 
     @EventHandler
