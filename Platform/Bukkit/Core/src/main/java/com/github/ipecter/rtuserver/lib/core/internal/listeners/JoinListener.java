@@ -1,9 +1,9 @@
-package com.github.ipecter.rtuserver.lib.framework.internal.listeners;
+package com.github.ipecter.rtuserver.lib.core.internal.listeners;
 
-import com.github.ipecter.rtuserver.lib.framework.RSFramework;
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
 import com.github.ipecter.rtuserver.lib.bukkit.api.listener.RSListener;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
+import com.github.ipecter.rtuserver.lib.core.RSFramework;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -14,16 +14,19 @@ import java.util.Map;
 
 public class JoinListener extends RSListener {
 
-    public JoinListener(RSPlugin plugin) {
+    private final RSFramework framework;
+
+    public JoinListener(RSFramework framework, RSPlugin plugin) {
         super(plugin);
+        this.framework = framework;
     }
 
     @EventHandler
     public void motdMessage(PlayerJoinEvent e) {
         Player player = e.getPlayer();
         if (!player.hasPermission(getPlugin().getName() + ".motd")) return;
-        Map<String, RSPlugin> plugins = lib.getPlugins();
-        Audience audience = lib.getAdventure().player(player);
+        Map<String, RSPlugin> plugins = framework.getPlugins();
+        Audience audience = getPlugin().getAdventure().player(player);
         for (RSPlugin plugin : plugins.values()) {
             if (!plugin.getConfigurations().getSetting().isMotd()) continue;
             String str = "%s developed by %s".formatted(player.getName(), String.join(" & ", plugin.getDescription().getAuthors()));

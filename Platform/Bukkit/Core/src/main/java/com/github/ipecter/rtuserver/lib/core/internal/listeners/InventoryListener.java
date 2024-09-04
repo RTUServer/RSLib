@@ -1,7 +1,6 @@
-package com.github.ipecter.rtuserver.lib.framework.internal.listeners;
+package com.github.ipecter.rtuserver.lib.core.internal.listeners;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
-import com.github.ipecter.rtuserver.lib.framework.RSFramework;
 import com.github.ipecter.rtuserver.lib.bukkit.api.inventory.RSInventory;
 import com.github.ipecter.rtuserver.lib.bukkit.api.listener.RSListener;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
@@ -32,8 +31,8 @@ public class InventoryListener extends RSListener {
             } catch (Exception exception) {
                 e.setCancelled(true);
                 Component errorMessage = ComponentFormatter.mini(getMessage().get("error.inventory"));
-                lib.console(errorMessage);
-                lib.getAdventure().player(player).sendMessage(errorMessage);
+                getPlugin().console(errorMessage);
+                getPlugin().getAdventure().player(player).sendMessage(errorMessage);
                 exception.printStackTrace();
             }
         }
@@ -52,8 +51,8 @@ public class InventoryListener extends RSListener {
             } catch (Exception ex) {
                 event.setCancelled(true);
                 Component errorMessage = ComponentFormatter.mini(getMessage().get("error.inventory"));
-                lib.console(errorMessage);
-                lib.getAdventure().player(player).sendMessage(errorMessage);
+                getPlugin().console(errorMessage);
+                getPlugin().getAdventure().player(player).sendMessage(errorMessage);
                 ex.printStackTrace();
             }
         }

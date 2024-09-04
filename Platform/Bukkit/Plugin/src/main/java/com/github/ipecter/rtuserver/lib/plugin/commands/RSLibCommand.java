@@ -1,6 +1,6 @@
-package com.github.ipecter.rtuserver.lib.core.commands;
+package com.github.ipecter.rtuserver.lib.plugin.commands;
 
-import com.github.ipecter.rtuserver.lib.core.RSLib;
+import com.github.ipecter.rtuserver.lib.plugin.RSLib;
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
 import com.github.ipecter.rtuserver.lib.bukkit.api.command.RSCommandData;
 import com.github.ipecter.rtuserver.lib.bukkit.api.command.RSCommand;

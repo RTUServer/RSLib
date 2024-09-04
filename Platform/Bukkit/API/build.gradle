@@ -27,28 +27,7 @@ dependencies {
 
 }
 
-processResources {
-    def props = [
-            name   : properties.get("name"),
-            version: version,
-            author : author
-    ]
-    inputs.properties props
-    filteringCharset 'UTF-8'
-    filesMatching('plugin.yml') {
-        expand props
-    }
-}
-
 shadowJar {
-    relocate 'io.papermc.lib', 'com.github.ipecter.rtuserver.lib.bukkit.util.paper'
-}
-
-tasks {
-    build {
-        dependsOn(shadowJar)
-    }
-    shadowJar {
-        setArchiveClassifier(null)
-    }
+    relocate 'io.papermc.lib', 'com.github.ipecter.rtuserver.lib.bukkit.api.util.paper'
+    relocate('net.kyori.adventure.platform', 'com.github.ipecter.rtuserver.lib.bukkit.api.util.kyori.adventure.platform')
 }

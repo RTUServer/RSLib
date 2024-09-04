@@ -1,4 +1,4 @@
-package com.github.ipecter.rtuserver.lib.framework;
+package com.github.ipecter.rtuserver.lib.core;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
 import com.github.ipecter.rtuserver.lib.bukkit.api.command.RSCommand;
@@ -6,9 +6,9 @@ import com.github.ipecter.rtuserver.lib.bukkit.api.listener.RSListener;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.platform.MinecraftVersion;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.platform.SystemEnviroment;
-import com.github.ipecter.rtuserver.lib.framework.internal.listeners.InventoryListener;
-import com.github.ipecter.rtuserver.lib.framework.internal.listeners.JoinListener;
-import com.github.ipecter.rtuserver.lib.framework.internal.runnable.CommandLimit;
+import com.github.ipecter.rtuserver.lib.core.internal.listeners.InventoryListener;
+import com.github.ipecter.rtuserver.lib.core.internal.listeners.JoinListener;
+import com.github.ipecter.rtuserver.lib.core.internal.runnable.CommandLimit;
 import com.github.ipecter.rtuserver.lib.nms.v1_17_r1.NMS_1_17_R1;
 import com.github.ipecter.rtuserver.lib.nms.v1_18_r1.NMS_1_18_R1;
 import com.github.ipecter.rtuserver.lib.nms.v1_18_r2.NMS_1_18_R2;
@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j(topic = "RSLib/Framework")
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+//@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RSFramework {
 
     @Getter
@@ -105,7 +105,6 @@ public class RSFramework {
 
     protected void enable(RSPlugin plugin) {
         printStartUp(plugin);
-
         registerInternal(plugin);
     }
 
@@ -119,7 +118,7 @@ public class RSFramework {
     }
 
     private void registerInternalListener(RSPlugin plugin) {
-        registerEvent(new JoinListener(plugin));
+        registerEvent(new JoinListener(this, plugin));
         registerEvent(new InventoryListener(plugin));
     }
 

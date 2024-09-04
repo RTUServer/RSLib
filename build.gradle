@@ -63,6 +63,15 @@ allprojects {
         compileOnly 'org.postgresql:postgresql:42.7.3'
         compileOnly 'com.zaxxer:HikariCP:5.1.0'
     }
+
+    tasks {
+        build {
+            dependsOn(shadowJar)
+        }
+        shadowJar {
+            setArchiveClassifier(null)
+        }
+    }
 }
 
 dependencies {
@@ -80,11 +89,7 @@ shadowJar {
 }
 
 tasks {
-    build {
-        dependsOn(shadowJar)
-    }
     shadowJar {
-        setArchiveClassifier(null)
         doLast {
             copy {
                 from archiveFile.get().asFile into file("$projectDir/builds")

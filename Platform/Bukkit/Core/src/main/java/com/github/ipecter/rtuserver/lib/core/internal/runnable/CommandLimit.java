@@ -1,4 +1,4 @@
-package com.github.ipecter.rtuserver.lib.framework.internal.runnable;
+package com.github.ipecter.rtuserver.lib.core.internal.runnable;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
 import lombok.Getter;

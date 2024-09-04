@@ -29,7 +29,7 @@ include 'Platform:Bukkit',
         'Platform:Bukkit:API',
         'Platform:Bukkit:Core',
         'Platform:Bukkit:DI',
-        'Platform:Bukkit:Framework',
+        'Platform:Bukkit:Plugin',
         'Platform:Bukkit:NMS'
 
 include 'Platform:Bukkit:NMS:NMS',

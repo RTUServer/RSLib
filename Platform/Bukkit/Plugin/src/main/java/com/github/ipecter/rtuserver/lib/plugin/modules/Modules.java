@@ -1,6 +1,6 @@
-package com.github.ipecter.rtuserver.lib.core.modules;
+package com.github.ipecter.rtuserver.lib.plugin.modules;
 
-import com.github.ipecter.rtuserver.lib.core.RSLib;
+import com.github.ipecter.rtuserver.lib.plugin.RSLib;
 import lombok.Getter;
 
 @Getter

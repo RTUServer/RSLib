@@ -1,4 +1,4 @@
-package com.github.ipecter.rtuserver.lib.core.modules;
+package com.github.ipecter.rtuserver.lib.plugin.modules;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
 import com.github.ipecter.rtuserver.lib.bukkit.api.config.RSConfiguration;

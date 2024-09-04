@@ -1,10 +1,10 @@
-package com.github.ipecter.rtuserver.lib.core;
+package com.github.ipecter.rtuserver.lib.plugin;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.platform.MinecraftVersion;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.platform.SystemEnviroment;
-import com.github.ipecter.rtuserver.lib.core.commands.RSLibCommand;
-import com.github.ipecter.rtuserver.lib.core.modules.Modules;
+import com.github.ipecter.rtuserver.lib.plugin.commands.RSLibCommand;
+import com.github.ipecter.rtuserver.lib.plugin.modules.Modules;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
