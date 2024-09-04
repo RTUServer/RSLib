@@ -74,7 +74,7 @@ public class RSFramework {
         hooks.put(dependencyName, Bukkit.getPluginManager().isPluginEnabled(dependencyName));
     }
 
-    protected void load(RSPlugin plugin) {
+    public void load(RSPlugin plugin) {
         loadNMS(plugin);
     }
 
@@ -103,7 +103,7 @@ public class RSFramework {
     private void onPacket(ProtoConnection connection, Object object) {
     }
 
-    protected void enable(RSPlugin plugin) {
+    public void enable(RSPlugin plugin) {
         printStartUp(plugin);
         registerInternal(plugin);
     }

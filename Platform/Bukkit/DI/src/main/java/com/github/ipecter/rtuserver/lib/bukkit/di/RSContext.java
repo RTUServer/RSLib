@@ -5,15 +5,21 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-public class Application {
+public class RSContext {
+
+    private static ApplicationContext context;
 
     public static void initialize() {
-        ApplicationContext context = new AnnotationConfigApplicationContext(Config.class); // 1
+        context = new AnnotationConfigApplicationContext(Config.class); // 1
+    }
+
+    public static ApplicationContext get() {
+        return context;
     }
 
     static class Config {
         @Bean
-        public RSFramework departmentService() {
+        public RSFramework Framework() {
             return new RSFramework();
         }
     }
