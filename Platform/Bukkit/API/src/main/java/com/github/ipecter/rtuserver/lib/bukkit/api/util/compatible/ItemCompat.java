@@ -1,6 +1,7 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.util.compatible;
 
-import com.github.ipecter.rtuserver.lib.bukkit.RSLib;
+import com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework;
+import com.google.inject.Inject;
 import dev.lone.itemsadder.api.CustomStack;
 import io.th0rgal.oraxen.api.OraxenItems;
 import io.th0rgal.oraxen.items.ItemBuilder;
@@ -23,6 +24,9 @@ import java.util.Base64;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemCompat {
 
+    @Inject
+    private static RSFramework framework;
+
     @Nullable
     public static ItemStack from(@NotNull String namespacedID) {
         String[] split = namespacedID.split(":");
@@ -30,13 +34,13 @@ public class ItemCompat {
         switch (platform) {
             case "oraxen" -> {
                 if (split.length != 2) return null;
-                if (RSLib.getInstance().isEnabledDependency("Oraxen")) {
+                if (framework.isEnabledDependency("Oraxen")) {
                     ItemBuilder itemBuilder = OraxenItems.getItemById(split[1]);
                     return itemBuilder != null ? itemBuilder.build() : null;
                 } else return null;
             }
             case "itemsadder" -> {
-                if (RSLib.getInstance().isEnabledDependency("ItemsAdder")) {
+                if (framework.isEnabledDependency("ItemsAdder")) {
                     if (split.length != 3) return null;
                     CustomStack customStack = CustomStack.getInstance(split[1] + ":" + split[2]);
                     return customStack != null ? customStack.getItemStack() : null;
@@ -64,11 +68,11 @@ public class ItemCompat {
 
     @NotNull
     public static String to(@NotNull ItemStack itemStack) {
-        if (RSLib.getInstance().isEnabledDependency("Oraxen")) {
+        if (framework.isEnabledDependency("Oraxen")) {
             String oraxen = OraxenItems.getIdByItem(itemStack);
             if (oraxen != null) return "oraxen:" + oraxen;
         }
-        if (RSLib.getInstance().isEnabledDependency("ItemsAdder")) {
+        if (framework.isEnabledDependency("ItemsAdder")) {
             CustomStack itemsAdder = CustomStack.byItemStack(itemStack);
             if (itemsAdder != null) return "itemsadder:" + itemsAdder.getNamespacedID();
         }
@@ -80,14 +84,14 @@ public class ItemCompat {
     }
 
     public static boolean isSimilar(ItemStack stack1, ItemStack stack2) {
-        if (RSLib.getInstance().isEnabledDependency("Oraxen")) {
+        if (framework.isEnabledDependency("Oraxen")) {
             String var1 = OraxenItems.getIdByItem(stack1);
             String var2 = OraxenItems.getIdByItem(stack2);
             if (var1 != null && var2 != null) return var1.equalsIgnoreCase(var2);
             else if (var1 != null) return OraxenItems.getItemById(var1).build().isSimilar(stack2);
             else if (var2 != null) return OraxenItems.getItemById(var2).build().isSimilar(stack1);
         }
-        if (RSLib.getInstance().isEnabledDependency("ItemsAdder")) {
+        if (framework.isEnabledDependency("ItemsAdder")) {
             CustomStack var1 = CustomStack.byItemStack(stack1);
             CustomStack var2 = CustomStack.byItemStack(stack2);
             if (var1 != null && var2 != null) return var1.getNamespacedID().equalsIgnoreCase(var2.getNamespacedID());

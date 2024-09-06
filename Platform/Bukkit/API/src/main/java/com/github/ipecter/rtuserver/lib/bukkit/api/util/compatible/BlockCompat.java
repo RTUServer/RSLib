@@ -1,6 +1,7 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.util.compatible;
 
-import com.github.ipecter.rtuserver.lib.bukkit.RSLib;
+import com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework;
+import com.google.inject.Inject;
 import dev.lone.itemsadder.api.CustomBlock;
 import io.th0rgal.oraxen.api.OraxenBlocks;
 import io.th0rgal.oraxen.mechanics.Mechanic;
@@ -18,18 +19,21 @@ import javax.annotation.Nullable;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BlockCompat {
 
+    @Inject
+    private static RSFramework framework;
+
     @Nullable
     public static BlockData from(String data) {
         String[] split = data.split(":");
         String platform = split[0].toLowerCase();
         switch (platform) {
             case "oraxen" -> {
-                if (RSLib.getInstance().isEnabledDependency("Oraxen")) {
+                if (framework.isEnabledDependency("Oraxen")) {
                     return OraxenBlocks.getOraxenBlockData(split[1]);
                 } else return null;
             }
             case "itemsadder" -> {
-                if (RSLib.getInstance().isEnabledDependency("ItemsAdder")) {
+                if (framework.isEnabledDependency("ItemsAdder")) {
                     CustomBlock customBlock = CustomBlock.getInstance(split[1] + ":" + split[2]);
                     return customBlock != null ? customBlock.getBaseBlockData() : null;
                 } else return null;
@@ -44,12 +48,12 @@ public class BlockCompat {
 
     @NotNull
     public static String to(Block block) {
-        if (RSLib.getInstance().isEnabledDependency("Oraxen")) {
+        if (framework.isEnabledDependency("Oraxen")) {
             Mechanic oraxen = OraxenBlocks.getOraxenBlock(block.getBlockData());
             if (oraxen != null)
                 return "oraxen:" + oraxen.getItemID();
         }
-        if (RSLib.getInstance().isEnabledDependency("ItemsAdder")) {
+        if (framework.isEnabledDependency("ItemsAdder")) {
             CustomBlock itemsAdder = CustomBlock.byAlreadyPlaced(block);
             if (itemsAdder != null)
                 return "itemsadder:" + itemsAdder.getNamespacedID();
@@ -62,14 +66,14 @@ public class BlockCompat {
         String platform = split[0].toLowerCase();
         switch (platform) {
             case "oraxen" -> {
-                if (RSLib.getInstance().isEnabledDependency("Oraxen")) {
+                if (framework.isEnabledDependency("Oraxen")) {
                     if (OraxenBlocks.isOraxenBlock(namespacedID)) OraxenBlocks.place(split[1], location);
                     else return false;
                 } else return false;
                 return true;
             }
             case "itemsadder" -> {
-                if (RSLib.getInstance().isEnabledDependency("ItemsAdder")) {
+                if (framework.isEnabledDependency("ItemsAdder")) {
                     String block = split[1] + ":" + split[2];
                     if (CustomBlock.isInRegistry(block)) CustomBlock.place(block, location);
                     else return false;

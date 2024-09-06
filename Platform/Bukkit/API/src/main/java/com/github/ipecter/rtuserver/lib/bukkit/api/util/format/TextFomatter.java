@@ -1,18 +1,25 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.util.format;
 
 import com.github.ipecter.rtuserver.lib.bukkit.RSLib;
-import com.github.ipecter.rtuserver.lib.bukkit.api.config.Configurations;
+import com.github.ipecter.rtuserver.lib.bukkit.api.config.framework.getConfigurations();
 import com.github.ipecter.rtuserver.lib.bukkit.api.config.MessageConfiguration;
+import com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework;
+import com.google.inject.Inject;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TextFomatter {
 
-    private static final Configurations configurations = RSLib.getInstance().getConfigurations();
-    private static final MessageConfiguration message = configurations.getMessage();
+    @Inject
+    private static RSFramework framework;
+
+    private static final MessageConfiguration message = framework.getConfigurations().getMessage();
 
     public static DataNameType checkType(List<String> list, String name) {
         if (name.matches("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9_]*$")) {
@@ -30,7 +37,7 @@ public class TextFomatter {
     }
 
     public static DataNameType checkType(Player player, List<String> list, String name) {
-        Audience audience = RSLib.getInstance().getAdventure().player(player);
+        Audience audience = framework.getAdventure().player(player);
         DataNameType dataNameType = checkType(list, name);
         switch (dataNameType) {
             case ALL -> audience.sendMessage(ComponentFormatter.parse(message.get("dataNameType.all")));

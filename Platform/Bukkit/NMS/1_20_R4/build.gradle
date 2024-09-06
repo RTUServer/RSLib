@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly project(':Platform:Bukkit:NMS:NMS')
+    compileOnly project(':Platform:Bukkit:API')
     paperweight.paperDevBundle("1.20.6-R0.1-SNAPSHOT")
 }
 

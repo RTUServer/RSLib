@@ -1,6 +1,7 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.util.dependencies;
 
-import com.github.ipecter.rtuserver.lib.bukkit.RSLib;
+import com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework;
+import com.google.inject.Inject;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -15,15 +16,18 @@ import org.jetbrains.annotations.NotNull;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PAPI {
 
+    @Inject
+    private static RSFramework framework;
+
     public static String parse(CommandSender sender, String message) {
-        if (!RSLib.getInstance().isEnabledDependency("PlaceholderAPI")) return message;
+        if (!framework.isEnabledDependency("PlaceholderAPI")) return message;
         return PlaceholderAPI.setPlaceholders((sender instanceof Player player) ? player : null, message);
     }
 
     public static @NotNull TagResolver tag(final @NotNull Player player) {
         return TagResolver.resolver("papi", (argumentQueue, context) -> {
             final String papiPlaceholder = argumentQueue.popOr("papi tag requires an argument").value();
-            if (!RSLib.getInstance().isEnabledDependency("PlaceholderAPI"))
+            if (!framework.isEnabledDependency("PlaceholderAPI"))
                 return Tag.selfClosingInserting(Component.empty());
             final String parsedPlaceholder = PlaceholderAPI.setPlaceholders(player, '%' + papiPlaceholder + '%');
             final Component componentPlaceholder = LegacyComponentSerializer.legacySection().deserialize(parsedPlaceholder);

@@ -8,9 +8,13 @@ subprojects {
 }
 
 dependencies {
+    compileOnly project(path: ':Platform:Bukkit:API')
+    compileOnly project(path: ':Platform:Bukkit:Core')
+
     implementation project(":Library:MiniMessage")
     implementation project(":Library:ProtoWeaver:Common")
     implementation project(":Library:ProtoWeaver:Bukkit")
+
     implementation 'com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4'
 
     compileOnly 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'
@@ -25,9 +29,6 @@ dependencies {
     compileOnly "com.github.MilkBowl:VaultAPI:1.7.1"
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.1.0'
     compileOnly 'net.luckperms:api:5.4'
-
-    implementation project(path: ':Platform:Bukkit:API')
-    implementation project(path: ':Platform:Bukkit:Core')
 
 }
 

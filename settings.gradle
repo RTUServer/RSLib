@@ -28,12 +28,10 @@ include 'Platform'
 include 'Platform:Bukkit',
         'Platform:Bukkit:API',
         'Platform:Bukkit:Core',
-        'Platform:Bukkit:DI',
         'Platform:Bukkit:Plugin',
         'Platform:Bukkit:NMS'
 
-include 'Platform:Bukkit:NMS:NMS',
-        'Platform:Bukkit:NMS:1_17_R1',
+include 'Platform:Bukkit:NMS:1_17_R1',
         'Platform:Bukkit:NMS:1_18_R1',
         'Platform:Bukkit:NMS:1_18_R2',
         'Platform:Bukkit:NMS:1_19_R1',

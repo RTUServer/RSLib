@@ -1,5 +1,7 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.util.external;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
@@ -7,6 +9,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuartzUtil {
 
     public static void addTask(String name, String cron, Class<? extends Job> job) {

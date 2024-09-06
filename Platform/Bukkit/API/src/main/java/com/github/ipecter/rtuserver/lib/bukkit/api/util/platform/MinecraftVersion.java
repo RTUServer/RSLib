@@ -1,11 +1,14 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.util.platform;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MinecraftVersion {
 
     private static final String VERSION_STR = fromAPI(Bukkit.getBukkitVersion());

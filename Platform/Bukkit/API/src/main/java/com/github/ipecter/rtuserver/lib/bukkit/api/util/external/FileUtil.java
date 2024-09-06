@@ -1,6 +1,8 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.util.external;
 
 import com.google.common.io.ByteStreams;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -10,6 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.logging.Level;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileUtil {
 
     public static File copyResource(Plugin plugin, String sourceFile) {
