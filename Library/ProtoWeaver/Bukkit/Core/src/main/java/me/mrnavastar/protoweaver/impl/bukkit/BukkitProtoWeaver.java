@@ -6,7 +6,7 @@ import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.protocol.CompressionType;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
 import me.mrnavastar.protoweaver.api.protocol.velocity.VelocityAuth;
-import me.mrnavastar.protoweaver.impl.PacketCallback;
+import me.mrnavastar.protoweaver.api.impl.PacketCallback;
 import me.mrnavastar.protoweaver.impl.bukkit.nms.IProtoWeaver;
 import me.mrnavastar.protoweaver.impl.bukkit.nms.v1_17_r1.ProtoWeaver_1_17_R1;
 import me.mrnavastar.protoweaver.impl.bukkit.nms.v1_18_r1.ProtoWeaver_1_18_R1;

@@ -7,7 +7,7 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
-import me.mrnavastar.protoweaver.impl.PacketCallback;
+import me.mrnavastar.protoweaver.api.impl.PacketCallback;
 import me.mrnavastar.protoweaver.impl.velocity.VelocityProtoWeaver;
 
 import java.nio.file.Path;

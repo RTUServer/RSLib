@@ -5,7 +5,7 @@ import com.github.ipecter.rtuserver.lib.bukkit.api.command.RSCommand;
 import com.github.ipecter.rtuserver.lib.bukkit.api.core.internal.runnable.CommandLimit;
 import com.github.ipecter.rtuserver.lib.bukkit.api.listener.RSListener;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
-import me.mrnavastar.protoweaver.impl.bukkit.BukkitProtoWeaver;
+import me.mrnavastar.protoweaver.api.impl.bukkit.BukkitProtoWeaver;
 import net.kyori.adventure.text.Component;
 import org.bukkit.permissions.PermissionDefault;
 

@@ -14,7 +14,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
-import me.mrnavastar.protoweaver.impl.PacketCallback;
+import me.mrnavastar.protoweaver.api.impl.PacketCallback;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.PermissionDefault;
 

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
-import me.mrnavastar.protoweaver.impl.PacketCallback;
+import me.mrnavastar.protoweaver.api.impl.PacketCallback;
 
 @Slf4j(topic = "RSLib/ProtoHandler")
 @NoArgsConstructor(force = true)
