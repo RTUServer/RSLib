@@ -1,4 +1,0 @@
-dependencies {
-    //implementation project(":Library:MiniMessage")
-    implementation project(":Library:ProtoWeaver")
-}

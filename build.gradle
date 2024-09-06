@@ -75,9 +75,8 @@ allprojects {
 }
 
 dependencies {
-    implementation project(":Library")
+    implementation project(":Library:MiniMessage")
     implementation project(":Platform")
-
 
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'

@@ -1,5 +1,7 @@
 dependencies {
-    compileOnly project(":Library:ProtoWeaver:Common")
+    compileOnly project(":Library:ProtoWeaver:Bungee:API")
+    compileOnly project(":Library:ProtoWeaver:Common:API")
+    compileOnly project(":Library:ProtoWeaver:Common:Core")
     compileOnly 'io.github.waterfallmc:waterfall-api:1.20-R0.3-SNAPSHOT'
 }
 

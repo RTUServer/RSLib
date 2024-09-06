@@ -1,6 +1,6 @@
 dependencies {
-    implementation project(":Platform:Common")
-    implementation project(":Platform:Bukkit")
-    implementation project(":Platform:Bungee")
-    implementation project(":Platform:Velocity")
+    implementation project("Common")
+    implementation project("Bukkit")
+    implementation project("Bungee")
+    implementation project("Velocity")
 }

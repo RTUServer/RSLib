@@ -19,9 +19,9 @@ subprojects {
 }
 
 dependencies {
-    implementation project(":Platform:Bukkit:Plugin")
-    implementation project(":Platform:Bukkit:API")
-    implementation project(":Platform:Bukkit:Core")
-    implementation project(":Platform:Bukkit:NMS")
+    implementation project("Plugin")
+    implementation project("API")
+    implementation project("Core")
+    implementation project("NMS")
     implementation 'com.google.inject:guice:7.0.0'
 }

@@ -1,0 +1,4 @@
+dependencies {
+    compileOnly project(":Library:ProtoWeaver:Common:API")
+    compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
+}

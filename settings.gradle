@@ -4,8 +4,6 @@ rootProject.name = 'RSLib'
 
 include 'Library:MiniMessage'
 
-include 'Library:ProtoWeaver'
-
 include 'Library:ProtoWeaver:Common:API',
         'Library:ProtoWeaver:Common:Core'
 
