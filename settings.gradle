@@ -4,11 +4,19 @@ rootProject.name = 'RSLib'
 
 include 'Library:MiniMessage'
 
-include 'Library:ProtoWeaver',
-        'Library:ProtoWeaver:Common',
-        'Library:ProtoWeaver:Bukkit',
-        'Library:ProtoWeaver:Velocity',
-        'Library:ProtoWeaver:Bungee'
+include 'Library:ProtoWeaver'
+
+include 'Library:ProtoWeaver:Common:API',
+        'Library:ProtoWeaver:Common:Core'
+
+include 'Library:ProtoWeaver:Velocity:API',
+        'Library:ProtoWeaver:Velocity:Core'
+
+include 'Library:ProtoWeaver:Bungee:API',
+        'Library:ProtoWeaver:Bungee:Core'
+
+include 'Library:ProtoWeaver:Bukkit:API',
+        'Library:ProtoWeaver:Bukkit:Core'
 
 include 'Library:ProtoWeaver:Bukkit:NMS:NMS',
         'Library:ProtoWeaver:Bukkit:NMS:1_17_R1',
