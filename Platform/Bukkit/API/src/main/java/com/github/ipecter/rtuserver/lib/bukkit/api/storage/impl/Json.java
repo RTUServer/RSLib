@@ -43,8 +43,8 @@ public class Json implements Storage {
     @Override
     public boolean add(String name, JsonObject data) {
         if (!map.containsKey(name)) {
-            plugin.console("<red>Can't load " + name + " data!</red>"));
-            plugin.console(ComponentFormatter.mini("<red>" + name + " 파일을 불러오는 도중 오류가 발생하였습니다!</red>"));
+            plugin.console("<red>Can't load " + name + " data!</red>");
+            plugin.console("<red>" + name + " 파일을 불러오는 도중 오류가 발생하였습니다!</red>");
             return false;
         }
         return map.get(name).add(data);
@@ -53,8 +53,8 @@ public class Json implements Storage {
     @Override
     public boolean set(String name, Pair<String, Object> find, Pair<String, Object> data) {
         if (!map.containsKey(name)) {
-            plugin.console(ComponentFormatter.mini("<red>Can't load " + name + " data!</red>"));
-            plugin.console(ComponentFormatter.mini("<red>" + name + " 파일을 불러오는 도중 오류가 발생하였습니다!</red>"));
+            plugin.console("<red>Can't load " + name + " data!</red>");
+            plugin.console("<red>" + name + " 파일을 불러오는 도중 오류가 발생하였습니다!</red>");
             return false;
         }
         return map.get(name).set(find, data);
@@ -63,8 +63,8 @@ public class Json implements Storage {
     @Override
     public List<JsonObject> get(String name, Pair<String, Object> find) {
         if (!map.containsKey(name)) {
-            plugin.console(ComponentFormatter.mini("<red>Can't load " + name + " data!</red>"));
-            plugin.console(ComponentFormatter.mini("<red>" + name + " 파일을 불러오는 도중 오류가 발생하였습니다!</red>"));
+            plugin.console("<red>Can't load " + name + " data!</red>");
+            plugin.console("<red>" + name + " 파일을 불러오는 도중 오류가 발생하였습니다!</red>");
             return null;
         }
         return map.get(name).get(find);
@@ -72,8 +72,8 @@ public class Json implements Storage {
 
     public boolean sync(String name) {
         if (!map.containsKey(name)) {
-            plugin.console(ComponentFormatter.mini("<red>Can't load " + name + " data!</red>"));
-            plugin.console(ComponentFormatter.mini("<red>" + name + " 파일을 불러오는 도중 오류가 발생하였습니다!</red>"));
+            plugin.console("<red>Can't load " + name + " data!</red>");
+            plugin.console("<red>" + name + " 파일을 불러오는 도중 오류가 발생하였습니다!</red>");
             return false;
         }
         return map.get(name).sync();
@@ -137,8 +137,8 @@ public class Json implements Storage {
                     } else if (object instanceof String str) {
                         valObj.addProperty(value.getKey(), str);
                     } else {
-                        plugin.console(ComponentFormatter.mini("<red>Unsupported type of data tried to be saved! Only supports JsonElement, Number, Boolean, and String</red>"));
-                        plugin.console(ComponentFormatter.mini("<red>지원하지 않는 타입의 데이터가 저장되려고 했습니다! JsonElement, Number, Boolean, String만 지원합니다</red>"));
+                        plugin.console("<red>Unsupported type of data tried to be saved! Only supports JsonElement, Number, Boolean, and String</red>");
+                        plugin.console("<red>지원하지 않는 타입의 데이터가 저장되려고 했습니다! JsonElement, Number, Boolean, String만 지원합니다</red>");
                         data = backup;
                         return false;
                     }
@@ -194,8 +194,8 @@ public class Json implements Storage {
                 data = json != null && !json.isJsonNull() ? json.getAsJsonArray() : new JsonArray();
                 return true;
             } catch (FileNotFoundException e) {
-                plugin.console(ComponentFormatter.mini("<red>Error when sync " + file.getName() + "!</red>"));
-                plugin.console(ComponentFormatter.mini("<red> " + file.getName() + " 파일과 동기화 도중 오류가 발생하였습니다!</red>"));
+                plugin.console("<red>Error when sync " + file.getName() + "!</red>");
+                plugin.console("<red> " + file.getName() + " 파일과 동기화 도중 오류가 발생하였습니다!</red>");
                 return false;
             }
         }
@@ -204,8 +204,8 @@ public class Json implements Storage {
             try (Writer writer = new FileWriter(file)) {
                 gson.newBuilder().setPrettyPrinting().create().toJson(data, writer);
             } catch (IOException e) {
-                plugin.console(ComponentFormatter.mini("<red>Error when saving " + file.getName() + "!</red>"));
-                plugin.console(ComponentFormatter.mini("<red> " + file.getName() + " 파일을 저장하는 도중 오류가 발생하였습니다!</red>");
+                plugin.console("<red>Error when saving " + file.getName() + "!</red>");
+                plugin.console("<red> " + file.getName() + " 파일을 저장하는 도중 오류가 발생하였습니다!</red>");
             }
         }
 

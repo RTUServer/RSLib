@@ -1,7 +1,6 @@
 package com.github.ipecter.rtuserver.lib.bukkit.nms.v1_20_r1;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.nms.NMSBiome;
-import com.github.ipecter.rtuserver.lib.nms.NMSBiome;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;

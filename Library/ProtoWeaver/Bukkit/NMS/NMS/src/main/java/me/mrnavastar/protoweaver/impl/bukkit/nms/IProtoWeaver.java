@@ -1,6 +1,6 @@
 package me.mrnavastar.protoweaver.impl.bukkit.nms;
 
-import me.mrnavastar.protoweaver.core.util.ProtoLogger;
+import me.mrnavastar.protoweaver.api.util.ProtoLogger;
 
 public interface IProtoWeaver extends ProtoLogger.IProtoLogger {
     boolean isModernProxy();

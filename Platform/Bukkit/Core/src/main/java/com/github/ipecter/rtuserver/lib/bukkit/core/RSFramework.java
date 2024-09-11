@@ -6,9 +6,11 @@ import com.github.ipecter.rtuserver.lib.bukkit.api.listener.RSListener;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.platform.MinecraftVersion;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.platform.SystemEnviroment;
+import com.github.ipecter.rtuserver.lib.bukkit.core.config.CommonTranslation;
 import com.github.ipecter.rtuserver.lib.bukkit.core.internal.listeners.InventoryListener;
 import com.github.ipecter.rtuserver.lib.bukkit.core.internal.listeners.JoinListener;
 import com.github.ipecter.rtuserver.lib.bukkit.core.internal.runnable.CommandLimit;
+import com.github.ipecter.rtuserver.lib.bukkit.core.modules.Modules;
 import com.github.ipecter.rtuserver.lib.bukkit.nms.v1_17_r1.NMS_1_17_R1;
 import com.github.ipecter.rtuserver.lib.bukkit.nms.v1_18_r1.NMS_1_18_R1;
 import com.github.ipecter.rtuserver.lib.bukkit.nms.v1_18_r2.NMS_1_18_R2;
@@ -23,15 +25,17 @@ import com.github.ipecter.rtuserver.lib.bukkit.nms.v1_21_r1.NMS_1_21_R1;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
+import me.mrnavastar.protoweaver.api.callback.PacketCallback;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
-import me.mrnavastar.protoweaver.api.impl.PacketCallback;
-import me.mrnavastar.protoweaver.api.impl.bukkit.BukkitProtoWeaver;
+import me.mrnavastar.protoweaver.impl.bukkit.core.BukkitProtoWeaver;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j(topic = "RSLib/Framework")
@@ -55,6 +59,10 @@ public class RSFramework implements com.github.ipecter.rtuserver.lib.bukkit.api.
     private String NMSVersion;
     @Getter
     private CommandLimit commandLimit;
+    @Getter
+    private CommonTranslation commonTranslation;
+    @Getter
+    private Modules modules;
 
     public void loadPlugin(RSPlugin plugin) {
         log.info("loading RSPlugin: {}", plugin.getName());
@@ -105,6 +113,8 @@ public class RSFramework implements com.github.ipecter.rtuserver.lib.bukkit.api.
 
     public void enable(RSPlugin plugin) {
         printStartUp(plugin);
+        commonTranslation = new CommonTranslation(plugin);
+        modules = new Modules(plugin);
         registerInternal(plugin);
     }
 
@@ -126,20 +136,23 @@ public class RSFramework implements com.github.ipecter.rtuserver.lib.bukkit.api.
     }
 
     private void printStartUp(RSPlugin plugin) {
-        String str = """
-                RSLib | Version: %version% | Bukkit: %bukkit% | NMS: %nms% | OS: %os% | JDK: %jdk%
-                ╔ Developed by ════════════════════════════════════════════════════════════════════════════╗
-                ║ ░█▀▄░█░█░▀█▀░█▀█░█▀▀░█▀▄░░░▀█▀░█▀▀░█▀▀░█░█░█▀█░█▀█░█░░░█▀█░█▀▀░█░█░░░█░█░█▀█░▀█▀░█▀▀░█░█ ║
-                ║ ░█▀▄░█░█░░█░░█░█░█▀▀░█░█░░░░█░░█▀▀░█░░░█▀█░█░█░█░█░█░░░█░█░█░█░░█░░░░█░█░█░█░░█░░█▀▀░░█░ ║
-                ║ ░▀░▀░▀▀▀░▀▀▀░▀░▀░▀▀▀░▀▀░░░░░▀░░▀▀▀░▀▀▀░▀░▀░▀░▀░▀▀▀░▀▀▀░▀▀▀░▀▀▀░░▀░░░░▀▀▀░▀░▀░▀▀▀░▀░░░░▀░ ║
-                ╚══════════════════════════════════════════════════════════════════════════════════════════╝
-                """
-                .replace("%version%", plugin.getDescription().getVersion())
-                .replace("%bukkit%", Bukkit.getName() + "-" + MinecraftVersion.getAsText())
-                .replace("%nms%", NMSVersion)
-                .replace("%os%", SystemEnviroment.getOS())
-                .replace("%jdk%", SystemEnviroment.getJDKVersion());
-        System.out.println(str);
+        Audience audience = plugin.getAdventure().console();
+        List<String> list = List.of(
+                "╔ <gray>Developed by</gray> ════════════════════════════════════════════════════════════════════════════╗",
+                "║ ░█▀▄░█░█░▀█▀░█▀█░█▀▀░█▀▄░░░▀█▀░█▀▀░█▀▀░█░█░█▀█░█▀█░█░░░█▀█░█▀▀░█░█░░░█░█░█▀█░▀█▀░█▀▀░█░█ ║",
+                "║ ░█▀▄░█░█░░█░░█░█░█▀▀░█░█░░░░█░░█▀▀░█░░░█▀█░█░█░█░█░█░░░█░█░█░█░░█░░░░█░█░█░█░░█░░█▀▀░░█░ ║",
+                "║ ░▀░▀░▀▀▀░▀▀▀░▀░▀░▀▀▀░▀▀░░░░░▀░░▀▀▀░▀▀▀░▀░▀░▀░▀░▀▀▀░▀▀▀░▀▀▀░▀▀▀░░▀░░░░▀▀▀░▀░▀░▀▀▀░▀░░░░▀░ ║",
+                "╚══════════════════════════════════════════════════════════════════════════════════════════╝"
+        );
+        audience.sendMessage(ComponentFormatter.mini(
+                "RSLib | Version: %s | Bukkit: %s | NMS: %s | OS: %s | JDK: %s"
+                        .formatted(plugin.getDescription().getVersion()
+                                , Bukkit.getName() + "-" + MinecraftVersion.getAsText()
+                                , NMSVersion
+                                , SystemEnviroment.getOS()
+                                , SystemEnviroment.getJDKVersion())));
+        for (String message : list)
+            audience.sendMessage(ComponentFormatter.mini("<gradient:#2979FF:#7C4DFF>" + message + "</gradient>"));
     }
 
     public void registerEvent(RSListener listener) {
@@ -154,7 +167,7 @@ public class RSFramework implements com.github.ipecter.rtuserver.lib.bukkit.api.
         Bukkit.getPluginManager().addPermission(new Permission(name, permissionDefault));
     }
 
-    protected void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
+    public void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
         protoWeaver.registerProtocol(namespace, key, packetType, protocolHandler, null);
     }
 

@@ -12,7 +12,7 @@ import me.mrnavastar.protoweaver.api.ProtoWeaver;
 import me.mrnavastar.protoweaver.api.auth.ClientAuthHandler;
 import me.mrnavastar.protoweaver.api.auth.ServerAuthHandler;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
-import me.mrnavastar.protoweaver.api.impl.PacketCallback;
+import me.mrnavastar.protoweaver.api.callback.PacketCallback;
 
 import java.lang.reflect.Modifier;
 import java.util.Objects;

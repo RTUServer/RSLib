@@ -2,10 +2,12 @@ package com.github.ipecter.rtuserver.lib.bukkit.api.core;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
 import com.github.ipecter.rtuserver.lib.bukkit.api.command.RSCommand;
+import com.github.ipecter.rtuserver.lib.bukkit.api.core.config.CommonTranslation;
 import com.github.ipecter.rtuserver.lib.bukkit.api.core.internal.runnable.CommandLimit;
+import com.github.ipecter.rtuserver.lib.bukkit.api.core.modules.Modules;
 import com.github.ipecter.rtuserver.lib.bukkit.api.listener.RSListener;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
-import me.mrnavastar.protoweaver.api.impl.bukkit.BukkitProtoWeaver;
+import me.mrnavastar.protoweaver.impl.bukkit.api.BukkitProtoWeaver;
 import net.kyori.adventure.text.Component;
 import org.bukkit.permissions.PermissionDefault;
 
@@ -26,6 +28,10 @@ public interface RSFramework {
 
     CommandLimit getCommandLimit();
 
+    CommonTranslation getCommonTranslation();
+
+    Modules getModules();
+
     void loadPlugin(RSPlugin plugin);
 
     void unloadPlugin(RSPlugin plugin);
@@ -39,8 +45,6 @@ public interface RSFramework {
     void enable(RSPlugin plugin);
 
     void disable(RSPlugin plugin);
-
-    void registerInternalRunnable(RSPlugin plugin);
 
     void registerEvent(RSListener listener);
 

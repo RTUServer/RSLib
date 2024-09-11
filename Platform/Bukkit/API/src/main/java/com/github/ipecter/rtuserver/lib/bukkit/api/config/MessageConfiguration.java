@@ -1,8 +1,9 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.config;
 
-import com.github.ipecter.rtuserver.lib.bukkit.RSLib;
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
+import com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
+import com.google.inject.Inject;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 
@@ -11,6 +12,9 @@ import java.util.Map;
 
 @Getter
 public class MessageConfiguration extends RSConfiguration {
+
+    @Inject
+    private RSFramework framework;
 
     private final Map<String, Object> map = new HashMap<>();
 
@@ -39,6 +43,6 @@ public class MessageConfiguration extends RSConfiguration {
     }
 
     public String getCommon(String key) {
-        return RSLib.getInstance().getConfigurations().getMessage().get("common." + key);
+        return framework.getCommonTranslation().getMessage(key);
     }
 }

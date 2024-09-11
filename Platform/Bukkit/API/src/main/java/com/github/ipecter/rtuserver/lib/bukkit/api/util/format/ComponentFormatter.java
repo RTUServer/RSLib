@@ -38,15 +38,15 @@ public class ComponentFormatter {
         return LegacyComponentSerializer.legacy(legacyCharacter).serialize(component);
     }
 
-    public static Component system(CommandSender sender, String miniMessage) {
-        Component lore = parse(sender, framework.getModules().getSystemMessageModule().getLore());
-        return parse(miniMessage).hoverEvent(HoverEvent.showText(lore));
-    }
-
-    public static Component system(CommandSender sender, Component component) {
-        Component lore = parse(sender, framework.getModules().getSystemMessageModule().getLore());
-        return component.hoverEvent(HoverEvent.showText(lore));
-    }
+//    public static Component system(CommandSender sender, String miniMessage) {
+//        Component lore = parse(sender, framework.getModules().getSystemMessageModule().getLore());
+//        return parse(miniMessage).hoverEvent(HoverEvent.showText(lore));
+//    }
+//
+//    public static Component system(CommandSender sender, Component component) {
+//        Component lore = parse(sender, framework.getModules().getSystemMessageModule().getLore());
+//        return component.hoverEvent(HoverEvent.showText(lore));
+//    }
 
 
 }

@@ -1,9 +1,9 @@
 package com.github.ipecter.rtuserver.lib.bungee;
 
 import lombok.extern.slf4j.Slf4j;
+import me.mrnavastar.protoweaver.api.callback.PacketCallback;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
-import me.mrnavastar.protoweaver.api.impl.PacketCallback;
-import me.mrnavastar.protoweaver.impl.bungee.BungeeProtoWeaver;
+import me.mrnavastar.protoweaver.impl.bungee.api.BungeeProtoWeaver;
 import net.md_5.bungee.api.plugin.Plugin;
 
 @Slf4j(topic = "RSLib")
@@ -15,7 +15,7 @@ public class RSLib extends Plugin {
     @Override
     public void onEnable() {
         log.info("RSLib Bungee loaded.");
-        protoWeaver = new BungeeProtoWeaver(callable, getProxy(), getDataFolder().toPath());
+        protoWeaver = new me.mrnavastar.protoweaver.impl.bungee.core.BungeeProtoWeaver(callable, getProxy(), getDataFolder().toPath());
         getProxy().getPluginManager().registerListener(this, protoWeaver);
         protoWeaver.onProxyInitialize();
     }

@@ -8,8 +8,8 @@ subprojects {
 }
 
 dependencies {
-    compileOnly project(":Library:ProtoWeaver:Common")
-    compileOnly project(":Library:ProtoWeaver:Bukkit")
+    compileOnly project(":Library:ProtoWeaver:Common:API")
+    compileOnly project(":Library:ProtoWeaver:Bukkit:API")
     compileOnly 'com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4'
 
     compileOnly 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'

@@ -1,13 +1,13 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.command;
 
-import com.github.ipecter.rtuserver.lib.bukkit.RSLib;
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
 import com.github.ipecter.rtuserver.lib.bukkit.api.config.CommandConfiguration;
-import com.github.ipecter.rtuserver.lib.bukkit.api.config.Configurations;
 import com.github.ipecter.rtuserver.lib.bukkit.api.config.MessageConfiguration;
+import com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework;
 import com.github.ipecter.rtuserver.lib.bukkit.api.shortcut.Message;
 import com.github.ipecter.rtuserver.lib.bukkit.api.shortcut.Scheduler;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
+import com.google.inject.Inject;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -24,8 +24,8 @@ import java.util.UUID;
 @Getter
 public abstract class RSCommand extends Command implements Message, Scheduler {
 
-    private final RSLib lib = RSLib.getInstance();
-    private final Configurations config = lib.getConfigurations();
+    @Inject
+    private RSFramework framework;
 
     private final RSPlugin plugin;
     private final MessageConfiguration message;
@@ -33,17 +33,8 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
 
     private final String name;
     private final boolean useReload;
-    private final int cooldown;
     private CommandSender sender;
     private Audience audience;
-
-    public RSCommand(RSPlugin plugin, @NotNull String name) {
-        this(plugin, name, false, RSLib.getInstance().getModules().getCommandModule().getExecuteLimit());
-    }
-
-    public RSCommand(RSPlugin plugin, @NotNull List<String> name) {
-        this(plugin, name, false, RSLib.getInstance().getModules().getCommandModule().getExecuteLimit());
-    }
 
     public RSCommand(RSPlugin plugin, @NotNull String name, int cooldown) {
         this(plugin, name, false, cooldown);
@@ -51,14 +42,6 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
 
     public RSCommand(RSPlugin plugin, @NotNull List<String> name, int cooldown) {
         this(plugin, name, false, cooldown);
-    }
-
-    public RSCommand(RSPlugin plugin, @NotNull String name, boolean useReload) {
-        this(plugin, name, useReload, RSLib.getInstance().getModules().getCommandModule().getExecuteLimit());
-    }
-
-    public RSCommand(RSPlugin plugin, @NotNull List<String> name, boolean useReload) {
-        this(plugin, name, useReload, RSLib.getInstance().getModules().getCommandModule().getExecuteLimit());
     }
 
     public RSCommand(RSPlugin plugin, @NotNull String name, boolean useReload, int cooldown) {
@@ -73,7 +56,6 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
         this.name = names.get(0);
         if (names.size() > 1) setAliases(names);
         this.useReload = useReload;
-        this.cooldown = cooldown;
     }
 
     public boolean isOp() {
@@ -87,10 +69,13 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
         if (sender instanceof Player player) {
-            Map<UUID, Integer> cooldownMap = lib.getCommandLimit().getExecuteLimit();
-            if (cooldownMap.getOrDefault(player.getUniqueId(), 0) <= 0) cooldownMap.put(player.getUniqueId(), cooldown);
-            else {
-                announce(lib.getConfigurations().getMessage().get("command.cooldown"));
+            Map<UUID, Integer> cooldownMap = framework.getCommandLimit().getExecuteLimit();
+            int cooldown = framework.getModules().getCommandModule().getExecuteLimit();
+            if (cooldown > 0) {
+                if (cooldownMap.getOrDefault(player.getUniqueId(), 0) <= 0)
+                    cooldownMap.put(player.getUniqueId(), cooldown);
+            } else {
+                announce(framework.getCommonTranslation().getMessage("command.cooldown"));
                 return true;
             }
         }

@@ -1,7 +1,8 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.config;
 
-import com.github.ipecter.rtuserver.lib.bukkit.RSLib;
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
+import com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework;
+import com.google.inject.Inject;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -9,6 +10,9 @@ import java.util.Map;
 
 @Getter
 public class CommandConfiguration extends RSConfiguration {
+
+    @Inject
+    private RSFramework framework;
 
     private final Map<String, Object> map = new HashMap<>();
 
@@ -32,6 +36,6 @@ public class CommandConfiguration extends RSConfiguration {
     }
 
     public String getCommon(String key) {
-        return RSLib.getInstance().getConfigurations().getCommand().get("common." + key);
+        return framework.getCommonTranslation().getMessage(key);
     }
 }

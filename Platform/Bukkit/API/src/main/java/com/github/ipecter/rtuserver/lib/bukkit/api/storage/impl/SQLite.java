@@ -100,8 +100,8 @@ public class SQLite implements Storage {
             else if (object instanceof Boolean bool) value = String.valueOf(bool);
             else if (object instanceof String str) value = "'" + str + "'";
             else {
-                plugin.console("<red>Unsupported type of data tried to be saved! Only supports JsonElement, Number, Boolean, and String</red>"));
-                plugin.console(ComponentFormatter.mini("<red>지원하지 않는 타입의 데이터가 저장되려고 했습니다! JsonElement, Number, Boolean, String만 지원합니다</red>");
+                plugin.console("<red>Unsupported type of data tried to be saved! Only supports JsonElement, Number, Boolean, and String</red>");
+                plugin.console("<red>지원하지 않는 타입의 데이터가 저장되려고 했습니다! JsonElement, Number, Boolean, String만 지원합니다</red>");
                 return false;
             }
 

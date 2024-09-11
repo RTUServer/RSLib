@@ -9,8 +9,7 @@ import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.protocol.CompressionType;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
 import me.mrnavastar.protoweaver.api.protocol.Side;
-import me.mrnavastar.protoweaver.core.netty.ProtoPacketHandler;
-import me.mrnavastar.protoweaver.core.util.ProtoLogger;
+import me.mrnavastar.protoweaver.api.util.ProtoLogger;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
