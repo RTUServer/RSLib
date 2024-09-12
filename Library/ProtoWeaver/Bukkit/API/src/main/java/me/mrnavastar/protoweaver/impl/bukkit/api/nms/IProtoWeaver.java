@@ -1,4 +1,4 @@
-package me.mrnavastar.protoweaver.impl.bukkit.nms;
+package me.mrnavastar.protoweaver.impl.bukkit.api.nms;
 
 import me.mrnavastar.protoweaver.api.util.ProtoLogger;
 

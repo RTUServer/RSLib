@@ -13,9 +13,7 @@ subprojects {
         compileOnly 'com.google.inject:guice:7.0.0'
 
     }
-    java {
-        toolchain.languageVersion = JavaLanguageVersion.of(17)
-    }
+    
 }
 
 dependencies {

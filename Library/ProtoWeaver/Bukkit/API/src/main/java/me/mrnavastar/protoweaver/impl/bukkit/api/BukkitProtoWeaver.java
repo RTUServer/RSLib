@@ -3,7 +3,7 @@ package me.mrnavastar.protoweaver.impl.bukkit.api;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.callback.PacketCallback;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
-import me.mrnavastar.protoweaver.impl.bukkit.nms.IProtoWeaver;
+import me.mrnavastar.protoweaver.impl.bukkit.api.nms.IProtoWeaver;
 
 import java.util.List;
 

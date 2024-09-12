@@ -7,7 +7,7 @@ import io.papermc.paper.network.ChannelInitializeListenerHolder;
 import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.protocol.velocity.VelocityAuth;
 import me.mrnavastar.protoweaver.api.util.ProtoLogger;
-import me.mrnavastar.protoweaver.impl.bukkit.nms.IProtoWeaver;
+import me.mrnavastar.protoweaver.impl.bukkit.api.nms.IProtoWeaver;
 import me.mrnavastar.protoweaver.core.loader.netty.ProtoDeterminer;
 import me.mrnavastar.protoweaver.core.loader.netty.SSLContext;
 import net.kyori.adventure.key.Key;

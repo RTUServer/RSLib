@@ -1,12 +1,13 @@
 subprojects {
     dependencies {
-        compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
+        compileOnly project(":Library:ProtoWeaver:Bukkit:API")
+        compileOnly project(":Library:ProtoWeaver:Common:API")
+        compileOnly project(":Library:ProtoWeaver:Common:Core")
     }
     
 }
 
 dependencies {
-    compileOnly project(":Platform:Bukkit:API")
     implementation project(path: '1_17_R1', configuration: 'reobf')
     implementation project(path: '1_18_R1', configuration: 'reobf')
     implementation project(path: '1_18_R2', configuration: 'reobf')
@@ -18,13 +19,4 @@ dependencies {
     implementation project(path: '1_20_R3', configuration: 'reobf')
     implementation project(path: '1_20_R4', configuration: 'reobf')
     implementation project(path: '1_21_R1', configuration: 'reobf')
-}
-
-tasks {
-    build {
-        dependsOn(shadowJar)
-    }
-    shadowJar {
-        setArchiveClassifier(null)
-    }
 }

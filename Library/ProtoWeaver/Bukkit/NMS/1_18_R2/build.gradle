@@ -3,6 +3,5 @@ plugins {
 }
 
 dependencies {
-    compileOnly project(':Library:ProtoWeaver:Bukkit:NMS:NMS')
     paperweight.paperDevBundle("1.18.2-R0.1-SNAPSHOT")
 }

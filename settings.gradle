@@ -16,7 +16,7 @@ include 'Library:ProtoWeaver:Bungee:API',
 include 'Library:ProtoWeaver:Bukkit:API',
         'Library:ProtoWeaver:Bukkit:Core'
 
-include 'Library:ProtoWeaver:Bukkit:NMS:NMS',
+include 'Library:ProtoWeaver:Bukkit:NMS',
         'Library:ProtoWeaver:Bukkit:NMS:1_17_R1',
         'Library:ProtoWeaver:Bukkit:NMS:1_18_R1',
         'Library:ProtoWeaver:Bukkit:NMS:1_18_R2',
