@@ -4,7 +4,10 @@ subprojects {
         compileOnly project(":Library:ProtoWeaver:Common:API")
         compileOnly project(":Library:ProtoWeaver:Common:Core")
     }
-    
+
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 dependencies {

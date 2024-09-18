@@ -7,7 +7,7 @@ public class ProtoLogger {
 
     public static void setLogger(IProtoLogger logger) {
         ProtoLogger.logger = logger;
-        info("ProtoLogger initialized.");
+        info("ProtoLogger initialized");
     }
 
     public static void info(String message) {

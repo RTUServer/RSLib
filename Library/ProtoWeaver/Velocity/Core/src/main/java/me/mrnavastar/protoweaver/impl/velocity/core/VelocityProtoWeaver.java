@@ -42,7 +42,7 @@ public class VelocityProtoWeaver implements me.mrnavastar.protoweaver.impl.veloc
         protocol.setMaxPacketSize(67108864); // 64mb
         protocol.addPacket(Object.class);
         if (isModernProxy()) {
-            info("Detected modern proxy.");
+            info("Detected modern proxy");
             protocol.setServerAuthHandler(VelocityAuth.class);
             protocol.setClientAuthHandler(VelocityAuth.class);
         }

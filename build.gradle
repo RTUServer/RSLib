@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.github.ipecter.rtuserver'
-version = '3.0.0-pre3'
+version = '3.0.0-pre4'
 
 allprojects {
     apply {
@@ -64,33 +64,35 @@ allprojects {
         compileOnly 'com.zaxxer:HikariCP:5.1.0'
     }
 
+    build {
+        dependsOn(shadowJar)
+    }
+
     tasks {
-        build {
-            dependsOn(shadowJar)
-        }
         shadowJar {
             setArchiveClassifier(null)
         }
     }
 
     java {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
-        }
+        toolchain.languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
 dependencies {
-    implementation project(":Library:MiniMessage")
-    implementation project(":Platform")
+    implementation project(':Platform:Bukkit')
+//    implementation project(':Platform:Bungee:API')
+//    implementation project(':Platform:Bungee:Core')
+//    implementation project(':Platform:Velocity:API')
+//    implementation project(':Platform:Velocity:Core')
+    implementation project(':Platform:Bungee')
+    implementation project(':Platform:Velocity')
+
+    implementation 'com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4'
+    implementation 'com.google.inject:guice:7.0.0'
 
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
-}
-
-shadowJar {
-    relocate 'io.papermc.lib', 'com.github.ipecter.rtuserver.lib.bukkit.util.paper'
-    relocate('net.kyori.adventure.platform', 'com.github.ipecter.rtuserver.lib.bukkit.util.kyori.adventure.platform')
 }
 
 tasks {
@@ -103,11 +105,17 @@ tasks {
     }
 }
 
+def targetJavaVersion = 17
+
 java {
-    def javaVersion = JavaVersion.toVersion(17)
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = targetJavaVersion
 }

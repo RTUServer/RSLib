@@ -5,4 +5,6 @@ public interface Modules {
     CommandModule getCommandModule();
 
     SystemMessageModule getSystemMessageModule();
+
+    void reload();
 }

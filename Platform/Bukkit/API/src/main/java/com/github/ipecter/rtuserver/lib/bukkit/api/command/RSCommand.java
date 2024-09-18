@@ -36,19 +36,15 @@ public abstract class RSCommand extends Command implements Message, Scheduler {
     private CommandSender sender;
     private Audience audience;
 
-    public RSCommand(RSPlugin plugin, @NotNull String name, int cooldown) {
-        this(plugin, name, false, cooldown);
+    public RSCommand(RSPlugin plugin, @NotNull List<String> name) {
+        this(plugin, name, false);
     }
 
-    public RSCommand(RSPlugin plugin, @NotNull List<String> name, int cooldown) {
-        this(plugin, name, false, cooldown);
+    public RSCommand(RSPlugin plugin, @NotNull String name, boolean useReload) {
+        this(plugin, List.of(name), useReload);
     }
 
-    public RSCommand(RSPlugin plugin, @NotNull String name, boolean useReload, int cooldown) {
-        this(plugin, List.of(name), useReload, cooldown);
-    }
-
-    public RSCommand(RSPlugin plugin, List<String> names, boolean useReload, int cooldown) {
+    public RSCommand(RSPlugin plugin, List<String> names, boolean useReload) {
         super(names.get(0));
         this.plugin = plugin;
         this.message = plugin.getConfigurations().getMessage();

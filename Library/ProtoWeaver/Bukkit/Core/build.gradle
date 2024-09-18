@@ -1,9 +1,5 @@
 dependencies {
     compileOnly project(":Library:ProtoWeaver:Bukkit:API")
-    compileOnly project(":Library:ProtoWeaver:Common:API")
-    compileOnly project(":Library:ProtoWeaver:Common:Core")
-    compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
-
     compileOnly project(":Library:ProtoWeaver:Bukkit:NMS")
     compileOnly project(path: ':Library:ProtoWeaver:Bukkit:NMS:1_17_R1', configuration: 'reobf')
     compileOnly project(path: ':Library:ProtoWeaver:Bukkit:NMS:1_18_R1', configuration: 'reobf')
@@ -16,5 +12,4 @@ dependencies {
     compileOnly project(path: ':Library:ProtoWeaver:Bukkit:NMS:1_20_R3', configuration: 'reobf')
     compileOnly project(path: ':Library:ProtoWeaver:Bukkit:NMS:1_20_R4', configuration: 'reobf')
     compileOnly project(path: ':Library:ProtoWeaver:Bukkit:NMS:1_21_R1', configuration: 'reobf')
-
 }

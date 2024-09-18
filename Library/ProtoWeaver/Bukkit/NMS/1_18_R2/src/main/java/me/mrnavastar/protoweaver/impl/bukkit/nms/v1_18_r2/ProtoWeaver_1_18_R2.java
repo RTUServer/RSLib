@@ -22,7 +22,7 @@ public class ProtoWeaver_1_18_R2 implements IProtoWeaver {
         SSLContext.genKeys();
         SSLContext.initContext();
         if (isModernProxy()) {
-            info("Detected modern proxy.");
+            info("Detected modern proxy");
             ChannelInitializeListenerHolder.addListener(Key.key("protoweaver", "internal"), new Paper());
             VelocityAuth.setSecret(new String(PaperConfig.velocitySecretKey));
         }

@@ -3,6 +3,5 @@ subprojects {
         compileOnly project(":Library:ProtoWeaver:Common:API")
         compileOnly project(":Library:ProtoWeaver:Common:Core")
         compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
-
     }
 }
