@@ -5,7 +5,7 @@ import com.github.ipecter.rtuserver.lib.bukkit.api.command.RSCommand;
 import com.github.ipecter.rtuserver.lib.bukkit.api.listener.RSListener;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
 import com.github.ipecter.rtuserver.lib.bukkit.api.util.platform.MinecraftVersion;
-import com.github.ipecter.rtuserver.lib.bukkit.api.util.platform.SystemEnviroment;
+import com.github.ipecter.rtuserver.lib.bukkit.api.util.platform.SystemEnvironment;
 import com.github.ipecter.rtuserver.lib.bukkit.core.config.CommonTranslation;
 import com.github.ipecter.rtuserver.lib.bukkit.core.internal.listeners.InventoryListener;
 import com.github.ipecter.rtuserver.lib.bukkit.core.internal.listeners.JoinListener;
@@ -42,8 +42,6 @@ import java.util.Map;
 //@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RSFramework implements com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework {
 
-    @Getter
-    private static RSFramework instance;
     @Getter
     private final Component prefix = ComponentFormatter.mini("<gradient:#00f260:#057eff>RSLib/Framework » </gradient>");
     @Getter
@@ -149,8 +147,8 @@ public class RSFramework implements com.github.ipecter.rtuserver.lib.bukkit.api.
                         .formatted(plugin.getDescription().getVersion()
                                 , Bukkit.getName() + "-" + MinecraftVersion.getAsText()
                                 , NMSVersion
-                                , SystemEnviroment.getOS()
-                                , SystemEnviroment.getJDKVersion())));
+                                , SystemEnvironment.getOS()
+                                , SystemEnvironment.getJDKVersion())));
         for (String message : list)
             audience.sendMessage(ComponentFormatter.mini("<gradient:#2979FF:#7C4DFF>" + message + "</gradient>"));
     }

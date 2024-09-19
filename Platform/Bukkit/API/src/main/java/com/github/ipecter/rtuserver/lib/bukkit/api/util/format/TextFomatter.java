@@ -1,15 +1,7 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.util.format;
 
-import com.github.ipecter.rtuserver.lib.bukkit.api.config.MessageConfiguration;
-import com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework;
-import com.google.inject.Inject;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import net.kyori.adventure.audience.Audience;
-import org.bukkit.entity.Player;
-
-import java.util.Collections;
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TextFomatter {

@@ -13,10 +13,9 @@ import java.util.Map;
 @Getter
 public class MessageConfiguration extends RSConfiguration {
 
+    private final Map<String, Object> map = new HashMap<>();
     @Inject
     private RSFramework framework;
-
-    private final Map<String, Object> map = new HashMap<>();
 
     public MessageConfiguration(RSPlugin plugin, String file) {
         super(plugin, "Translations/Message", "Locale_" + file + ".yml", null);

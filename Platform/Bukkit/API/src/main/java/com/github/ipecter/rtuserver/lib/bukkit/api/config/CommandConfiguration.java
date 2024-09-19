@@ -11,10 +11,9 @@ import java.util.Map;
 @Getter
 public class CommandConfiguration extends RSConfiguration {
 
+    private final Map<String, Object> map = new HashMap<>();
     @Inject
     private RSFramework framework;
-
-    private final Map<String, Object> map = new HashMap<>();
 
     public CommandConfiguration(RSPlugin plugin, String file) {
         super(plugin, "Translations/Command", "Locale_" + file + ".yml", null);

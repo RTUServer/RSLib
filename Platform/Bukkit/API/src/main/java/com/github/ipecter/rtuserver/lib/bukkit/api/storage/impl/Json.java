@@ -3,7 +3,6 @@ package com.github.ipecter.rtuserver.lib.bukkit.api.storage.impl;
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
 import com.github.ipecter.rtuserver.lib.bukkit.api.storage.Storage;
 import com.github.ipecter.rtuserver.lib.bukkit.api.storage.config.JsonConfig;
-import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
 import com.google.common.io.Files;
 import com.google.gson.*;
 import lombok.Getter;

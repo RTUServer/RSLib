@@ -24,15 +24,13 @@ import java.util.UUID;
 @Getter
 public abstract class RSCommand extends Command implements Message, Scheduler {
 
-    @Inject
-    private RSFramework framework;
-
     private final RSPlugin plugin;
     private final MessageConfiguration message;
     private final CommandConfiguration command;
-
     private final String name;
     private final boolean useReload;
+    @Inject
+    private RSFramework framework;
     private CommandSender sender;
     private Audience audience;
 

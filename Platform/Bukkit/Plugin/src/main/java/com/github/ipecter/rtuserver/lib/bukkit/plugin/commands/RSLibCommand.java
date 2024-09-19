@@ -1,9 +1,9 @@
 package com.github.ipecter.rtuserver.lib.bukkit.plugin.commands;
 
-import com.github.ipecter.rtuserver.lib.bukkit.plugin.RSLib;
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
-import com.github.ipecter.rtuserver.lib.bukkit.api.command.RSCommandData;
 import com.github.ipecter.rtuserver.lib.bukkit.api.command.RSCommand;
+import com.github.ipecter.rtuserver.lib.bukkit.api.command.RSCommandData;
+import com.github.ipecter.rtuserver.lib.bukkit.plugin.RSLib;
 
 import java.util.List;
 

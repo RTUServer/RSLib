@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class SystemEnviroment {
+public class SystemEnvironment {
 
     public static String getOS() {
         return System.getProperty("os.name");
