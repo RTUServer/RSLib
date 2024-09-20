@@ -1,11 +1,11 @@
-package com.github.ipecter.rtuserver.lib.bukkit.api.config;
+package com.github.ipecter.rtuserver.lib.bukkit.api.config.impl;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
 import com.github.ipecter.rtuserver.lib.bukkit.api.storage.Storage;
 import com.github.ipecter.rtuserver.lib.bukkit.api.storage.StorageType;
 import com.github.ipecter.rtuserver.lib.bukkit.api.storage.config.*;
 import com.github.ipecter.rtuserver.lib.bukkit.api.storage.impl.*;
-import com.github.ipecter.rtuserver.lib.bukkit.api.util.external.FileUtil;
+import com.github.ipecter.rtuserver.lib.bukkit.api.utility.platform.FileResource;
 import lombok.Getter;
 
 import java.io.File;
@@ -90,8 +90,8 @@ public class Configurations {
         switch (type) {
             case JSON -> {
                 if (!(storage instanceof Json) || json.isChanged() || isUpdated) {
-                    for (String name : list) FileUtil.createFile(plugin.getDataFolder() + "/Data", name + ".json");
-                    File[] files = FileUtil.createFolder(plugin.getDataFolder() + "/Data").listFiles();
+                    for (String name : list) FileResource.createFile(plugin.getDataFolder() + "/Data", name + ".json");
+                    File[] files = FileResource.createFolder(plugin.getDataFolder() + "/Data").listFiles();
                     assert files != null;
                     if (storage != null) storage.close();
                     plugin.setStorage(new Json(plugin, files));

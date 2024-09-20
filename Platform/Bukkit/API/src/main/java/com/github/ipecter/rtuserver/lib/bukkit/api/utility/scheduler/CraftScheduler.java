@@ -1,12 +1,11 @@
-package com.github.ipecter.rtuserver.lib.bukkit.api.shortcut;
+package com.github.ipecter.rtuserver.lib.bukkit.api.utility.scheduler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
-public interface Scheduler {
-
+public class CraftScheduler {
     /**
      * Returns a task that will run on the next server tick.
      *
@@ -17,7 +16,7 @@ public interface Scheduler {
      * @throws IllegalArgumentException if task is null
      */
     @NotNull
-    default BukkitTask run(@NotNull Plugin plugin, @NotNull Runnable task) {
+    public static BukkitTask run(@NotNull Plugin plugin, @NotNull Runnable task) {
         return Bukkit.getScheduler().runTask(plugin, task);
     }
 
@@ -34,7 +33,7 @@ public interface Scheduler {
      * @throws IllegalArgumentException if task is null
      */
     @NotNull
-    default BukkitTask runAsync(@NotNull Plugin plugin, @NotNull Runnable task) {
+    public static BukkitTask runAsync(@NotNull Plugin plugin, @NotNull Runnable task) {
         return Bukkit.getScheduler().runTaskAsynchronously(plugin, task);
     }
 
@@ -50,7 +49,7 @@ public interface Scheduler {
      * @throws IllegalArgumentException if task is null
      */
     @NotNull
-    default BukkitTask runLater(@NotNull Plugin plugin, @NotNull Runnable task, long delay) {
+    public static BukkitTask runLater(@NotNull Plugin plugin, @NotNull Runnable task, long delay) {
         return Bukkit.getScheduler().runTaskLater(plugin, task, delay);
     }
 
@@ -69,7 +68,7 @@ public interface Scheduler {
      * @throws IllegalArgumentException if task is null
      */
     @NotNull
-    default BukkitTask runLaterAsync(@NotNull Plugin plugin, @NotNull Runnable task, long delay) {
+    public static BukkitTask runLaterAsync(@NotNull Plugin plugin, @NotNull Runnable task, long delay) {
         return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, task, delay);
     }
 
@@ -86,7 +85,7 @@ public interface Scheduler {
      * @throws IllegalArgumentException if task is null
      */
     @NotNull
-    default BukkitTask runTimer(@NotNull Plugin plugin, @NotNull Runnable task, long delay, long period) {
+    public static BukkitTask runTimer(@NotNull Plugin plugin, @NotNull Runnable task, long delay, long period) {
         return Bukkit.getScheduler().runTaskTimer(plugin, task, delay, period);
     }
 
@@ -107,10 +106,7 @@ public interface Scheduler {
      * @throws IllegalArgumentException if task is null
      */
     @NotNull
-    default BukkitTask runTimerAsync(@NotNull Plugin plugin, @NotNull Runnable task, long delay, long period) {
+    public static BukkitTask runTimerAsync(@NotNull Plugin plugin, @NotNull Runnable task, long delay, long period) {
         return Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, task, delay, period);
     }
-
 }
-
-

@@ -1,11 +1,11 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.command.RSCommand;
-import com.github.ipecter.rtuserver.lib.bukkit.api.config.Configurations;
+import com.github.ipecter.rtuserver.lib.bukkit.api.config.impl.Configurations;
 import com.github.ipecter.rtuserver.lib.bukkit.api.listener.RSListener;
 import com.github.ipecter.rtuserver.lib.bukkit.api.storage.Storage;
-import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
-import com.github.ipecter.rtuserver.lib.bukkit.api.util.platform.MinecraftVersion;
+import com.github.ipecter.rtuserver.lib.bukkit.api.utility.format.ComponentFormatter;
+import com.github.ipecter.rtuserver.lib.bukkit.api.utility.platform.MinecraftVersion;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

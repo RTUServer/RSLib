@@ -1,6 +1,6 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.shortcut;
 
-import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
+import com.github.ipecter.rtuserver.lib.bukkit.api.utility.format.ComponentFormatter;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;

@@ -1,11 +1,10 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.inventory;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
-import com.github.ipecter.rtuserver.lib.bukkit.api.config.CommandConfiguration;
-import com.github.ipecter.rtuserver.lib.bukkit.api.config.MessageConfiguration;
-import com.github.ipecter.rtuserver.lib.bukkit.api.config.SettingConfiguration;
+import com.github.ipecter.rtuserver.lib.bukkit.api.config.impl.CommandConfiguration;
+import com.github.ipecter.rtuserver.lib.bukkit.api.config.impl.MessageConfiguration;
+import com.github.ipecter.rtuserver.lib.bukkit.api.config.impl.SettingConfiguration;
 import com.github.ipecter.rtuserver.lib.bukkit.api.shortcut.Message;
-import com.github.ipecter.rtuserver.lib.bukkit.api.shortcut.Scheduler;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.*;
@@ -16,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 
 @Getter
-public abstract class RSInventory implements InventoryHolder, Message, Scheduler {
+public abstract class RSInventory implements InventoryHolder {
 
 
     private final RSPlugin plugin;

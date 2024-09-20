@@ -1,4 +1,4 @@
-package com.github.ipecter.rtuserver.lib.bukkit.api.util.format;
+package com.github.ipecter.rtuserver.lib.bukkit.api.utility.format;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

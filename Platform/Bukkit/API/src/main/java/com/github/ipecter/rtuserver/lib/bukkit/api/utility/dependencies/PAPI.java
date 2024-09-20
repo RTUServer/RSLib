@@ -1,4 +1,4 @@
-package com.github.ipecter.rtuserver.lib.bukkit.api.util.dependencies;
+package com.github.ipecter.rtuserver.lib.bukkit.api.utility.dependencies;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework;
 import com.google.inject.Inject;

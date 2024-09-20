@@ -1,4 +1,4 @@
-package com.github.ipecter.rtuserver.lib.bukkit.api.util.external;
+package com.github.ipecter.rtuserver.lib.bukkit.api.utility.platform;
 
 import com.google.common.io.ByteStreams;
 import lombok.AccessLevel;
@@ -13,9 +13,9 @@ import java.io.OutputStream;
 import java.util.logging.Level;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class FileUtil {
+public class FileResource {
 
-    public static File copyResource(Plugin plugin, String sourceFile) {
+    public static File copy(Plugin plugin, String sourceFile) {
         File targetFolder = createFolder(plugin.getDataFolder());
         File resultFile = new File(targetFolder, sourceFile);
         if (!resultFile.exists()) {
@@ -33,7 +33,7 @@ public class FileUtil {
         return resultFile;
     }
 
-    public static File copyResource(Plugin plugin, String sourceFolder, String sourceFile) {
+    public static File copy(Plugin plugin, String sourceFolder, String sourceFile) {
         File targetFolder = createFolder(plugin.getDataFolder() + "/" + sourceFolder);
         File resultFile = new File(targetFolder, sourceFile);
         if (!resultFile.exists()) {
@@ -51,7 +51,7 @@ public class FileUtil {
         return resultFile;
     }
 
-    public static File createWithCopyResource(Plugin plugin, String sourceFolder, String sourceFile) {
+    public static File createFileCopy(Plugin plugin, String sourceFolder, String sourceFile) {
         File targetFolder = createFolder(plugin.getDataFolder() + "/" + sourceFolder);
         File resultFile = new File(targetFolder, sourceFile);
         if (resultFile.exists()) return resultFile;

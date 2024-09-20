@@ -1,12 +1,11 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.command;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
-import com.github.ipecter.rtuserver.lib.bukkit.api.config.CommandConfiguration;
-import com.github.ipecter.rtuserver.lib.bukkit.api.config.MessageConfiguration;
+import com.github.ipecter.rtuserver.lib.bukkit.api.config.impl.CommandConfiguration;
+import com.github.ipecter.rtuserver.lib.bukkit.api.config.impl.MessageConfiguration;
 import com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework;
 import com.github.ipecter.rtuserver.lib.bukkit.api.shortcut.Message;
-import com.github.ipecter.rtuserver.lib.bukkit.api.shortcut.Scheduler;
-import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
+import com.github.ipecter.rtuserver.lib.bukkit.api.utility.format.ComponentFormatter;
 import com.google.inject.Inject;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
@@ -22,7 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Getter
-public abstract class RSCommand extends Command implements Message, Scheduler {
+public abstract class RSCommand extends Command {
 
     private final RSPlugin plugin;
     private final MessageConfiguration message;

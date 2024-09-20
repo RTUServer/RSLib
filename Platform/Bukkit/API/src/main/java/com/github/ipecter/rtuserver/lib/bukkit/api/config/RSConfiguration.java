@@ -1,7 +1,7 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.config;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
-import com.github.ipecter.rtuserver.lib.bukkit.api.util.external.FileUtil;
+import com.github.ipecter.rtuserver.lib.bukkit.api.utility.platform.FileResource;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
@@ -47,7 +47,7 @@ public class RSConfiguration {
 
     public RSConfiguration(RSPlugin plugin, String folder, String name, Integer version) {
         this.plugin = plugin;
-        this.file = FileUtil.createWithCopyResource(plugin, folder, name);
+        this.file = FileResource.createFileCopy(plugin, folder, name);
         this.config = new YamlFile(file);
         load();
         if (version != null) set("version", version);

@@ -12,8 +12,8 @@
 
 ## JDK Version
 
-- for 1.17.1 ~ 1.20.4, Java 17
-- for 1.20.5 ~ 1.21.1, Java 21
+- ~~for 1.17.1 ~ 1.20.4, Java 17~~
+- for 1.17.1 ~ 1.21.1, Java 21
 - for Project Build, Java 21
 
 ## Supported MC Version

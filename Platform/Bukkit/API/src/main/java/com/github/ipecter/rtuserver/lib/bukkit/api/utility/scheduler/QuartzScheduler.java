@@ -1,4 +1,4 @@
-package com.github.ipecter.rtuserver.lib.bukkit.api.util.external;
+package com.github.ipecter.rtuserver.lib.bukkit.api.utility.scheduler;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class QuartzUtil {
+public class QuartzScheduler {
 
     public static void addTask(String name, String cron, Class<? extends Job> job) {
         JobDetail detail = JobBuilder.newJob(job).usingJobData(new JobDataMap()).build();
@@ -37,7 +37,7 @@ public class QuartzUtil {
         }
     }
 
-    public static String getNextFireTime(String name) {
+    public static String getRemainTime(String name) {
         try {
             Trigger trigger = StdSchedulerFactory.getDefaultScheduler().getTrigger(TriggerKey.triggerKey("rslib", name));
             LocalDateTime now = LocalDateTime.now();

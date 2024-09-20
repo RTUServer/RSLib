@@ -3,7 +3,7 @@ package com.github.ipecter.rtuserver.lib.bukkit.core.internal.listeners;
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
 import com.github.ipecter.rtuserver.lib.bukkit.api.inventory.RSInventory;
 import com.github.ipecter.rtuserver.lib.bukkit.api.listener.RSListener;
-import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
+import com.github.ipecter.rtuserver.lib.bukkit.api.utility.format.ComponentFormatter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

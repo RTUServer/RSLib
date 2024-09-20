@@ -1,6 +1,7 @@
-package com.github.ipecter.rtuserver.lib.bukkit.api.config;
+package com.github.ipecter.rtuserver.lib.bukkit.api.config.impl;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
+import com.github.ipecter.rtuserver.lib.bukkit.api.config.RSConfiguration;
 import com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework;
 import com.google.inject.Inject;
 import lombok.Getter;

@@ -1,17 +1,16 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.listener;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
-import com.github.ipecter.rtuserver.lib.bukkit.api.config.CommandConfiguration;
-import com.github.ipecter.rtuserver.lib.bukkit.api.config.MessageConfiguration;
-import com.github.ipecter.rtuserver.lib.bukkit.api.config.SettingConfiguration;
+import com.github.ipecter.rtuserver.lib.bukkit.api.config.impl.CommandConfiguration;
+import com.github.ipecter.rtuserver.lib.bukkit.api.config.impl.MessageConfiguration;
+import com.github.ipecter.rtuserver.lib.bukkit.api.config.impl.SettingConfiguration;
 import com.github.ipecter.rtuserver.lib.bukkit.api.shortcut.Message;
-import com.github.ipecter.rtuserver.lib.bukkit.api.shortcut.Scheduler;
 import lombok.Getter;
 import org.bukkit.event.Listener;
 
 
 @Getter
-public abstract class RSListener implements Listener, Message, Scheduler {
+public abstract class RSListener implements Listener {
 
     private final RSPlugin plugin;
     private final SettingConfiguration setting;

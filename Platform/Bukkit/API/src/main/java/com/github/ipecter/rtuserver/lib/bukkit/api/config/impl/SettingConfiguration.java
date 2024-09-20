@@ -1,6 +1,7 @@
-package com.github.ipecter.rtuserver.lib.bukkit.api.config;
+package com.github.ipecter.rtuserver.lib.bukkit.api.config.impl;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
+import com.github.ipecter.rtuserver.lib.bukkit.api.config.RSConfiguration;
 import com.github.ipecter.rtuserver.lib.bukkit.api.storage.StorageType;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,8 +43,8 @@ public class SettingConfiguration extends RSConfiguration {
                 메세지 언어, 새로운 언어 파일을 만들 수 있습니다, Locale_KR.yml = KR
                 내장된 언어: KR, EN (구성을 불러올때 자동으로 파일이 생성됩니다)""");
         storage = StorageType.getType(getString("storage", storage.name(), """
-                Data save format, Available format: JSON, MONGODB, MYSQL, SQLITE, MARIADB, POSTGRESQL
-                데이터 저장 포멧: 사용 가능한 포멧: JSON, MONGODB, MYSQL, SQLITE, MARIADB, POSTGRESQL"""));
+                Data save format, Available format: JSON, MONGODB, MYSQL, MARIADB
+                데이터 저장 포멧: 사용 가능한 포멧: JSON, MONGODB, MYSQL, MARIADB"""));
     }
 
     @Override

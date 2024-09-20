@@ -1,8 +1,9 @@
-package com.github.ipecter.rtuserver.lib.bukkit.api.config;
+package com.github.ipecter.rtuserver.lib.bukkit.api.config.impl;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
+import com.github.ipecter.rtuserver.lib.bukkit.api.config.RSConfiguration;
 import com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework;
-import com.github.ipecter.rtuserver.lib.bukkit.api.util.format.ComponentFormatter;
+import com.github.ipecter.rtuserver.lib.bukkit.api.utility.format.ComponentFormatter;
 import com.google.inject.Inject;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
