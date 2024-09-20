@@ -65,7 +65,6 @@ public class ItemCompat {
         }
     }
 
-
     @NotNull
     public static String to(@NotNull ItemStack itemStack) {
         if (framework.isEnabledDependency("Oraxen")) {

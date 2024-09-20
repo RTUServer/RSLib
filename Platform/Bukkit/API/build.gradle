@@ -9,6 +9,14 @@ dependencies {
     compileOnly "com.github.MilkBowl:VaultAPI:1.7.1"
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.1.0'
     compileOnly 'net.luckperms:api:5.4'
+
+    implementation "io.papermc:paperlib:1.0.7"
+    implementation "net.kyori:adventure-platform-bukkit:4.3.4"
+}
+
+shadowJar {
+    relocate 'io.papermc.lib', 'com.github.ipecter.rtuserver.lib.bukkit.api.util.paper'
+    relocate 'net.kyori.adventure.platform.bukkit', 'com.github.ipecter.rtuserver.lib.bukkit.api.util.kyori'
 }
 
 java {

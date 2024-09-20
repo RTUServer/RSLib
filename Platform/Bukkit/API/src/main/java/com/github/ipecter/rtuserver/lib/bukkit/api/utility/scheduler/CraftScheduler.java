@@ -1,10 +1,13 @@
 package com.github.ipecter.rtuserver.lib.bukkit.api.utility.scheduler;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CraftScheduler {
     /**
      * Returns a task that will run on the next server tick.

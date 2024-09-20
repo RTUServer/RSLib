@@ -4,12 +4,10 @@ import com.github.ipecter.rtuserver.lib.bukkit.api.RSPlugin;
 import com.github.ipecter.rtuserver.lib.bukkit.api.config.impl.CommandConfiguration;
 import com.github.ipecter.rtuserver.lib.bukkit.api.config.impl.MessageConfiguration;
 import com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework;
-import com.github.ipecter.rtuserver.lib.bukkit.api.shortcut.Message;
-import com.github.ipecter.rtuserver.lib.bukkit.api.utility.format.ComponentFormatter;
+import com.github.ipecter.rtuserver.lib.bukkit.api.utility.player.PlayerChat;
 import com.google.inject.Inject;
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -61,6 +59,7 @@ public abstract class RSCommand extends Command {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
+        PlayerChat chat = PlayerChat.of(plugin);
         if (sender instanceof Player player) {
             Map<UUID, Integer> cooldownMap = framework.getCommandLimit().getExecuteLimit();
             int cooldown = framework.getModules().getCommandModule().getExecuteLimit();
@@ -68,7 +67,7 @@ public abstract class RSCommand extends Command {
                 if (cooldownMap.getOrDefault(player.getUniqueId(), 0) <= 0)
                     cooldownMap.put(player.getUniqueId(), cooldown);
             } else {
-                announce(framework.getCommonTranslation().getMessage("command.cooldown"));
+                chat.announce(player, framework.getCommonTranslation().getMessage("command.cooldown"));
                 return true;
             }
         }
@@ -80,15 +79,15 @@ public abstract class RSCommand extends Command {
                 if (hasPermission(plugin.getName() + ".reload")) {
                     plugin.getConfigurations().reload();
                     reload(data);
-                    announce(message.getCommon("reload"));
-                } else announce(message.getCommon("noPermission"));
+                    chat.announce(sender, message.getCommon("reload"));
+                } else chat.announce(sender, message.getCommon("noPermission"));
                 return true;
             }
         }
         if (!execute(data)) {
-            announce(message.getCommon("wrongUsage"));
+            chat.announce(sender, message.getCommon("wrongUsage"));
             if (hasPermission(plugin.getName() + ".reload"))
-                announce(String.format("<gray> - </gray>/%s %s", getName(), command.getCommon("reload")));
+                chat.announce(sender, String.format("<gray> - </gray>/%s %s", getName(), command.getCommon("reload")));
             wrongUsage(data);
         }
         return true;
@@ -114,13 +113,5 @@ public abstract class RSCommand extends Command {
     }
 
     protected void wrongUsage(RSCommandData data) {
-    }
-
-    protected void announce(String minimessage) {
-        send(sender, message.getPrefix().append(ComponentFormatter.mini(minimessage)));
-    }
-
-    protected void announce(Component component) {
-        send(sender, message.getPrefix().append(component));
     }
 }

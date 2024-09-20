@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.CommandSender;
@@ -37,15 +38,15 @@ public class ComponentFormatter {
         return LegacyComponentSerializer.legacy(legacyCharacter).serialize(component);
     }
 
-//    public static Component system(CommandSender sender, String miniMessage) {
-//        Component lore = parse(sender, framework.getModules().getSystemMessageModule().getLore());
-//        return parse(miniMessage).hoverEvent(HoverEvent.showText(lore));
-//    }
-//
-//    public static Component system(CommandSender sender, Component component) {
-//        Component lore = parse(sender, framework.getModules().getSystemMessageModule().getLore());
-//        return component.hoverEvent(HoverEvent.showText(lore));
-//    }
+    public static Component system(CommandSender sender, String miniMessage) {
+        Component lore = parse(sender, framework.getModules().getSystemMessageModule().getLore());
+        return parse(miniMessage).hoverEvent(HoverEvent.showText(lore));
+    }
+
+    public static Component system(CommandSender sender, Component component) {
+        Component lore = parse(sender, framework.getModules().getSystemMessageModule().getLore());
+        return component.hoverEvent(HoverEvent.showText(lore));
+    }
 
 
 }
