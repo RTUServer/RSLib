@@ -10,7 +10,11 @@ import com.google.inject.Injector;
 import lombok.Getter;
 import me.mrnavastar.protoweaver.api.callback.PacketCallback;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
+import org.bukkit.Bukkit;
 import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.plugin.Plugin;
+import org.reflections.Reflections;
+import org.reflections.scanners.FieldAnnotationsScanner;
 
 public class RSLib extends RSPlugin {
 
@@ -26,6 +30,17 @@ public class RSLib extends RSPlugin {
         instance = this;
         Injector injector = Guice.createInjector(new InjectorModule());
         injector.injectMembers(this);
+        System.out.println("A");
+//        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+//            plugin.
+//        }
+        Reflections reflections = new Reflections("com",
+        new FieldAnnotationsScanner());
+        reflections.getFieldsAnnotatedWith(Inject.class).forEach(field -> {
+            System.out.println(field.getDeclaringClass().getName());
+            //injector.injectMembers(field.getDeclaringClass());
+        });
+        System.out.println("B");
         framework.load(this);
     }
 

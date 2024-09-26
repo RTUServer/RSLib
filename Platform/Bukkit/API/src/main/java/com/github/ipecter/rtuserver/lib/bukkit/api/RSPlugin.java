@@ -2,10 +2,12 @@ package com.github.ipecter.rtuserver.lib.bukkit.api;
 
 import com.github.ipecter.rtuserver.lib.bukkit.api.command.RSCommand;
 import com.github.ipecter.rtuserver.lib.bukkit.api.config.impl.Configurations;
+import com.github.ipecter.rtuserver.lib.bukkit.api.core.RSFramework;
 import com.github.ipecter.rtuserver.lib.bukkit.api.listener.RSListener;
 import com.github.ipecter.rtuserver.lib.bukkit.api.storage.Storage;
 import com.github.ipecter.rtuserver.lib.bukkit.api.utility.format.ComponentFormatter;
 import com.github.ipecter.rtuserver.lib.bukkit.api.utility.platform.MinecraftVersion;
+import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -25,6 +27,9 @@ import java.util.Set;
 @RequiredArgsConstructor
 public abstract class RSPlugin extends JavaPlugin {
 
+    @Getter
+    @Inject
+    private RSFramework framework;
     @Getter
     private final Component prefix;
     private final Set<Listener> registeredListeners = new HashSet<>();
@@ -105,15 +110,15 @@ public abstract class RSPlugin extends JavaPlugin {
     }
 
     public void registerCommand(RSCommand command) {
-        //TODO: RSFramework
+        framework.registerCommand(command);
     }
 
     public void registerPermission(String name, PermissionDefault permissionDefault) {
-        //TODO: RSFramework
+        framework.registerPermission(name, permissionDefault);
     }
 
     protected void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
-        //TODO: RSFramework
+        framework.registerProtocol(namespace, key, packetType, protocolHandler);
     }
 
     protected void load() {

@@ -6,6 +6,7 @@ import com.github.ipecter.rtuserver.lib.bukkit.api.core.config.CommonTranslation
 import com.github.ipecter.rtuserver.lib.bukkit.api.core.internal.runnable.CommandLimit;
 import com.github.ipecter.rtuserver.lib.bukkit.api.core.modules.Modules;
 import com.github.ipecter.rtuserver.lib.bukkit.api.listener.RSListener;
+import com.google.inject.Guice;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.impl.bukkit.api.BukkitProtoWeaver;
 import net.kyori.adventure.text.Component;
@@ -14,6 +15,11 @@ import org.bukkit.permissions.PermissionDefault;
 import java.util.Map;
 
 public interface RSFramework {
+
+//    static RSFramework get() {
+//        return Guice.createInjector(null).getInstance(RSFramework.class);
+//    }
+
     Component getPrefix();
 
     Map<String, RSPlugin> getPlugins();
