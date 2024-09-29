@@ -5,7 +5,7 @@ plugins {
     id 'io.papermc.paperweight.userdev' version "1.7.2" apply false
 }
 
-group = 'com.github.ipecter.rtuserver'
+group = 'kr.rtuserver'
 version = plugin_version
 
 allprojects {
@@ -55,13 +55,9 @@ allprojects {
         compileOnly 'com.google.guava:guava:33.0.0-jre'
         compileOnly 'org.apache.commons:commons-lang3:3.14.0'
         compileOnly 'org.xerial.snappy:snappy-java:1.1.10.5'
+        compileOnly 'org.projectlombok:lombok:1.18.32'
+        compileOnly 'org.slf4j:slf4j-api:2.0.16'
 
-        compileOnly 'org.mongodb:mongodb-driver-sync:4.11.1'
-        compileOnly 'mysql:mysql-connector-java:8.0.33'
-        compileOnly 'org.xerial:sqlite-jdbc:3.45.3.0'
-        compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.3.3'
-        compileOnly 'org.postgresql:postgresql:42.7.3'
-        compileOnly 'com.zaxxer:HikariCP:5.1.0'
     }
 
     build {
@@ -81,16 +77,11 @@ allprojects {
 
 dependencies {
     implementation project(':Platform:Bukkit')
-//    implementation project(':Platform:Bungee:API')
-//    implementation project(':Platform:Bungee:Core')
-//    implementation project(':Platform:Velocity:API')
-//    implementation project(':Platform:Velocity:Core')
     implementation project(':Platform:Bungee')
     implementation project(':Platform:Velocity')
+    implementation project(':Platform:Common')
 
     implementation 'com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4'
-    implementation 'com.google.inject:guice:7.0.0'
-    implementation 'org.reflections:reflections:0.9.10'
 
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
@@ -107,7 +98,10 @@ tasks {
 }
 
 def targetJavaVersion = 17
-
+tasks.withType(JavaCompile).configureEach {
+    options.release = targetJavaVersion
+    //options.compilerArgs += ['-source', '17', '-target', '17']
+}
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion
@@ -115,8 +109,4 @@ java {
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.release = targetJavaVersion
 }

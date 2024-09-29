@@ -1,6 +1,6 @@
 name: '${name}'
 version: '${version}'
-main: com.github.ipecter.rtuserver.lib.bukkit.plugin.RSLib
+main: kr.rtuserver.lib.bukkit.plugin.RSLib
 description: Library Plugin for RSPlugins
 api-version: 1.17
 authors: [ '${author}' ]

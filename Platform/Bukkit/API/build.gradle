@@ -1,5 +1,6 @@
 dependencies {
     // API Build
+    implementation project(":Platform:Common:API")
     implementation project(":Library:ProtoWeaver:Common:API")
 
     compileOnly 'me.clip:placeholderapi:2.11.6'
@@ -15,8 +16,8 @@ dependencies {
 }
 
 shadowJar {
-    relocate 'io.papermc.lib', 'com.github.ipecter.rtuserver.lib.bukkit.api.util.paper'
-    relocate 'net.kyori.adventure.platform.bukkit', 'com.github.ipecter.rtuserver.lib.bukkit.api.util.kyori'
+    relocate 'io.papermc.lib', 'kr.rtuserver.lib.bukkit.api.util.paper'
+    relocate 'net.kyori.adventure.platform.bukkit', 'kr.rtuserver.lib.bukkit.api.util.kyori'
 }
 
 java {

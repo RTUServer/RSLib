@@ -50,5 +50,9 @@ include 'Platform:Bukkit:NMS:1_17_R1',
         'Platform:Bukkit:NMS:1_21_R1'
 
 include 'Platform:Common',
+        'Platform:Common:API',
+        'Platform:Common:Core'
+
+include 'Platform:Common',
         'Platform:Velocity',
         'Platform:Bungee'

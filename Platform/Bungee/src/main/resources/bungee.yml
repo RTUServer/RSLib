@@ -1,4 +1,4 @@
 name: "${name}"
-main: com.github.ipecter.rtuserver.lib.bungee.RSLib
+main: kr.rtuserver.lib.bungee.RSLib
 version: "${version}"
 author: "${author}"

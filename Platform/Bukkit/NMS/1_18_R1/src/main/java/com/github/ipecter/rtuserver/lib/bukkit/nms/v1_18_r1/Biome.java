@@ -1,6 +1,6 @@
-package com.github.ipecter.rtuserver.lib.bukkit.nms.v1_18_r1;
+package kr.rtuserver.lib.bukkit.nms.v1_18_r1;
 
-import com.github.ipecter.rtuserver.lib.bukkit.api.nms.NMSBiome;
+import kr.rtuserver.lib.bukkit.api.nms.NMSBiome;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
