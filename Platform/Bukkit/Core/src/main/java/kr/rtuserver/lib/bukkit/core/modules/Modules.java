@@ -7,15 +7,15 @@ import lombok.Getter;
 public class Modules implements kr.rtuserver.lib.bukkit.api.core.modules.Modules {
 
     private final CommandModule commandModule;
-    private final SystemMessageModule systemMessageModule;
+    private final ThemeModule themeModule;
 
     public Modules(RSPlugin plugin) {
         commandModule = new CommandModule(plugin);
-        systemMessageModule = new SystemMessageModule(plugin);
+        themeModule = new ThemeModule(plugin);
     }
 
     public void reload() {
         commandModule.reload();
-        systemMessageModule.reload();
+        themeModule.reload();
     }
 }

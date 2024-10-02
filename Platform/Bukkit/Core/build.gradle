@@ -1,5 +1,5 @@
 dependencies {
-    compileOnly project(":Platform:Common:API")
+    compileOnly project(":Library:LightDI")
     compileOnly project(":Library:ProtoWeaver:Common:Core")
     compileOnly project(":Library:ProtoWeaver:Bukkit:Core")
 

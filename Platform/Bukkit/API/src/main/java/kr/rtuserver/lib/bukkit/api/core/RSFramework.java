@@ -15,10 +15,6 @@ import java.util.Map;
 
 public interface RSFramework {
 
-//    static RSFramework get() {
-//        return Guice.createInjector(null).getInstance(RSFramework.class);
-//    }
-
     Component getPrefix();
 
     Map<String, RSPlugin> getPlugins();

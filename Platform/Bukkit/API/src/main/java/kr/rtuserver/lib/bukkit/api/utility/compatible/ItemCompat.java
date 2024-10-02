@@ -1,10 +1,10 @@
 package kr.rtuserver.lib.bukkit.api.utility.compatible;
 
-import kr.rtuserver.lib.common.api.cdi.LightDI;
-import kr.rtuserver.lib.bukkit.api.core.RSFramework;
 import dev.lone.itemsadder.api.CustomStack;
 import io.th0rgal.oraxen.api.OraxenItems;
 import io.th0rgal.oraxen.items.ItemBuilder;
+import kr.rtuserver.lib.bukkit.api.core.RSFramework;
+import kr.rtuserver.lib.common.api.cdi.LightDI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.bukkit.Material;
@@ -23,8 +23,9 @@ import java.util.Base64;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemCompat {
-    
+
     static RSFramework framework;
+
     static RSFramework framework() {
         if (framework == null) framework = LightDI.getBean(RSFramework.class);
         return framework;

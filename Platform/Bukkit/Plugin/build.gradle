@@ -1,5 +1,5 @@
 dependencies {
-    compileOnly project(":Platform:Common:API")
+    compileOnly project(":Library:LightDI")
     compileOnly project(':Platform:Bukkit:API')
     compileOnly project(':Platform:Bukkit:Core')
 

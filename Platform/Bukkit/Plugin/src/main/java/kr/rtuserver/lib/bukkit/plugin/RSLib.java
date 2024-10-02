@@ -1,8 +1,8 @@
 package kr.rtuserver.lib.bukkit.plugin;
 
-import kr.rtuserver.lib.common.api.cdi.LightDI;
 import kr.rtuserver.lib.bukkit.api.RSPlugin;
 import kr.rtuserver.lib.bukkit.plugin.commands.RSLibCommand;
+import kr.rtuserver.lib.common.api.cdi.LightDI;
 import lombok.Getter;
 import me.mrnavastar.protoweaver.api.callback.PacketCallback;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
@@ -33,9 +33,13 @@ public class RSLib extends RSPlugin {
     }
 
     @Override
+    protected void initialize() {
+        getFramework().load(this);
+    }
+
+    @Override
     protected void load() {
         instance = this;
-        getFramework().load(this);
     }
 
     @Override

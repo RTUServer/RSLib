@@ -41,7 +41,7 @@ dependencies {
     implementation project("Core")
     implementation project("Plugin")
 
-    implementation project(':Platform:Common:API')
+    implementation project(':Library:LightDI')
     implementation project(':Platform:Bukkit:API')
     implementation project(path: ':Platform:Bukkit:NMS:1_17_R1', configuration: 'reobf')
     implementation project(path: ':Platform:Bukkit:NMS:1_18_R1', configuration: 'reobf')

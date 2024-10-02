@@ -8,7 +8,6 @@ runVelocity {
 }
 
 dependencies {
-    //implementation project(":Library:MiniMessage")
     implementation project(":Library:ProtoWeaver:Common:API")
     implementation project(":Library:ProtoWeaver:Common:Core")
     implementation project(":Library:ProtoWeaver:Velocity:API")

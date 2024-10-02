@@ -1,9 +1,9 @@
 package kr.rtuserver.lib.bukkit.api.config;
 
-import kr.rtuserver.lib.bukkit.api.RSPlugin;
-import kr.rtuserver.lib.bukkit.api.utility.platform.FileResource;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
+import kr.rtuserver.lib.bukkit.api.RSPlugin;
+import kr.rtuserver.lib.bukkit.api.utility.platform.FileResource;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.simpleyaml.configuration.ConfigurationSection;
@@ -116,13 +116,16 @@ public class RSConfiguration {
     }
 
     public void save() {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            try {
-                config.save(file);
-            } catch (IOException ex) {
-                Bukkit.getLogger().log(Level.SEVERE, "Could not save " + file, ex);
-            }
-        });
+        if (plugin.isEnabled()) Bukkit.getScheduler().runTaskAsynchronously(plugin, this::saveFile);
+        else saveFile();
+    }
+
+    private void saveFile() {
+        try {
+            config.save(file);
+        } catch (IOException ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "Could not save " + file, ex);
+        }
     }
 
     protected void set(String path, Object val) {

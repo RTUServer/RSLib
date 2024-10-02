@@ -1,10 +1,10 @@
 package kr.rtuserver.lib.bukkit.api.utility.compatible;
 
-import kr.rtuserver.lib.common.api.cdi.LightDI;
-import kr.rtuserver.lib.bukkit.api.core.RSFramework;
 import dev.lone.itemsadder.api.CustomBlock;
 import io.th0rgal.oraxen.api.OraxenBlocks;
 import io.th0rgal.oraxen.mechanics.Mechanic;
+import kr.rtuserver.lib.bukkit.api.core.RSFramework;
+import kr.rtuserver.lib.common.api.cdi.LightDI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.bukkit.Location;
@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 public class BlockCompat {
 
     static RSFramework framework;
+
     static RSFramework framework() {
         if (framework == null) framework = LightDI.getBean(RSFramework.class);
         return framework;

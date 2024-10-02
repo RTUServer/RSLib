@@ -82,6 +82,7 @@ public class RSFramework implements kr.rtuserver.lib.bukkit.api.core.RSFramework
 
     public void load(RSPlugin plugin) {
         loadNMS(plugin);
+        modules = new Modules(plugin);
     }
 
     private void loadNMS(RSPlugin plugin) {
@@ -112,7 +113,6 @@ public class RSFramework implements kr.rtuserver.lib.bukkit.api.core.RSFramework
     public void enable(RSPlugin plugin) {
         printStartUp(plugin);
         commonTranslation = new CommonTranslation(plugin);
-        modules = new Modules(plugin);
         registerInternal(plugin);
     }
 

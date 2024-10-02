@@ -1,7 +1,7 @@
 package kr.rtuserver.lib.bukkit.api.utility.format;
 
-import kr.rtuserver.lib.common.api.cdi.LightDI;
 import kr.rtuserver.lib.bukkit.api.core.RSFramework;
+import kr.rtuserver.lib.common.api.cdi.LightDI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 public class ComponentFormatter {
 
     static RSFramework framework;
+
     static RSFramework framework() {
         if (framework == null) framework = LightDI.getBean(RSFramework.class);
         return framework;
@@ -42,12 +43,12 @@ public class ComponentFormatter {
     }
 
     public static Component system(CommandSender sender, String miniMessage) {
-        Component lore = parse(sender, framework().getModules().getSystemMessageModule().getLore());
+        Component lore = parse(sender, framework().getModules().getThemeModule().getSystemMessage());
         return parse(miniMessage).hoverEvent(HoverEvent.showText(lore));
     }
 
     public static Component system(CommandSender sender, Component component) {
-        Component lore = parse(sender, framework().getModules().getSystemMessageModule().getLore());
+        Component lore = parse(sender, framework().getModules().getThemeModule().getSystemMessage());
         return component.hoverEvent(HoverEvent.showText(lore));
     }
 

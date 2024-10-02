@@ -4,7 +4,7 @@ public interface Modules {
 
     CommandModule getCommandModule();
 
-    SystemMessageModule getSystemMessageModule();
+    ThemeModule getThemeModule();
 
     void reload();
 }

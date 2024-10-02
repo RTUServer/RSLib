@@ -3,6 +3,7 @@ package kr.rtuserver.lib.bukkit.api;
 import kr.rtuserver.lib.bukkit.api.command.RSCommand;
 import kr.rtuserver.lib.bukkit.api.config.impl.Configurations;
 import kr.rtuserver.lib.bukkit.api.core.RSFramework;
+import kr.rtuserver.lib.bukkit.api.core.modules.ThemeModule;
 import kr.rtuserver.lib.bukkit.api.listener.RSListener;
 import kr.rtuserver.lib.bukkit.api.storage.Storage;
 import kr.rtuserver.lib.bukkit.api.utility.format.ComponentFormatter;
@@ -27,11 +28,11 @@ import java.util.Set;
 @RequiredArgsConstructor
 public abstract class RSPlugin extends JavaPlugin {
 
+    private final Set<Listener> registeredListeners = new HashSet<>();
     @Getter
     private RSFramework framework;
     @Getter
-    private final Component prefix;
-    private final Set<Listener> registeredListeners = new HashSet<>();
+    private Component prefix;
     @Getter
     private RSPlugin plugin;
     @Getter
@@ -42,8 +43,12 @@ public abstract class RSPlugin extends JavaPlugin {
     @Setter
     private Storage storage;
 
-    public RSPlugin() {
-        this.prefix = ComponentFormatter.mini("<gradient:#00f260:#057eff>" + getName() + " » </gradient>");
+    public RSPlugin(String prefix) {
+        this.prefix = ComponentFormatter.mini(prefix);
+    }
+
+    public RSPlugin(Component prefix) {
+        this.prefix = prefix;
     }
 
     @Override
@@ -58,18 +63,18 @@ public abstract class RSPlugin extends JavaPlugin {
             return;
         }
         registerPermission(plugin.getName() + ".reload", PermissionDefault.OP);
-        //for (String plugin : this.getDescription().getSoftDepend()) RSLib.getInstance().hookDependency(plugin); TODO: RSFramework
+        for (String plugin : this.getDescription().getSoftDepend()) framework.hookDependency(plugin);
         configurations = new Configurations(this);
         enable();
         console("<green>활성화!</green>");
-        //RSLib.getInstance().loadPlugin(this); TODO: RSFramework
+        framework.loadPlugin(this);
     }
 
     @Override
     public void onDisable() {
         disable();
         if (storage != null) storage.close();
-        //RSLib.getInstance().unloadPlugin(this); TODO: RSFramework
+        framework.unloadPlugin(this);
         console("<red>비활성화!</red>");
         if (adventure != null) {
             adventure.close();
@@ -80,15 +85,21 @@ public abstract class RSPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
         this.framework = LightDI.getBean(RSFramework.class);
+        initialize();
+        if (this.prefix == null) {
+            ThemeModule theme = this.framework.getModules().getThemeModule();
+            String text = String.format("<gradient:%s:%s>%s%s%s</gradient>", theme.getGradientStart(), theme.getGradientEnd(), theme.getPrefix(), getName(), theme.getSuffix());
+            this.prefix = ComponentFormatter.mini(text);
+        }
         load();
     }
 
     public void console(Component message) {
-        getAdventure().console().sendMessage(getPrefix().append(Component.text(" ")).append(message));
+        getAdventure().console().sendMessage(getPrefix().append(message));
     }
 
     public void console(String minimessage) {
-        getAdventure().console().sendMessage(getPrefix().append(Component.text(" ")).append(ComponentFormatter.mini(minimessage)));
+        getAdventure().console().sendMessage(getPrefix().append(ComponentFormatter.mini(minimessage)));
     }
 
     public void registerEvent(RSListener listener) {
@@ -119,6 +130,9 @@ public abstract class RSPlugin extends JavaPlugin {
 
     protected void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
         framework.registerProtocol(namespace, key, packetType, protocolHandler);
+    }
+
+    protected void initialize() {
     }
 
     protected void load() {

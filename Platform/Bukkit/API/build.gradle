@@ -1,6 +1,6 @@
 dependencies {
     // API Build
-    implementation project(":Platform:Common:API")
+    implementation project(":Library:LightDI")
     implementation project(":Library:ProtoWeaver:Common:API")
 
     compileOnly 'me.clip:placeholderapi:2.11.6'
@@ -15,11 +15,17 @@ dependencies {
     implementation "net.kyori:adventure-platform-bukkit:4.3.4"
 }
 
+
 shadowJar {
+    mustRunAfter(":Library:MiniMessage:shadowJar")
+    mustRunAfter(":Library:LightDI:shadowJar")
     relocate 'io.papermc.lib', 'kr.rtuserver.lib.bukkit.api.util.paper'
     relocate 'net.kyori.adventure.platform.bukkit', 'kr.rtuserver.lib.bukkit.api.util.kyori'
 }
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+tasks.withType(JavaCompile).configureEach {
+    //options.compilerArgs += ['-source', '17', '-target', '17']
 }
