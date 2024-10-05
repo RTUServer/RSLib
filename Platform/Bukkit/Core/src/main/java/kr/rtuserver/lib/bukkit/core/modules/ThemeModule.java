@@ -7,10 +7,10 @@ import lombok.Getter;
 @Getter
 public class ThemeModule extends RSConfiguration implements kr.rtuserver.lib.bukkit.api.core.modules.ThemeModule {
 
-    private String gradientStart = "#3df559";
-    private String gradientEnd = "#3db8f5";
-    private String prefix = "[";
-    private String suffix = "] ";
+    private String gradientStart = "#2979FF";
+    private String gradientEnd = "#7C4DFF";
+    private String prefix = "『";
+    private String suffix = "』";
     private String systemMessage = "<gradient:" + gradientStart + ":" + gradientEnd + ">시스템 메세지</gradient>\n<gray>%servertime_yyyy-MM-dd a h:mm%</gray>";
 
     public ThemeModule(RSPlugin plugin) {

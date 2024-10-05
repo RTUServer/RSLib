@@ -35,6 +35,6 @@ public class CommandConfiguration extends RSConfiguration {
     }
 
     public String getCommon(String key) {
-        return framework.getCommonTranslation().getMessage(key);
+        return framework.getCommonTranslation().getCommand(key);
     }
 }
