@@ -7,6 +7,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import kr.rtuserver.lib.bukkit.api.RSPlugin;
 import kr.rtuserver.lib.bukkit.api.storage.Storage;
+import kr.rtuserver.lib.bukkit.api.storage.config.MariaDBConfig;
 import kr.rtuserver.lib.bukkit.api.storage.config.MySQLConfig;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,7 @@ import java.util.List;
 public class MariaDB implements Storage {
 
     private final RSPlugin plugin;
+    private final MariaDBConfig config;
     private final boolean verbose;
 
     private final Gson gson = new Gson();
@@ -28,9 +30,13 @@ public class MariaDB implements Storage {
     private HikariDataSource hikariDataSource;
     private Connection connection;
 
+    private final String prefix;
+
     public MariaDB(RSPlugin plugin, List<String> list) {
         this.plugin = plugin;
+        this.config = plugin.getConfigurations().getMariadb();
         this.verbose = plugin.getConfigurations().getSetting().isVerbose();
+        this.prefix = config.getTablePrefix();
         HikariConfig hikariConfig = getHikariConfig(plugin);
         hikariDataSource = new HikariDataSource(hikariConfig);
         hikariDataSource.setMaximumPoolSize(30);
@@ -41,7 +47,7 @@ public class MariaDB implements Storage {
         }
         try {
             for (String table : list) {
-                String query = "CREATE TABLE IF NOT EXISTS `" + table + "` (`data` JSON NOT NULL);";
+                String query = "CREATE TABLE IF NOT EXISTS `" + prefix + table + "` (`data` JSON NOT NULL);";
                 PreparedStatement ps = getConnection().prepareStatement(query);
                 ps.execute();
             }
@@ -59,7 +65,6 @@ public class MariaDB implements Storage {
 
     @NotNull
     private HikariConfig getHikariConfig(RSPlugin plugin) {
-        MySQLConfig config = plugin.getConfigurations().getMysql();
         String serverHost = config.getHost() + ":" + config.getPort();
         String url = "jdbc:mysql://" + serverHost + "/" + config.getDatabase() + "?serverTimezone=UTC&useUniCode=yes&characterEncoding=UTF-8";
         HikariConfig hikariConfig = new HikariConfig();
@@ -78,7 +83,7 @@ public class MariaDB implements Storage {
         String json = gson.toJson(data);
         try {
             //INSERT INTO `test` (`data`) VALUES ('{"A": B"}');
-            PreparedStatement ps = getConnection().prepareStatement("INSERT INTO " + table + " (data) VALUES ('" + json + "');");
+            PreparedStatement ps = getConnection().prepareStatement("INSERT INTO " + prefix + table + " (data) VALUES ('" + json + "');");
             return ps.execute();
         } catch (SQLException e) {
             //if (verbose) throw new RuntimeException(e);
@@ -104,7 +109,7 @@ public class MariaDB implements Storage {
                 return false;
             }
 
-            query = "UPDATE " + table + " SET data = JSON_SET(data, '$." + data.getKey() + "', " + value + ")";
+            query = "UPDATE " + prefix + table + " SET data = JSON_SET(data, '$." + data.getKey() + "', " + value + ")";
         } else query = "DELETE FROM " + table;
         if (find != null) {
             Object value = find.getValue();

@@ -2,6 +2,7 @@ dependencies {
     // API Build
     implementation project(":Library:LightDI")
     implementation project(":Library:ProtoWeaver:Common:API")
+    implementation project(":Library:ProtoWeaver:Bukkit:API")
 
     compileOnly 'me.clip:placeholderapi:2.11.6'
     compileOnly 'io.th0rgal:oraxen:1.168.0'

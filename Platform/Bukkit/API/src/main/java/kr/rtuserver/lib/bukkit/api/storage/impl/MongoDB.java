@@ -26,14 +26,18 @@ import java.util.List;
 public class MongoDB implements Storage {
 
     private final RSPlugin plugin;
+    private final MongoDBConfig config;
 
     private final Gson gson = new Gson();
     private final MongoClient client;
     private final MongoDatabase database;
 
+    private final String prefix;
+
     public MongoDB(RSPlugin plugin) {
         this.plugin = plugin;
-        MongoDBConfig config = plugin.getConfigurations().getMongodb();
+        this.config = plugin.getConfigurations().getMongodb();
+        this.prefix = config.getTablePrefix();
         String serverHost = config.getHost() + ":" + config.getPort();
         // Replace the placeholder with your Atlas connection string
         String uri = "mongodb://" + config.getUsername() + ":" + config.getPassword() + "@" + serverHost;
@@ -52,14 +56,14 @@ public class MongoDB implements Storage {
 
     @Override
     public boolean add(String collectionName, JsonObject data) {
-        MongoCollection<Document> collection = database.getCollection(collectionName);
+        MongoCollection<Document> collection = database.getCollection(prefix + collectionName);
         Document document = Document.parse(gson.toJson(data));
         return collection.insertOne(document).wasAcknowledged();
     }
 
     @Override
     public boolean set(String collectionName, Pair<String, Object> find, Pair<String, Object> data) {
-        MongoCollection<Document> collection = database.getCollection(collectionName);
+        MongoCollection<Document> collection = database.getCollection(prefix + collectionName);
         if (find != null) {
             Bson filter;
             if (find.getValue() instanceof JsonObject jsonElement) {
