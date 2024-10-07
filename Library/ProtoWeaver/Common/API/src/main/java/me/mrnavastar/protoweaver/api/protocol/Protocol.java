@@ -36,6 +36,8 @@ public class Protocol {
     private int maxPacketSize = 16384;
     @Getter
     private int maxConnections = -1;
+    @Getter
+    private boolean global = false;
 
     private Class<? extends ProtoConnectionHandler> serverConnectionHandler;
     private PacketCallback serverPacketCallable;
@@ -310,6 +312,16 @@ public class Protocol {
          */
         public Builder setMaxConnections(int maxConnections) {
             protocol.maxConnections = maxConnections;
+            return this;
+        }
+
+        /**
+         * TODO
+         *
+         * @param global TODO
+         */
+        public Builder setGlobal(boolean global) {
+            protocol.global = global;
             return this;
         }
 

@@ -15,5 +15,11 @@ public interface BukkitProtoWeaver {
 
     List<Protocol> getProtocols();
 
+    void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler);
+
     void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, PacketCallback callback);
+
+    void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler);
+
+    void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, PacketCallback callback);
 }

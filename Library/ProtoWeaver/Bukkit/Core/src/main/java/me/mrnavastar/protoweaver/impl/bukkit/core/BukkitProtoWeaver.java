@@ -1,5 +1,6 @@
 package me.mrnavastar.protoweaver.impl.bukkit.core;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
@@ -7,6 +8,7 @@ import me.mrnavastar.protoweaver.api.callback.PacketCallback;
 import me.mrnavastar.protoweaver.api.protocol.CompressionType;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
 import me.mrnavastar.protoweaver.api.protocol.velocity.VelocityAuth;
+import me.mrnavastar.protoweaver.impl.bukkit.api.BukkitProtoHandler;
 import me.mrnavastar.protoweaver.impl.bukkit.api.nms.IProtoWeaver;
 import me.mrnavastar.protoweaver.impl.bukkit.nms.v1_17_r1.ProtoWeaver_1_17_R1;
 import me.mrnavastar.protoweaver.impl.bukkit.nms.v1_18_r1.ProtoWeaver_1_18_R1;
@@ -51,7 +53,18 @@ BukkitProtoWeaver implements me.mrnavastar.protoweaver.impl.bukkit.api.BukkitPro
         registerProtocol("rslib", "internal", Object.class, BukkitProtoHandler.class, callback);
     }
 
+    public void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
+        registerProtocol(namespace, key, false, packetType, protocolHandler, null);
+    }
+
     public void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, PacketCallback callback) {
+        registerProtocol(namespace, key,false, packetType, protocolHandler, callback);
+    }
+
+    public void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
+        registerProtocol(namespace, key, global, packetType, protocolHandler, null);
+    }
+    public void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, PacketCallback callback) {
         Protocol.Builder protocol = Protocol.create(namespace, key);
         protocol.setCompression(CompressionType.SNAPPY);
         protocol.setMaxPacketSize(67108864); // 64mb
@@ -62,6 +75,7 @@ BukkitProtoWeaver implements me.mrnavastar.protoweaver.impl.bukkit.api.BukkitPro
         }
         if (callback == null) protocol.setServerHandler(protocolHandler);
         else protocol.setServerHandler(protocolHandler, callback);
+        protocol.setGlobal(global);
         protocols.add(protocol.load());
     }
 }
