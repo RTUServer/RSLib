@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
+import me.mrnavastar.protoweaver.api.callback.PacketCallback;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
@@ -129,7 +130,16 @@ public abstract class RSPlugin extends JavaPlugin {
     }
 
     protected void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
-        framework.registerProtocol(namespace, key, packetType, protocolHandler);
+        framework.registerProtocol(namespace, key, false, packetType, protocolHandler, null);
+    }
+    protected void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, PacketCallback callback) {
+        framework.registerProtocol(namespace, key, false,  packetType, protocolHandler, callback);
+    }
+    protected void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
+        framework.registerProtocol(namespace, key, global, packetType, protocolHandler, null);
+    }
+    protected void registerProtocol(String namespace, String key, boolean global,  Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, PacketCallback callback) {
+        framework.registerProtocol(namespace, key, global, packetType, protocolHandler, callback);
     }
 
     protected void initialize() {

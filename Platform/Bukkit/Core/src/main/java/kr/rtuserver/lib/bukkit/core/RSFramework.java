@@ -165,8 +165,8 @@ public class RSFramework implements kr.rtuserver.lib.bukkit.api.core.RSFramework
         Bukkit.getPluginManager().addPermission(new Permission(name, permissionDefault));
     }
 
-    public void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
-        protoWeaver.registerProtocol(namespace, key, packetType, protocolHandler, null);
+    public void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, PacketCallback callback) {
+        protoWeaver.registerProtocol(namespace, key, global, packetType, protocolHandler, callback);
     }
 
 
