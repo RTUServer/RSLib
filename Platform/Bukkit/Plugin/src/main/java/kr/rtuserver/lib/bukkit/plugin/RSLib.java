@@ -34,7 +34,7 @@ public class RSLib extends RSPlugin {
     }
 
     @Override
-    protected void load()  {
+    protected void load() {
         instance = this;
     }
 

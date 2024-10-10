@@ -26,10 +26,9 @@ public class MariaDB implements Storage {
 
     private final Gson gson = new Gson();
     private final String driver = "org.mariadb.jdbc.MariaDbDataSource";
+    private final String prefix;
     private HikariDataSource hikariDataSource;
     private Connection connection;
-
-    private final String prefix;
 
     public MariaDB(RSPlugin plugin, List<String> list) {
         this.plugin = plugin;
