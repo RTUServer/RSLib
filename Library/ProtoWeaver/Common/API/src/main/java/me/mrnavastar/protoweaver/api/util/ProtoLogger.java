@@ -1,14 +1,19 @@
 package me.mrnavastar.protoweaver.api.util;
 
+import lombok.Setter;
 
 public class ProtoLogger {
 
-    private static IProtoLogger logger;
+    public interface IProtoLogger {
+        void info(String message);
 
-    public static void setLogger(IProtoLogger logger) {
-        ProtoLogger.logger = logger;
-        info("ProtoLogger initialized");
+        void warn(String message);
+
+        void err(String message);
     }
+
+    @Setter
+    private static IProtoLogger logger;
 
     public static void info(String message) {
         if (logger != null) logger.info(message);
@@ -20,16 +25,8 @@ public class ProtoLogger {
         else System.out.println("WARN: " + message);
     }
 
-    public static void error(String message) {
-        if (logger != null) logger.error(message);
+    public static void err(String message) {
+        if (logger != null) logger.err(message);
         else System.out.println("ERR: " + message);
-    }
-
-    public interface IProtoLogger {
-        void info(String message);
-
-        void warn(String message);
-
-        void error(String message);
     }
 }

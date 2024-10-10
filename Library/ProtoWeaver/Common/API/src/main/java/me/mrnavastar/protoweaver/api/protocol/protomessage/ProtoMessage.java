@@ -12,13 +12,6 @@ import me.mrnavastar.protoweaver.api.util.Event;
  */
 public class ProtoMessage implements ProtoConnectionHandler {
 
-    /**
-     * This event is triggered when a message is received and can be used both on the server and the client.
-     * Be sure to load this protocol.
-     */
-    public static final Event<MessageReceived> MESSAGE_RECEIVED = new Event<>(callbacks -> (connection, channel, message) -> {
-        callbacks.forEach(callback -> callback.trigger(connection, channel, message));
-    });
     @Getter
     private static final Protocol protocol = Protocol.create("protoweaver", "proto-message")
             .setCompression(CompressionType.SNAPPY)
@@ -32,6 +25,14 @@ public class ProtoMessage implements ProtoConnectionHandler {
         if (packet instanceof Message message)
             MESSAGE_RECEIVED.getInvoker().trigger(connection, message.getChannel(), message.getMessage());
     }
+
+    /**
+     * This event is triggered when a message is received and can be used both on the server and the client.
+     * Be sure to load this protocol.
+     */
+    public static final Event<MessageReceived> MESSAGE_RECEIVED = new Event<>(callbacks -> (connection, channel, message) -> {
+        callbacks.forEach(callback -> callback.trigger(connection, channel, message));
+    });
 
     @FunctionalInterface
     public interface MessageReceived {

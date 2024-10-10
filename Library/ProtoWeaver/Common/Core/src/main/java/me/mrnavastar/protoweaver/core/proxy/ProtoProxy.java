@@ -2,24 +2,26 @@ package me.mrnavastar.protoweaver.core.proxy;
 
 import lombok.NonNull;
 import lombok.Setter;
-import me.mrnavastar.protoweaver.core.client.ProtoClient;
 import me.mrnavastar.protoweaver.api.ProtoWeaver;
-import me.mrnavastar.protoweaver.api.netty.Sender;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
 import me.mrnavastar.protoweaver.api.protocol.Side;
+import me.mrnavastar.protoweaver.api.proxy.ProtoServer;
 import me.mrnavastar.protoweaver.api.proxy.ServerSupplier;
-import me.mrnavastar.protoweaver.api.util.ProtoLogger;
+import me.mrnavastar.protoweaver.core.client.ProtoClient;
+import me.mrnavastar.r.R;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ProtoProxy {
 
-    private static final ConcurrentHashMap<SocketAddress, ArrayList<ProtoClient>> servers = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<ProtoServer, ArrayList<ProtoClient>> servers = new ConcurrentHashMap<>();
 
     /**
      * Sets the polling rate of servers that are disconnected. Defaults to 5 seconds
@@ -36,52 +38,27 @@ public class ProtoProxy {
         ProtoWeaver.getLoadedProtocols().forEach(this::startProtocol);
     }
 
-    /**
-     * Sends a packet to every server running protoweaver with the correct protocol.
-     */
-    public static void sendAll(@NonNull Object packet) {
-        servers.values().forEach(clients -> {
-            clients.forEach(client -> {
-                client.send(packet);
-            });
-        });
-    }
-
-    /**
-     * Sends a packet to a specific server.
-     *
-     * @return true if success, false if failure or the server doesn't have the relevant protocol loaded
-     */
-    public static boolean send(@NonNull InetSocketAddress address, @NonNull Object packet) {
-        for (ProtoClient client : servers.get(address)) {
-            System.out.println(client.getAddress());
-            Sender s = client.send(packet);
-            if (s.isSuccess()) return true;
-        }
-        return false;
-    }
-
     private void startProtocol(Protocol protocol) {
-        if (protocol.toString().equals("protoweaver:internal")) return;
+        if (protocol.toString().equals("rslib:protoweaver")) return;
 
-        servers.forEach((address, clients) -> {
+        servers.forEach((server, clients) -> {
             for (ProtoClient client : clients) {
                 // Don't start a new connection if one already exists for this protocol
                 if (client.getCurrentProtocol().toString().equals(protocol.toString())) return;
             }
-            connectClient(protocol, address, clients);
+            connectClient(protocol, server, clients);
         });
     }
 
-    private void connectClient(Protocol protocol, SocketAddress address, ArrayList<ProtoClient> clients) {
-        ProtoClient client = new ProtoClient((InetSocketAddress) address, hostsFile);
+    private void connectClient(Protocol protocol, ProtoServer server, ArrayList<ProtoClient> clients) {
+        ProtoClient client = new ProtoClient((InetSocketAddress) server.getAddress(), hostsFile);
         client.connect(protocol).onConnectionLost(connection -> {
             clients.remove(client);
 
             if (connection.getDisconnecter().equals(Side.CLIENT)) return;
             Thread.sleep(serverPollRate);
-            connectClient(protocol, address, clients);
-        }).onConnectionEstablished(connection -> ProtoLogger.info("Connected to Server(" + address + ") with protocol: " + protocol));
+            connectClient(protocol, server, clients);
+        }).onConnectionEstablished(connection -> R.of(server).set("connection", connection));
         clients.add(client);
     }
 
@@ -89,5 +66,70 @@ public class ProtoProxy {
     public void shutdown() {
         servers.values().forEach(clients -> clients.forEach(ProtoClient::disconnect));
         servers.clear();
+    }
+
+    @ApiStatus.Internal
+    public void register(ProtoServer server) {
+        if (servers.putIfAbsent(server, new ArrayList<>()) == null)
+            ProtoWeaver.getLoadedProtocols().forEach(this::startProtocol);
+    }
+
+    @ApiStatus.Internal
+    public void unregister(ProtoServer server) {
+        Optional.ofNullable(servers.remove(server)).ifPresent(clients -> clients.forEach(ProtoClient::disconnect));
+    }
+
+    /**
+     * @return A list of {@link ProtoServer} that are registered to this proxy instance.
+     */
+    public static List<ProtoServer> getRegisteredServers() {
+        return servers.keySet().stream().toList();
+    }
+
+    /**
+     * @return A {@link ProtoServer} that is registered to this proxy instance.
+     */
+    public static Optional<ProtoServer> getRegisteredServer(String name) {
+        return getRegisteredServers().stream().filter(s -> s.getName().equals(name)).findFirst();
+    }
+
+    /**
+     * @return A {@link ProtoServer} that is registered to this proxy instance.
+     */
+    public static Optional<ProtoServer> getRegisteredServer(SocketAddress address) {
+        return getRegisteredServers().stream().filter(s -> s.getAddress().equals(address)).findFirst();
+    }
+
+    /**
+     * Returns a list of servers connected on the supplied {@link Protocol}.
+     *
+     * @param protocol the protocol to check for.
+     */
+    public static List<ProtoServer> getConnectedServers(@NonNull Protocol protocol) {
+        List<ProtoServer> connected = new ArrayList<>();
+        servers.forEach((server, clients) -> clients.stream()
+                .filter(c -> protocol.equals(c.getCurrentProtocol()) || c.isConnected())
+                .findFirst().ifPresent(c -> connected.add(server)));
+        return connected;
+    }
+
+    /**
+     * Returns a {@link ProtoServer} connected on the supplied {@link Protocol}.
+     *
+     * @param protocol the protocol to check for.
+     * @param name     the name of the server.
+     */
+    public static Optional<ProtoServer> getConnectedServer(@NonNull Protocol protocol, String name) {
+        return getConnectedServers(protocol).stream().filter(s -> s.getName().equals(name)).findFirst();
+    }
+
+    /**
+     * Returns a {@link ProtoServer} connected on the supplied {@link Protocol}.
+     *
+     * @param protocol the protocol to check for.
+     * @param address  the address of the server.
+     */
+    public static Optional<ProtoServer> getConnectedServer(@NonNull Protocol protocol, SocketAddress address) {
+        return getConnectedServers(protocol).stream().filter(s -> s.getAddress().equals(address)).findFirst();
     }
 }

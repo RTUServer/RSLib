@@ -4,8 +4,8 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
+import me.mrnavastar.protoweaver.api.callback.HandlerCallback;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
-import me.mrnavastar.protoweaver.api.callback.PacketCallback;
 
 @Slf4j(topic = "RSLib/ProtoHandler")
 @NoArgsConstructor(force = true)
@@ -13,7 +13,7 @@ import me.mrnavastar.protoweaver.api.callback.PacketCallback;
 public class BukkitProtoHandler implements ProtoConnectionHandler {
 
     private static ProtoConnection proxy;
-    private final PacketCallback callable;
+    private final HandlerCallback callable;
 
     public static ProtoConnection getProxy() {
         if (proxy == null || !proxy.isOpen()) return null;
@@ -22,8 +22,11 @@ public class BukkitProtoHandler implements ProtoConnectionHandler {
 
     @Override
     public void onReady(ProtoConnection protoConnection) {
+        if (callable != null) callable.onReady(protoConnection);
         proxy = protoConnection;
-        log.info("Connected to Proxy({})", protoConnection.getRemoteAddress());
+        log.info("Connected to Proxy");
+        log.info("┠ Address: {}", protoConnection.getRemoteAddress());
+        log.info("┖ Protocol: {}", protoConnection.getProtocol().getNamespaceKey());
     }
 
     @Override

@@ -33,15 +33,15 @@ import java.util.Date;
 public class SSLContext {
 
     @Getter
-    private static SslContext context;
+    private static io.netty.handler.ssl.SslContext context;
     private static File privateKey;
     private static File cert;
 
     public static void initKeystore(String dir) {
         Security.addProvider(new BouncyCastleProvider());
 
-        privateKey = new File(dir + "/Keys/private.pem");
-        cert = new File(dir + "/Keys/cert.pem");
+        privateKey = new File(dir + "/keys/private.pem");
+        cert = new File(dir + "/keys/cert.pem");
     }
 
     @SneakyThrows

@@ -1,5 +1,6 @@
 package me.mrnavastar.protoweaver.core.client;
 
+import com.google.common.base.internal.Finalizer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -18,8 +19,8 @@ import me.mrnavastar.protoweaver.api.netty.Sender;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
 import me.mrnavastar.protoweaver.api.protocol.Side;
 import me.mrnavastar.protoweaver.core.client.netty.ProtoTrustManager;
-import me.mrnavastar.protoweaver.core.protoweaver.ClientConnectionHandler;
-import me.mrnavastar.protoweaver.core.protoweaver.InternalConnectionHandler;
+import me.mrnavastar.protoweaver.core.protocol.protoweaver.ClientConnectionHandler;
+import me.mrnavastar.protoweaver.core.protocol.protoweaver.InternalConnectionHandler;
 
 import javax.net.ssl.SSLException;
 import java.net.InetSocketAddress;
@@ -27,13 +28,29 @@ import java.util.ArrayList;
 
 public class ProtoClient {
 
+    static {
+        // This exists so shadow jar does not yeet it
+        Class<?> c = Finalizer.class;
+    }
+
+    @FunctionalInterface
+    public interface ConnectionEstablishedHandler {
+        void handle(ProtoConnection connection) throws Exception;
+    }
+
+    @FunctionalInterface
+    public interface ConnectionLostHandler {
+        void handle(ProtoConnection connection) throws Exception;
+    }
+
     @Getter
     private final InetSocketAddress address;
+    private EventLoopGroup workerGroup = null;
+    @Getter
+    private ProtoConnection connection = null;
     private final SslContext sslContext;
     private final ArrayList<ConnectionEstablishedHandler> connectionEstablishedHandlers = new ArrayList<>();
     private final ArrayList<ConnectionLostHandler> connectionLostHandlers = new ArrayList<>();
-    private EventLoopGroup workerGroup = null;
-    private ProtoConnection connection = null;
 
     public ProtoClient(@NonNull InetSocketAddress address, @NonNull String hostsFile) {
         try {
@@ -79,7 +96,7 @@ public class ProtoClient {
             try {
                 f.awaitUninterruptibly();
                 if (f.isSuccess()) {
-                    ((ClientConnectionHandler) connection.getHandler()).start(connection, protocol.toString());
+                    ((ClientConnectionHandler) connection.getHandler()).start(connection, protocol);
                     // Wait for protocol to switch to passed in one
                     while (connection == null || connection.isOpen() && !connection.getProtocol().toString().equals(protocol.toString()))
                         Thread.onSpinWait();
@@ -101,6 +118,7 @@ public class ProtoClient {
                         throw new RuntimeException(e);
                     }
                 });
+                connection = null;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             } finally {
@@ -115,10 +133,7 @@ public class ProtoClient {
     }
 
     public void disconnect() {
-        if (connection != null) {
-            connection.disconnect();
-            connection = null;
-        }
+        if (connection != null) connection.disconnect();
         if (workerGroup != null && !workerGroup.isShutdown()) workerGroup.shutdownGracefully();
     }
 
@@ -139,15 +154,5 @@ public class ProtoClient {
 
     public Protocol getCurrentProtocol() {
         return connection == null ? null : connection.getProtocol();
-    }
-
-    @FunctionalInterface
-    public interface ConnectionEstablishedHandler {
-        void handle(ProtoConnection connection) throws Exception;
-    }
-
-    @FunctionalInterface
-    public interface ConnectionLostHandler {
-        void handle(ProtoConnection connection) throws Exception;
     }
 }

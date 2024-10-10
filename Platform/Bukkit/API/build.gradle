@@ -20,8 +20,20 @@ dependencies {
 shadowJar {
     mustRunAfter(":Library:MiniMessage:shadowJar")
     mustRunAfter(":Library:LightDI:shadowJar")
-    relocate 'io.papermc.lib', 'kr.rtuserver.lib.bukkit.api.util.paper'
-    relocate 'net.kyori.adventure.platform.bukkit', 'kr.rtuserver.lib.bukkit.api.util.kyori'
+    relocate 'io.papermc.lib', 'kr.rtuserver.lib.bukkit.api.utility.paper'
+    relocate 'net.kyori.adventure.platform.bukkit', 'kr.rtuserver.lib.bukkit.api.utility.kyori'
+
+    exclude "org/checkerframework/**"
+    exclude "edu/umd/cs/findbugs/**"
+    exclude "javax/**"
+    exclude "javassist/**"
+    exclude "net/jcip/**"
+    exclude "net/kyori/**"
+    exclude "org/reflections/**"
+    exclude "com/google/**"
+    exclude "io/netty/**"
+    exclude "META-INF/**"
+    exclude "classpath.index"
 }
 
 java {

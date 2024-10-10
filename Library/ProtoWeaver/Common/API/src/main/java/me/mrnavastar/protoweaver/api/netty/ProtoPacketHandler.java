@@ -1,5 +1,6 @@
 package me.mrnavastar.protoweaver.api.netty;
 
+import com.google.gson.Gson;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,6 +16,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ProtoPacketHandler extends ByteToMessageDecoder {
+
+    private final static Gson GSON = new Gson();
 
     private static ConcurrentHashMap<String, Integer> connectionCount;
 
@@ -44,7 +47,7 @@ public class ProtoPacketHandler extends ByteToMessageDecoder {
             connectionCount.put(connection.getProtocol().toString(), connectionCount.getOrDefault(connection.getProtocol().toString(), 1) - 1);
             this.handler.onDisconnect(connection);
         } catch (Exception e) {
-            ProtoLogger.error("Protocol: " + connection.getProtocol() + " threw an error on disconnect!");
+            connection.getProtocol().logErr("Threw an error on disconnect!");
             e.printStackTrace();
         }
     }
@@ -53,18 +56,19 @@ public class ProtoPacketHandler extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) {
         if (byteBuf.readableBytes() == 0) return;
 
-        byte[] bytes = new byte[byteBuf.readInt()];
-        byteBuf.readBytes(bytes);
-        Object packet = connection.getProtocol().deserialize(bytes);
-        if (packet == null) {
-            ProtoLogger.error("Protocol: " + connection.getProtocol() + " received an unknown object!");
-            return;
-        }
+        Object packet = null;
 
         try {
-            handler.handlePacket(connection, packet);
+            byte[] bytes = new byte[byteBuf.readInt()];
+            byteBuf.readBytes(bytes);
+            packet = connection.getProtocol().deserialize(bytes);
+            handler.handlePacket(connection, (Object) packet);
+
+        } catch (IllegalArgumentException e) {
+            connection.getProtocol().logWarn("Ignoring an " + e.getMessage());
         } catch (Exception e) {
-            ProtoLogger.error("Protocol: " + connection.getProtocol() + " threw an error on when trying to handle: " + packet.getClass() + "!");
+            if (packet != null)
+                connection.getProtocol().logErr("Threw an error when trying to handle: " + packet.getClass() + "!");
             e.printStackTrace();
         }
     }
@@ -72,7 +76,7 @@ public class ProtoPacketHandler extends ByteToMessageDecoder {
     // Done with two bufs to prevent the user from messing with the internal data
     public Sender send(Object packet) {
         try {
-            byte[] packetBuf = connection.getProtocol().serialize(packet);
+            byte[] packetBuf = connection.getProtocol().serialize((Object) packet);
             if (packetBuf.length == 0) return new Sender(connection, ctx.newSucceededFuture(), false);
 
             buf.writeInt(packetBuf.length); // Packet Len
@@ -81,8 +85,11 @@ public class ProtoPacketHandler extends ByteToMessageDecoder {
             Sender sender = new Sender(connection, ctx.writeAndFlush(buf), true);
             buf = Unpooled.buffer();
             return sender;
+        } catch (IllegalArgumentException e) {
+            connection.getProtocol().logErr("Tried to send an " + e.getMessage());
+            return new Sender(connection, ctx.newSucceededFuture(), false);
         } catch (Exception e) {
-            ProtoLogger.error("Failed to encode object: " + packet.getClass().getName());
+            connection.getProtocol().logErr("Threw an error when trying to send: " + packet.getClass() + "!");
             e.printStackTrace();
             return new Sender(connection, ctx.newSucceededFuture(), false);
         }
@@ -102,10 +109,10 @@ public class ProtoPacketHandler extends ByteToMessageDecoder {
                 ProtoLogger.warn(line);
             }
 
-            ProtoLogger.error("Failed to connect to: " + parts[2] + ":" + parts[3]);
-            ProtoLogger.error("Server SSL fingerprint does not match saved fingerprint! This could be a MITM ATTACK!");
-            ProtoLogger.error(" - https://en.wikipedia.org/wiki/Man-in-the-middle_attack");
-            ProtoLogger.error("If you've reset your server configuration recently, you can probably ignore this and reset/remove the \"protoweaver.hosts\" file.");
+            ProtoLogger.err("Failed to connect to: " + parts[2] + ":" + parts[3]);
+            ProtoLogger.err("Server SSL fingerprint does not match saved fingerprint! This could be a MITM ATTACK!");
+            ProtoLogger.err(" - https://en.wikipedia.org/wiki/Man-in-the-middle_attack");
+            ProtoLogger.err("If you've reset your server configuration recently, you can probably ignore this and reset/remove the \"protoweaver.hosts\" file.");
 
             connection.disconnect();
         }

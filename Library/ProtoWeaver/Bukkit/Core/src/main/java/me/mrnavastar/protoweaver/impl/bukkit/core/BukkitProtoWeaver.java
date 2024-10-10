@@ -1,12 +1,15 @@
 package me.mrnavastar.protoweaver.impl.bukkit.core;
 
-import lombok.Builder;
+import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
-import me.mrnavastar.protoweaver.api.callback.PacketCallback;
+import me.mrnavastar.protoweaver.api.callback.HandlerCallback;
+import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
+import me.mrnavastar.protoweaver.api.netty.Sender;
 import me.mrnavastar.protoweaver.api.protocol.CompressionType;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
+import me.mrnavastar.protoweaver.api.protocol.internal.ProtocolRegistry;
 import me.mrnavastar.protoweaver.api.protocol.velocity.VelocityAuth;
 import me.mrnavastar.protoweaver.impl.bukkit.api.BukkitProtoHandler;
 import me.mrnavastar.protoweaver.impl.bukkit.api.nms.IProtoWeaver;
@@ -27,14 +30,17 @@ import java.util.List;
 
 @Slf4j(topic = "RSLib/ProtoWeaver")
 @Getter
-public class
-BukkitProtoWeaver implements me.mrnavastar.protoweaver.impl.bukkit.api.BukkitProtoWeaver {
+public class BukkitProtoWeaver implements me.mrnavastar.protoweaver.impl.bukkit.api.BukkitProtoWeaver {
 
     private final IProtoWeaver protoWeaver;
     private final boolean isModernProxy;
+    private final HandlerCallback callable = new HandlerCallback(this::onReady, null);
     private final List<Protocol> protocols = new ArrayList<>();
+    private final static List<Protocol> unregistered = new ArrayList<>();
 
-    public BukkitProtoWeaver(PacketCallback callback, String sslFolder, String nmsVersion) {
+    private ProtoConnection connection;
+
+    public BukkitProtoWeaver(String sslFolder, String nmsVersion) {
         this.protoWeaver = switch (nmsVersion) {
             case "v1_17_R1" -> new ProtoWeaver_1_17_R1(sslFolder);
             case "v1_18_R1" -> new ProtoWeaver_1_18_R1(sslFolder);
@@ -50,25 +56,49 @@ BukkitProtoWeaver implements me.mrnavastar.protoweaver.impl.bukkit.api.BukkitPro
             default -> throw new IllegalStateException();
         };
         this.isModernProxy = protoWeaver.isModernProxy();
-        registerProtocol("rslib", "internal", Object.class, BukkitProtoHandler.class, callback);
+        Protocol.Builder protocol = Protocol.create("rslib", "internal");
+        protocol.setCompression(CompressionType.SNAPPY);
+        protocol.setMaxPacketSize(67108864); // 64mb
+        protocol.addPacket(Object.class);
+        protocol.addPacket(ProtocolRegistry.class);
+        if (isModernProxy) {
+            protocol.setServerAuthHandler(VelocityAuth.class);
+            protocol.setClientAuthHandler(VelocityAuth.class);
+        }
+        protocol.setServerHandler(BukkitProtoHandler.class, callable);
+        protocol.setGlobal(false);
+        protocol.load();
+    }
+
+    private void onReady(HandlerCallback.Ready data) {
+        connection = data.protoConnection();
+        List<Protocol> copy = ImmutableList.copyOf(unregistered);
+        for (Protocol protocol : copy) {
+            ProtocolRegistry registry = new ProtocolRegistry(protocol.getNamespace(), protocol.getKey(), protocol.isGlobal(), protocol.getPacketType());
+            Sender sender = connection.send(registry);
+            if (sender.isSuccess()) {
+                unregistered.remove(protocol);
+            }
+        }
     }
 
     public void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
         registerProtocol(namespace, key, false, packetType, protocolHandler, null);
     }
 
-    public void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, PacketCallback callback) {
-        registerProtocol(namespace, key,false, packetType, protocolHandler, callback);
+    public void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
+        registerProtocol(namespace, key, false, packetType, protocolHandler, callback);
     }
 
     public void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
         registerProtocol(namespace, key, global, packetType, protocolHandler, null);
     }
-    public void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, PacketCallback callback) {
+
+    public void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
         Protocol.Builder protocol = Protocol.create(namespace, key);
         protocol.setCompression(CompressionType.SNAPPY);
         protocol.setMaxPacketSize(67108864); // 64mb
-        protocol.addPacket(packetType);
+       // protocol.addPacket(packetType);
         if (isModernProxy) {
             protocol.setServerAuthHandler(VelocityAuth.class);
             protocol.setClientAuthHandler(VelocityAuth.class);
@@ -76,6 +106,12 @@ BukkitProtoWeaver implements me.mrnavastar.protoweaver.impl.bukkit.api.BukkitPro
         if (callback == null) protocol.setServerHandler(protocolHandler);
         else protocol.setServerHandler(protocolHandler, callback);
         protocol.setGlobal(global);
-        protocols.add(protocol.load());
+        Protocol result = protocol.load();
+        protocols.add(result);
+        if (connection != null) {
+            ProtocolRegistry registry = new ProtocolRegistry(namespace, key, global, (Class<Object>) packetType);
+            Sender sender = connection.send(registry);
+            if (sender.isSuccess()) log.info("New Protocol({}) is connected", namespace + ":" + key);
+        } else unregistered.add(result);
     }
 }

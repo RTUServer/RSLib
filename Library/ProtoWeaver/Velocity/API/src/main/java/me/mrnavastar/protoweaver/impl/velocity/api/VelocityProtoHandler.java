@@ -4,7 +4,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
-import me.mrnavastar.protoweaver.api.callback.PacketCallback;
+import me.mrnavastar.protoweaver.api.callback.HandlerCallback;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public class VelocityProtoHandler implements ProtoConnectionHandler {
 
     private static ProtoConnection server;
     private static final List<ProtoConnection> servers = new ArrayList<>();
-    private final PacketCallback callable;
+    private final HandlerCallback callable;
 
     public static ProtoConnection getServer() {
         if (server == null || !server.isOpen()) return null;
@@ -37,12 +37,19 @@ public class VelocityProtoHandler implements ProtoConnectionHandler {
     public void onReady(ProtoConnection protoConnection) {
         server = protoConnection;
         servers.add(protoConnection);
-        log.info("Connected to Server({})", protoConnection.getRemoteAddress());
+        log.info("Connected to Server");
+        log.info("┠ Address: {}", protoConnection.getRemoteAddress());
+        log.info("┖ Protocol: {}", protoConnection.getProtocol().getNamespaceKey());
+        if (callable != null) {
+            callable.onReady(protoConnection);
+        }
     }
 
     @Override
     public void handlePacket(ProtoConnection protoConnection, Object packet) {
-        if (callable != null) callable.handlePacket(protoConnection, packet);
+        if (callable != null) {
+            callable.handlePacket(protoConnection, packet);
+        }
         if (protoConnection.getProtocol().isGlobal()) getServers().forEach(connection -> connection.send(packet));
     }
 }

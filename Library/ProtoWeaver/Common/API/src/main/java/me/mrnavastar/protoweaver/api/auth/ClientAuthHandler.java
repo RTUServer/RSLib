@@ -10,5 +10,5 @@ public interface ClientAuthHandler {
      *
      * @return The secret that will be sent to the server.
      */
-    String getSecret();
+    byte[] getSecret();
 }

@@ -3,8 +3,7 @@ plugins {
 }
 
 runServer {
-    dependsOn(shadowJar)
-    minecraftVersion("1.20.5")
+    minecraftVersion("1.20.4")
 }
 
 subprojects {
@@ -64,6 +63,6 @@ dependencies {
 shadowJar {
     mustRunAfter(":Library:MiniMessage:shadowJar")
     mustRunAfter(":Library:LightDI:shadowJar")
-    relocate 'io.papermc.lib', 'kr.rtuserver.lib.bukkit.api.util.paper'
-    relocate 'net.kyori.adventure.platform.bukkit', 'kr.rtuserver.lib.bukkit.api.util.kyori'
+    relocate 'io.papermc.lib', 'kr.rtuserver.lib.bukkit.api.utility.paper'
+    relocate 'net.kyori.adventure.platform.bukkit', 'kr.rtuserver.lib.bukkit.api.utility.kyori'
 }

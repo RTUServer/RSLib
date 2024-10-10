@@ -25,8 +25,7 @@ import kr.rtuserver.lib.bukkit.nms.v1_21_r1.NMS_1_21_R1;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
-import me.mrnavastar.protoweaver.api.callback.PacketCallback;
-import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
+import me.mrnavastar.protoweaver.api.callback.HandlerCallback;
 import me.mrnavastar.protoweaver.impl.bukkit.core.BukkitProtoWeaver;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -48,7 +47,6 @@ public class RSFramework implements kr.rtuserver.lib.bukkit.api.core.RSFramework
     private final Map<String, RSPlugin> plugins = new HashMap<>();
     @Getter
     private final Map<String, Boolean> hooks = new HashMap<>();
-    private final PacketCallback callable = new PacketCallback(this::onPacket);
     @Getter
     private kr.rtuserver.lib.bukkit.api.nms.NMS NMS;
     @Getter
@@ -104,13 +102,16 @@ public class RSFramework implements kr.rtuserver.lib.bukkit.api.core.RSFramework
                 Bukkit.getPluginManager().disablePlugin(plugin);
             }
         }
-        protoWeaver = new BukkitProtoWeaver(callable, plugin.getDataFolder().getPath(), NMSVersion);
-    }
-
-    private void onPacket(ProtoConnection connection, Object object) {
+        protoWeaver = new BukkitProtoWeaver(plugin.getDataFolder().getPath(), NMSVersion);
     }
 
     public void enable(RSPlugin plugin) {
+        try {
+            Class.forName("com.google.common.collect.EmptyImmutableSortedSet");
+            System.out.println("A");
+        } catch (ClassNotFoundException var2) {
+            System.out.println("B");
+        }
         printStartUp(plugin);
         commonTranslation = new CommonTranslation(plugin);
         registerInternal(plugin);
@@ -165,7 +166,7 @@ public class RSFramework implements kr.rtuserver.lib.bukkit.api.core.RSFramework
         Bukkit.getPluginManager().addPermission(new Permission(name, permissionDefault));
     }
 
-    public void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, PacketCallback callback) {
+    public void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
         protoWeaver.registerProtocol(namespace, key, global, packetType, protocolHandler, callback);
     }
 

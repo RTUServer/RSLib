@@ -30,4 +30,6 @@ public interface ProtoConnectionHandler {
      */
     default void handlePacket(ProtoConnection connection, Object packet) {
     }
+
+    ;
 }

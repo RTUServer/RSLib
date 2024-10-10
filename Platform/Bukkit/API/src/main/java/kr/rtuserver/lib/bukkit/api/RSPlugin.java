@@ -13,8 +13,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
-import me.mrnavastar.protoweaver.api.callback.PacketCallback;
-import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
+import me.mrnavastar.protoweaver.api.callback.HandlerCallback;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -129,16 +128,55 @@ public abstract class RSPlugin extends JavaPlugin {
         framework.registerPermission(name, permissionDefault);
     }
 
+    /**
+     * 프록시의 RSLib과 통신을 위한 프로토콜 등록
+     *
+     * @param namespace       네임스페이스
+     * @param key             키
+     * @param packetType      패킷 데이터 역할의 클래스 (프록시 플러그인이 없는 경우 null로 설정해야합니다)
+     * @param protocolHandler 수신을 담당하는 ProtoHandler
+     */
     protected void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
         framework.registerProtocol(namespace, key, false, packetType, protocolHandler, null);
     }
-    protected void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, PacketCallback callback) {
-        framework.registerProtocol(namespace, key, false,  packetType, protocolHandler, callback);
+
+    /**
+     * 프록시의 RSLib과 통신을 위한 프로토콜 등록
+     *
+     * @param namespace       네임스페이스
+     * @param key             키
+     * @param packetType      패킷 데이터 역할의 클래스 (프록시 플러그인이 없는 경우 null로 설정해야합니다)
+     * @param protocolHandler 수신을 담당하는 ProtoHandler
+     * @param callback        ProtocolHandler 외부에서 수신 이벤트를 받는 callback
+     */
+    protected void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
+        framework.registerProtocol(namespace, key, false, packetType, protocolHandler, callback);
     }
+
+    /**
+     * 프록시의 RSLib과 통신을 위한 프로토콜 등록
+     *
+     * @param namespace       네임스페이스
+     * @param key             키
+     * @param global          모든 서버에 패킷을 전송할지 결정
+     * @param packetType      패킷 데이터 역할의 클래스 (프록시 플러그인이 없는 경우 null로 설정해야합니다)
+     * @param protocolHandler 수신을 담당하는 ProtoHandler
+     */
     protected void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler) {
         framework.registerProtocol(namespace, key, global, packetType, protocolHandler, null);
     }
-    protected void registerProtocol(String namespace, String key, boolean global,  Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, PacketCallback callback) {
+
+    /**
+     * 프록시의 RSLib과 통신을 위한 프로토콜 등록
+     *
+     * @param namespace       네임스페이스
+     * @param key             키
+     * @param global          모든 서버에 패킷을 전송할지 결정
+     * @param packetType      패킷 데이터 역할의 클래스 (프록시 플러그인이 없는 경우 null로 설정해야합니다)
+     * @param protocolHandler 수신을 담당하는 ProtoHandler
+     * @param callback        ProtocolHandler 외부에서 수신 이벤트를 받는 callback
+     */
+    protected void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
         framework.registerProtocol(namespace, key, global, packetType, protocolHandler, callback);
     }
 
@@ -152,13 +190,6 @@ public abstract class RSPlugin extends JavaPlugin {
     }
 
     protected void disable() {
-    }
-
-    /***
-     * Listener of Proxy Packet using Internal ProtoWeaver
-     * 내장 ProtoWeaver를 사용한 프록시 패킷 리스너
-     */
-    protected void onPacket(ProtoConnection connection, Object object) {
     }
 
 }

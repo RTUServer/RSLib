@@ -9,23 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ProtoWeaver {
 
-    /**
-     * An event that is fired when {@link ProtoWeaver#load(Protocol)} is called. This event can be used to cancel the loading
-     * of a protocol by calling {@link Event.Cancelable#cancel()}. You can't cancel the internal protoweaver protocol.
-     */
-    public static final Event<PreLoadedProtocol> PRE_PROTOCOL_LOADED = new Event<>(callbacks -> (protocol, cancelable) -> {
-        for (PreLoadedProtocol callback : callbacks) {
-            if (cancelable.isCanceled() && !protocol.getNamespace().equals("protoweaver") && !protocol.getName().equals("internal"))
-                break;
-            callback.trigger(protocol, cancelable);
-        }
-    });
-    /**
-     * An event that is fired once a {@link Protocol} has been fully loaded.
-     */
-    public static final Event<LoadedProtocol> PROTOCOL_LOADED = new Event<>(callbacks -> protocol -> {
-        callbacks.forEach(callback -> callback.trigger(protocol));
-    });
     private static final ConcurrentHashMap<String, Protocol> loadedProtocols = new ConcurrentHashMap<>();
 
     /**
@@ -69,6 +52,24 @@ public class ProtoWeaver {
     public static Protocol getLoadedProtocol(@NonNull String namespace, @NonNull String name) {
         return getLoadedProtocol(namespace + ":" + name);
     }
+
+    /**
+     * An event that is fired when {@link ProtoWeaver#load(Protocol)} is called. This event can be used to cancel the loading
+     * of a protocol by calling {@link Event.Cancelable#cancel()}. You can't cancel the internal protoweaver protocol.
+     */
+    public static final Event<PreLoadedProtocol> PRE_PROTOCOL_LOADED = new Event<>(callbacks -> (protocol, cancelable) -> {
+        for (PreLoadedProtocol callback : callbacks) {
+            if (cancelable.isCanceled() && !protocol.getNamespaceKey().equals("rslib:protoweaver")) break;
+            callback.trigger(protocol, cancelable);
+        }
+    });
+
+    /**
+     * An event that is fired once a {@link Protocol} has been fully loaded.
+     */
+    public static final Event<LoadedProtocol> PROTOCOL_LOADED = new Event<>(callbacks -> protocol -> {
+        callbacks.forEach(callback -> callback.trigger(protocol));
+    });
 
     @FunctionalInterface
     public interface PreLoadedProtocol {

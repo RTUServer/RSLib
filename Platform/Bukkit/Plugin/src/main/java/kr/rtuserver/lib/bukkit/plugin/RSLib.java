@@ -4,8 +4,6 @@ import kr.rtuserver.lib.bukkit.api.RSPlugin;
 import kr.rtuserver.lib.bukkit.plugin.commands.RSLibCommand;
 import kr.rtuserver.lib.common.api.cdi.LightDI;
 import lombok.Getter;
-import me.mrnavastar.protoweaver.api.callback.PacketCallback;
-import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
@@ -17,8 +15,6 @@ public class RSLib extends RSPlugin {
 
     @Getter
     private static RSLib instance;
-    @Getter
-    private final PacketCallback callable = new PacketCallback(this::onPacket);
 
     public RSLib() {
         super();
@@ -38,12 +34,8 @@ public class RSLib extends RSPlugin {
     }
 
     @Override
-    protected void load() {
+    protected void load()  {
         instance = this;
-    }
-
-    @Override
-    protected void onPacket(ProtoConnection connection, Object object) {
     }
 
     @Override

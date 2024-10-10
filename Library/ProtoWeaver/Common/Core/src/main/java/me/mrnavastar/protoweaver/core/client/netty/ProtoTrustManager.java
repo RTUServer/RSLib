@@ -22,6 +22,7 @@ import java.util.Arrays;
  */
 public class ProtoTrustManager {
 
+    private final File hostsFile;
     private static final FastThreadLocal<MessageDigest> tlmd;
 
     static {
@@ -38,7 +39,6 @@ public class ProtoTrustManager {
         };
     }
 
-    private final File hostsFile;
     private final String hostId;
     private byte[] trusted = null;
     @Getter
