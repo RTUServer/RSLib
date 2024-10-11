@@ -108,7 +108,7 @@ public class MariaDB implements Storage {
             }
 
             query = "UPDATE " + prefix + table + " SET data = JSON_SET(data, '$." + data.getKey() + "', " + value + ")";
-        } else query = "DELETE FROM " + table;
+        } else query = "DELETE FROM " + prefix + table;
         if (find != null) {
             Object value = find.getValue();
             if (value instanceof JsonObject jsonObject) value = jsonObject.toString();
@@ -128,7 +128,7 @@ public class MariaDB implements Storage {
     @Override
     public List<JsonObject> get(String table, Pair<String, Object> find) {
         List<JsonObject> result = new ArrayList<>();
-        String query = "SELECT * FROM " + table;
+        String query = "SELECT * FROM " + prefix + table;
         if (find != null) {
             Object value = find.getValue();
             if (value instanceof JsonObject jsonObject) value = jsonObject.toString();

@@ -1,5 +1,6 @@
 package me.mrnavastar.protoweaver.impl.velocity.api;
 
+import com.google.common.collect.ImmutableList;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class VelocityProtoHandler implements ProtoConnectionHandler {
 
     public static List<ProtoConnection> getServers() {
         List<ProtoConnection> result = new ArrayList<>();
-        for (ProtoConnection server : servers) {
+        for (ProtoConnection server : ImmutableList.copyOf(servers)) {
             if (server.isOpen()) result.add(server);
             else servers.remove(server);
         }

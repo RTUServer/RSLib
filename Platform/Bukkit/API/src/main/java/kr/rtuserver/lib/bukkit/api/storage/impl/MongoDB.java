@@ -91,7 +91,7 @@ public class MongoDB implements Storage {
 
     @Override
     public List<JsonObject> get(String collectionName, Pair<String, Object> find) {
-        MongoCollection<Document> collection = database.getCollection(collectionName);
+        MongoCollection<Document> collection = database.getCollection(prefix + collectionName);
         FindIterable<Document> documents = find != null ? collection.find(Filters.eq(find.getKey(), find.getValue())) : collection.find();
         List<JsonObject> result = new ArrayList<>();
         for (Document document : documents) {

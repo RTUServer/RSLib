@@ -5,7 +5,7 @@ import me.mrnavastar.protoweaver.api.callback.HandlerCallback;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
 import me.mrnavastar.protoweaver.impl.bukkit.api.nms.IProtoWeaver;
 
-import java.util.List;
+import java.util.Map;
 
 public interface BukkitProtoWeaver {
 
@@ -13,13 +13,9 @@ public interface BukkitProtoWeaver {
 
     boolean isModernProxy();
 
-    List<Protocol> getProtocols();
+    Map<String, Protocol> getProtocols();
 
-    void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler);
+    void registerProtocol(String namespace, String key, Class<?> packetType, boolean global, Class<? extends ProtoConnectionHandler> protocolHandler);
 
-    void registerProtocol(String namespace, String key, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback);
-
-    void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler);
-
-    void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback);
+    void registerProtocol(String namespace, String key, Class<?> packetType, boolean global, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback);
 }

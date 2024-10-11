@@ -3,10 +3,16 @@ package me.mrnavastar.protoweaver.impl.bungee.core;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
+import me.mrnavastar.protoweaver.api.ProtoWeaver;
 import me.mrnavastar.protoweaver.api.callback.HandlerCallback;
 import me.mrnavastar.protoweaver.api.protocol.CompressionType;
+import me.mrnavastar.protoweaver.api.protocol.PacketType;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
-import me.mrnavastar.protoweaver.api.protocol.internal.ProtocolRegistry;
+import me.mrnavastar.protoweaver.api.protocol.Request;
+import me.mrnavastar.protoweaver.api.protocol.internal.RegisterRequest;
+import me.mrnavastar.protoweaver.api.protocol.internal.RegisterResponse;
+import me.mrnavastar.protoweaver.api.protocol.internal.Result;
+import me.mrnavastar.protoweaver.api.protocol.velocity.VelocityAuth;
 import me.mrnavastar.protoweaver.api.proxy.ProtoServer;
 import me.mrnavastar.protoweaver.api.util.ProtoLogger;
 import me.mrnavastar.protoweaver.core.protocol.protoweaver.CommonPacketHandler;
@@ -41,17 +47,16 @@ public class BungeeProtoWeaver implements me.mrnavastar.protoweaver.impl.bungee.
         protocol.setClientHandler(BungeeProtoHandler.class, callable).load();
     }
 
-    public void registerProtocol(ProtocolRegistry registry) {
-        registerProtocol(registry.namespace(), registry.key(), registry.global(), registry.packetType(), CommonPacketHandler.class, null);
+    public void registerProtocol(Request request) {
+        registerProtocol(request.namespace(), request.key(), request.packetType(), request.global(), request.protocolHandler(), null);
     }
 
-    public void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
+    public void registerProtocol(String namespace, String key, Class<?> packetType, boolean global, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
         Protocol.Builder protocol = Protocol.create(namespace, key);
         protocol.setCompression(CompressionType.SNAPPY);
         protocol.setMaxPacketSize(67108864); // 64mb
-        protocol.addPacket(packetType);
-        protocol.setGlobal(global);
-        protocol.setClientHandler(protocolHandler, callback).load();
+        protocol.addPacket(PacketType.of(packetType, global));
+        protocol.setClientHandler(CommonPacketHandler.class, callback).load();
     }
 
     public void disable() {
@@ -80,6 +85,24 @@ public class BungeeProtoWeaver implements me.mrnavastar.protoweaver.impl.bungee.
     }
 
     private void onPacket(HandlerCallback.Packet data) {
-        if (data.packet() instanceof ProtocolRegistry registry) registerProtocol(registry);
+        if (data.packet() instanceof RegisterRequest request) {
+            boolean findClass = findClass(request.getType());
+            boolean alreadyLoaded = ProtoWeaver.getLoadedProtocols().stream().anyMatch(p -> p.getNamespaceKey().equalsIgnoreCase(request.getNamespaceKey()));
+            data.protoConnection().send(new RegisterResponse(request.getNamespace(), request.getKey(), request.getType(), request.isGlobal(), new Result(alreadyLoaded, !findClass)));
+        }
+        if (data.packet() instanceof RegisterResponse response) {
+            boolean findClass = findClass(response.getType());
+            Class<?> type = findClass ? response.getClassType() : String.class;
+            registerProtocol(response.getNamespace(), response.getKey(), type, response.isGlobal(), CommonPacketHandler.class, null);
+        }
+    }
+
+    private boolean findClass(String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 }

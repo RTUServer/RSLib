@@ -21,7 +21,6 @@ public class RSLibCommand extends RSCommand {
 
     @Override
     public boolean execute(RSCommandData data) {
-        System.out.println(framework.getNMSVersion());
         return false;
     }
 

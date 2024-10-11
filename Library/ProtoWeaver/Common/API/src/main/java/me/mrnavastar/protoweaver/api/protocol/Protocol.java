@@ -1,5 +1,6 @@
 package me.mrnavastar.protoweaver.api.protocol;
 
+import com.google.gson.Gson;
 import lombok.*;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.ProtoWeaver;
@@ -25,7 +26,9 @@ public class Protocol {
 
     @EqualsAndHashCode.Exclude
     private final ObjectSerializer serializer = new ObjectSerializer();
+    @Getter
     private final MessageDigest packetMD = MessageDigest.getInstance("SHA-1");
+    private final static Gson GSON = new Gson();
 
     @Getter
     private final String namespace;
@@ -275,15 +278,31 @@ public class Protocol {
             return this;
         }
 
+
         /**
          * Register a class to the {@link Protocol}. Does nothing if the class has already been registered.
          *
          * @param packet The packet to register.
          */
         public Builder addPacket(@NonNull Class<?> packet) {
+            protocol.global = false;
             protocol.packetType = packet;
-            protocol.serializer.register(packet);
+            protocol.serializer.register(packet, false);
             protocol.packetMD.update(packet.getName().getBytes(StandardCharsets.UTF_8));
+            return this;
+        }
+
+        /**
+         * Register a class to the {@link Protocol}. Does nothing if the class has already been registered.
+         *
+         * @param packet The packet to register.
+         */
+        public Builder addPacket(@NonNull PacketType packet) {
+            protocol.global = packet.isGlobal();
+            protocol.packetType = packet.getTypeClass();
+            protocol.serializer.register(packet.getTypeClass(), packet.isNotFound());
+            String type = packet.isNotFound() ? String.class.getName() : packet.getType();
+            protocol.packetMD.update(type.getBytes(StandardCharsets.UTF_8));
             return this;
         }
 
@@ -335,11 +354,6 @@ public class Protocol {
          */
         public Builder setLoggingLevel(Level level) {
             protocol.loggingLevel = level;
-            return this;
-        }
-
-        public Builder setGlobal(boolean global) {
-            protocol.global = global;
             return this;
         }
 

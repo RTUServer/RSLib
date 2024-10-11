@@ -106,12 +106,6 @@ public class RSFramework implements kr.rtuserver.lib.bukkit.api.core.RSFramework
     }
 
     public void enable(RSPlugin plugin) {
-        try {
-            Class.forName("com.google.common.collect.EmptyImmutableSortedSet");
-            System.out.println("A");
-        } catch (ClassNotFoundException var2) {
-            System.out.println("B");
-        }
         printStartUp(plugin);
         commonTranslation = new CommonTranslation(plugin);
         registerInternal(plugin);
@@ -166,8 +160,8 @@ public class RSFramework implements kr.rtuserver.lib.bukkit.api.core.RSFramework
         Bukkit.getPluginManager().addPermission(new Permission(name, permissionDefault));
     }
 
-    public void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
-        protoWeaver.registerProtocol(namespace, key, global, packetType, protocolHandler, callback);
+    public void registerProtocol(String namespace, String key, Class<?> packetType, boolean global, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
+        protoWeaver.registerProtocol(namespace, key, packetType, global, protocolHandler, callback);
     }
 
 

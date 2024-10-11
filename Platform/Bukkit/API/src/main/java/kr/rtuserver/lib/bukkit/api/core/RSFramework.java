@@ -54,6 +54,6 @@ public interface RSFramework {
 
     void registerPermission(String name, PermissionDefault permissionDefault);
 
-    void registerProtocol(String namespace, String key, boolean global, Class<?> packetType, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback);
+    void registerProtocol(String namespace, String key, Class<?> packetType, boolean global, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback);
 
 }

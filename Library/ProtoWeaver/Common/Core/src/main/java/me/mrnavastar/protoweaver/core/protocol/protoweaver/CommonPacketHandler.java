@@ -1,5 +1,6 @@
 package me.mrnavastar.protoweaver.core.protocol.protoweaver;
 
+import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
@@ -28,7 +29,7 @@ public class CommonPacketHandler implements ProtoConnectionHandler {
 
     public static List<ProtoConnection> getServers() {
         List<ProtoConnection> result = new ArrayList<>();
-        for (ProtoConnection server : servers) {
+        for (ProtoConnection server : ImmutableList.copyOf(servers)) {
             if (server.isOpen()) result.add(server);
             else servers.remove(server);
         }

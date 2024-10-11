@@ -8,3 +8,8 @@ dependencies {
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(17)
 }
+
+compileJava {
+    mustRunAfter(":Library:ProtoWeaver:Bungee:API:shadowJar")
+    mustRunAfter(":Library:ProtoWeaver:Common:Core:shadowJar")
+}

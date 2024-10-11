@@ -1,5 +1,6 @@
 package me.mrnavastar.protoweaver.api.util;
 
+import com.google.gson.Gson;
 import me.mrnavastar.r.R;
 import org.apache.fury.Fury;
 import org.apache.fury.ThreadSafeFury;
@@ -12,6 +13,7 @@ import java.util.List;
 public class ObjectSerializer {
 
     private final ThreadSafeFury fury = Fury.builder().withJdkClassSerializableCheck(false).buildThreadSafeFury();
+    private final Gson GSON = new Gson();
 
     static {
         // Make fury be quiet
@@ -28,13 +30,18 @@ public class ObjectSerializer {
         if (!type.isEnum()) recursiveRegister(type.getSuperclass(), registered);
     }
 
-    public void register(Class<?> type) {
-        recursiveRegister(type, new ArrayList<>());
+    private Class<?> type;
+    private boolean notFound = false;
+
+    public void register(Class<?> type, boolean notFound) {
+        this.type = type;
+        this.notFound = notFound;
+        recursiveRegister(notFound ? String.class : type, new ArrayList<>());
     }
 
     public byte[] serialize(Object object) throws IllegalArgumentException {
         try {
-            return fury.serialize(object);
+            return fury.serialize(notFound ? GSON.toJson(object, type) : object);
         } catch (InsecureException e) {
             throw new IllegalArgumentException("unregistered object: " + object.getClass().getName());
         }
@@ -42,7 +49,8 @@ public class ObjectSerializer {
 
     public Object deserialize(byte[] bytes) throws IllegalArgumentException {
         try {
-            return fury.deserialize(bytes);
+            Object result = fury.deserialize(bytes);
+            return notFound ? GSON.fromJson((String) result, type) : result;
         } catch (InsecureException e) {
             String packet = e.getMessage().split(" is not registered")[0].replace("class ", "");
             throw new IllegalArgumentException("unregistered object: " + packet);

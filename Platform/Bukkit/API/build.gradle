@@ -42,3 +42,7 @@ java {
 tasks.withType(JavaCompile).configureEach {
     //options.compilerArgs += ['-source', '17', '-target', '17']
 }
+
+compileJava {
+    mustRunAfter(":Library:ProtoWeaver:Common:API:shadowJar")
+}
