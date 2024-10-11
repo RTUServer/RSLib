@@ -8,6 +8,10 @@ subprojects {
     java {
         toolchain.languageVersion = JavaLanguageVersion.of(17)
     }
+
+    compileJava {
+        mustRunAfter(":Library:ProtoWeaver:Common:API:shadowJar")
+    }
 }
 
 dependencies {

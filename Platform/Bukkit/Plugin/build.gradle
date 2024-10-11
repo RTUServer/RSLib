@@ -1,4 +1,5 @@
 dependencies {
+    compileOnly project(":Library:LightDI")
     compileOnly project(':Platform:Bukkit:API')
     compileOnly project(':Platform:Bukkit:Core')
 
@@ -9,7 +10,6 @@ dependencies {
     compileOnly "com.github.MilkBowl:VaultAPI:1.7.1"
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.1.0'
     compileOnly 'net.luckperms:api:5.4'
-
 }
 
 processResources {

@@ -3,7 +3,6 @@ plugins {
 }
 
 runWaterfall {
-    dependsOn(shadowJar)
     waterfallVersion("1.20")
 }
 
@@ -15,8 +14,6 @@ dependencies {
     implementation project(":Library:ProtoWeaver:Bungee:Core")
 
     implementation 'com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4'
-    implementation 'com.google.inject:guice:7.0.0'
-    implementation 'org.reflections:reflections:0.9.10'
 
     compileOnly("net.md-5:bungeecord-api:1.20-R0.2")
 }
@@ -32,4 +29,11 @@ processResources {
     filesMatching('bungee.yml') {
         expand props
     }
+}
+
+compileJava {
+    mustRunAfter(":Library:ProtoWeaver:Common:API:shadowJar")
+    mustRunAfter(":Library:ProtoWeaver:Common:Core:shadowJar")
+    mustRunAfter(":Library:ProtoWeaver:Bungee:API:shadowJar")
+    mustRunAfter(":Library:ProtoWeaver:Bungee:Core:shadowJar")
 }

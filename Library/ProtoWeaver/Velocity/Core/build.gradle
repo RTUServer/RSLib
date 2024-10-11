@@ -6,3 +6,7 @@ dependencies {
 
     implementation 'com.moandjiezana.toml:toml4j:0.7.2'
 }
+
+compileJava {
+    mustRunAfter(":Library:ProtoWeaver:Common:Core:shadowJar")
+}

@@ -9,9 +9,9 @@ import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.protocol.CompressionType;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
 import me.mrnavastar.protoweaver.api.protocol.Side;
-import me.mrnavastar.protoweaver.api.util.ProtoLogger;
 
 import java.net.InetSocketAddress;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -24,18 +24,21 @@ public class ProtoConnection {
     private final ProtoPacketHandler packetHandler;
     private final Channel channel;
     private final ChannelPipeline pipeline;
-    /**
-     * Get the side that this connection is on. Always returns {@link Side#CLIENT} on client and {@link Side#SERVER} on server.
-     */
-    @Getter
-    private final Side side;
     @Getter
     private ProtoConnectionHandler handler;
+
     /**
      * Get the connections current protocol.
      */
     @Getter
     private Protocol protocol;
+
+    /**
+     * Get the side that this connection is on. Always returns {@link Side#CLIENT} on client and {@link Side#SERVER} on server.
+     */
+    @Getter
+    private final Side side;
+
     /**
      * Get which side closed the connection.
      */
@@ -54,13 +57,6 @@ public class ProtoConnection {
 
         pipeline.addLast("packetHandler", packetHandler);
         setCompression(protocol);
-    }
-
-    /**
-     * @return The number of connected clients the passed in protocol is currently serving.
-     */
-    public static int getConnectionCount(Protocol protocol) {
-        return connectionCount.getOrDefault(protocol.toString(), 0);
     }
 
     private void setCompression(@NonNull Protocol protocol) {
@@ -106,9 +102,16 @@ public class ProtoConnection {
 
             this.handler.onReady(this);
         } catch (Exception e) {
-            ProtoLogger.error("Protocol: " + protocol + " threw an error on initialization!");
+            protocol.logErr("Threw an error on initialization!");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * @return The number of connected clients the passed in protocol is currently serving.
+     */
+    public static int getConnectionCount(Protocol protocol) {
+        return connectionCount.getOrDefault(protocol.toString(), 0);
     }
 
     /**
@@ -144,5 +147,16 @@ public class ProtoConnection {
     public void disconnect() {
         if (isOpen()) channel.close();
         disconnecter = side;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ProtoConnection connection)) return false;
+        return protocol.equals(connection.getProtocol()) && Objects.equals(getRemoteAddress(), connection.getRemoteAddress());
+    }
+
+    @Override
+    public String toString() {
+        return "[" + protocol.toString() + ", " + getRemoteAddress() + "]";
     }
 }

@@ -1,33 +1,41 @@
 package me.mrnavastar.protoweaver.api.protocol;
 
-import com.esotericsoftware.kryo.kryo5.Kryo;
-import com.esotericsoftware.kryo.kryo5.io.Input;
-import com.esotericsoftware.kryo.kryo5.io.Output;
-import com.esotericsoftware.kryo.kryo5.objenesis.strategy.StdInstantiatorStrategy;
-import com.esotericsoftware.kryo.kryo5.serializers.DefaultSerializers;
-import com.esotericsoftware.kryo.kryo5.util.DefaultInstantiatorStrategy;
+import com.google.gson.Gson;
 import lombok.*;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.ProtoWeaver;
 import me.mrnavastar.protoweaver.api.auth.ClientAuthHandler;
 import me.mrnavastar.protoweaver.api.auth.ServerAuthHandler;
+import me.mrnavastar.protoweaver.api.callback.HandlerCallback;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
-import me.mrnavastar.protoweaver.api.callback.PacketCallback;
+import me.mrnavastar.protoweaver.api.util.ObjectSerializer;
+import me.mrnavastar.protoweaver.api.util.ProtoLogger;
 
 import java.lang.reflect.Modifier;
-import java.util.Objects;
-import java.util.UUID;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
 
 /**
  * Stores all the registered packets, settings and additional configuration of a {@link ProtoWeaver} protocol.
  */
+@EqualsAndHashCode
 public class Protocol {
+
+    @EqualsAndHashCode.Exclude
+    private final ObjectSerializer serializer = new ObjectSerializer();
+    @Getter
+    private final MessageDigest packetMD = MessageDigest.getInstance("SHA-1");
+    private final static Gson GSON = new Gson();
 
     @Getter
     private final String namespace;
     @Getter
-    private final String name;
-    private final Kryo kryo = new Kryo();
+    private final String key;
+    @Getter
+    private Class<?> packetType;
     @Getter
     private CompressionType compression = CompressionType.NONE;
     @Getter
@@ -36,22 +44,31 @@ public class Protocol {
     private int maxPacketSize = 16384;
     @Getter
     private int maxConnections = -1;
+    @Getter
+    private boolean global = false;
+    @Getter
+    private Level loggingLevel = Level.ALL;
 
+    @EqualsAndHashCode.Exclude
     private Class<? extends ProtoConnectionHandler> serverConnectionHandler;
-    private PacketCallback serverPacketCallable;
+    @EqualsAndHashCode.Exclude
     private Class<? extends ProtoConnectionHandler> clientConnectionHandler;
-    private PacketCallback clientPacketCallable;
+    @EqualsAndHashCode.Exclude
     private Class<? extends ServerAuthHandler> serverAuthHandler;
+    @EqualsAndHashCode.Exclude
     private Class<? extends ClientAuthHandler> clientAuthHandler;
-    private int packetHash = 0;
+    @EqualsAndHashCode.Exclude
+    private HandlerCallback serverHandlerCallable;
+    @EqualsAndHashCode.Exclude
+    private HandlerCallback clientHandlerCallable;
 
-    private Protocol(String namespace, String name) {
+    private Protocol(String namespace, String name) throws NoSuchAlgorithmException {
         this.namespace = namespace;
-        this.name = name;
-        kryo.setRegistrationRequired(false);
-        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+        this.key = name;
+    }
 
-        kryo.addDefaultSerializer(UUID.class, new DefaultSerializers.UUIDSerializer());
+    public String getNamespaceKey() {
+        return namespace + ":" + key;
     }
 
     /**
@@ -62,6 +79,7 @@ public class Protocol {
      * @param namespace Usually should be set to your mod id or project id
      * @param name      The name of your protocol.
      */
+    @SneakyThrows
     public static Builder create(@NonNull String namespace, @NonNull String name) {
         return new Builder(new Protocol(namespace, name));
     }
@@ -82,16 +100,16 @@ public class Protocol {
             case CLIENT -> {
                 if (clientConnectionHandler == null)
                     throw new RuntimeException("No client connection handler set for protocol: " + this);
-                if (clientPacketCallable == null) yield clientConnectionHandler.getDeclaredConstructor().newInstance();
+                if (clientHandlerCallable == null) yield clientConnectionHandler.getDeclaredConstructor().newInstance();
                 else
-                    yield clientConnectionHandler.getDeclaredConstructor(PacketCallback.class).newInstance(clientPacketCallable);
+                    yield clientConnectionHandler.getDeclaredConstructor(HandlerCallback.class).newInstance(clientHandlerCallable);
             }
             case SERVER -> {
                 if (serverConnectionHandler == null)
                     throw new RuntimeException("No server connection handler set for protocol: " + this);
-                if (serverPacketCallable == null) yield serverConnectionHandler.getDeclaredConstructor().newInstance();
+                if (serverHandlerCallable == null) yield serverConnectionHandler.getDeclaredConstructor().newInstance();
                 else
-                    yield serverConnectionHandler.getDeclaredConstructor(PacketCallback.class).newInstance(serverPacketCallable);
+                    yield serverConnectionHandler.getDeclaredConstructor(HandlerCallback.class).newInstance(serverHandlerCallable);
             }
         };
     }
@@ -108,20 +126,24 @@ public class Protocol {
         return clientAuthHandler.getDeclaredConstructor().newInstance();
     }
 
-    public byte[] serialize(@NonNull Object packet) {
-        try (Output output = new Output(maxPacketSize)) {
-            try {
-                kryo.writeClassAndObject(output, packet);
-            } catch (IllegalArgumentException ignore) {
-            }
-            return output.toBytes();
-        }
+    public byte[] serialize(@NonNull Object packet) throws IllegalArgumentException {
+        return serializer.serialize(packet);
     }
 
-    public Object deserialize(byte @NonNull [] packet) {
-        try (Input in = new Input(packet)) {
-            return kryo.readClassAndObject(in);
-        }
+    public Object deserialize(byte @NonNull [] packet) throws IllegalArgumentException {
+        return serializer.deserialize(packet);
+    }
+
+    @SneakyThrows
+    public byte[] getSHA1() {
+        MessageDigest md = (MessageDigest) this.packetMD.clone();
+        md.update(toString().getBytes(StandardCharsets.UTF_8));
+        md.update(ByteBuffer.allocate(12)
+                .putInt(compressionLevel)
+                .putInt(compression.ordinal())
+                .putInt(maxPacketSize)
+                .array());
+        return md.digest();
     }
 
     /**
@@ -136,24 +158,26 @@ public class Protocol {
      *
      * @param side The {@link Side} to check for an auth handler.
      */
-    public boolean requiresAuth(Side side) {
+    public boolean requiresAuth(@NonNull Side side) {
         if (side.equals(Side.CLIENT)) return clientAuthHandler != null;
         return serverAuthHandler != null;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(
-                namespace, name,
-                packetHash,
-                compression.ordinal(), compressionLevel,
-                maxPacketSize
-        );
+    public void logInfo(@NonNull String message) {
+        if (loggingLevel.intValue() <= Level.INFO.intValue()) ProtoLogger.info("[" + this + "] " + message);
+    }
+
+    public void logWarn(@NonNull String message) {
+        if (loggingLevel.intValue() <= Level.WARNING.intValue()) ProtoLogger.warn("[" + this + "] " + message);
+    }
+
+    public void logErr(@NonNull String message) {
+        if (loggingLevel.intValue() <= Level.SEVERE.intValue()) ProtoLogger.err("[" + this + "] " + message);
     }
 
     @Override
     public String toString() {
-        return namespace + ":" + name;
+        return namespace + ":" + key;
     }
 
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -182,13 +206,13 @@ public class Protocol {
          * @param handler The class of the packet handler.
          */
         @SneakyThrows
-        public Builder setServerHandler(Class<? extends ProtoConnectionHandler> handler, PacketCallback callable) {
+        public Builder setServerHandler(Class<? extends ProtoConnectionHandler> handler, HandlerCallback callable) {
             if (Modifier.isAbstract(handler.getModifiers()))
                 throw new IllegalArgumentException("Handler class cannot be abstract: " + handler);
-            if (handler.getDeclaredConstructor(PacketCallback.class).getParameterCount() != 1)
+            if (handler.getDeclaredConstructor(HandlerCallback.class).getParameterCount() != 1)
                 throw new IllegalArgumentException("Handler class must have a zero arg constructor: " + handler);
             protocol.serverConnectionHandler = handler;
-            protocol.serverPacketCallable = callable;
+            protocol.serverHandlerCallable = callable;
             return this;
         }
 
@@ -213,13 +237,13 @@ public class Protocol {
          * @param handler The class of the packet handler.
          */
         @SneakyThrows
-        public Builder setClientHandler(Class<? extends ProtoConnectionHandler> handler, PacketCallback callable) {
+        public Builder setClientHandler(Class<? extends ProtoConnectionHandler> handler, HandlerCallback callable) {
             if (Modifier.isAbstract(handler.getModifiers()))
                 throw new IllegalArgumentException("Handler class cannot be abstract: " + handler);
-            if (handler.getDeclaredConstructor(PacketCallback.class).getParameterCount() != 1)
-                throw new IllegalArgumentException("Handler class must have a zero arg constructor: " + handler);
+            if (handler.getDeclaredConstructor(HandlerCallback.class).getParameterCount() != 1)
+                throw new IllegalArgumentException("Handler class must have a one arg constructor: " + handler);
             protocol.clientConnectionHandler = handler;
-            protocol.clientPacketCallable = callable;
+            protocol.clientHandlerCallable = callable;
             return this;
         }
 
@@ -254,19 +278,31 @@ public class Protocol {
             return this;
         }
 
+
         /**
          * Register a class to the {@link Protocol}. Does nothing if the class has already been registered.
          *
          * @param packet The packet to register.
          */
         public Builder addPacket(@NonNull Class<?> packet) {
-            if (protocol.kryo.getClassResolver().getRegistration(packet) != null) return this;
+            protocol.global = false;
+            protocol.packetType = packet;
+            protocol.serializer.register(packet, false);
+            protocol.packetMD.update(packet.getName().getBytes(StandardCharsets.UTF_8));
+            return this;
+        }
 
-            protocol.kryo.register(packet);
-            protocol.packetHash = 31 * protocol.packetHash + packet.getName().hashCode();
-
-            /*for (Field field : packet.getDeclaredFields())
-                if (((Modifier.STATIC | Modifier.TRANSIENT) & field.getModifiers()) == 0) addPacket(field.getType());*/
+        /**
+         * Register a class to the {@link Protocol}. Does nothing if the class has already been registered.
+         *
+         * @param packet The packet to register.
+         */
+        public Builder addPacket(@NonNull PacketType packet) {
+            protocol.global = packet.isGlobal();
+            protocol.packetType = packet.getTypeClass();
+            protocol.serializer.register(packet.getTypeClass(), packet.isNotFound());
+            String type = packet.isNotFound() ? String.class.getName() : packet.getType();
+            protocol.packetMD.update(type.getBytes(StandardCharsets.UTF_8));
             return this;
         }
 
@@ -310,6 +346,14 @@ public class Protocol {
          */
         public Builder setMaxConnections(int maxConnections) {
             protocol.maxConnections = maxConnections;
+            return this;
+        }
+
+        /**
+         * Sets the logging level for this {@link Protocol}.
+         */
+        public Builder setLoggingLevel(Level level) {
+            protocol.loggingLevel = level;
             return this;
         }
 

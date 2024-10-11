@@ -10,9 +10,9 @@ import io.netty.handler.ssl.SslHandler;
 import lombok.SneakyThrows;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
 import me.mrnavastar.protoweaver.api.protocol.Side;
-import me.mrnavastar.protoweaver.core.protoweaver.InternalConnectionHandler;
 import me.mrnavastar.protoweaver.api.util.ProtoConstants;
 import me.mrnavastar.protoweaver.api.util.ProtoLogger;
+import me.mrnavastar.protoweaver.core.protocol.protoweaver.InternalConnectionHandler;
 
 import java.util.List;
 import java.util.Map;

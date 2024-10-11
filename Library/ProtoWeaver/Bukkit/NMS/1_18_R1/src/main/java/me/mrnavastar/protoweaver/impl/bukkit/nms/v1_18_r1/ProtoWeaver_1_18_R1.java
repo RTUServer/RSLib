@@ -7,9 +7,9 @@ import io.papermc.paper.network.ChannelInitializeListenerHolder;
 import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.protocol.velocity.VelocityAuth;
 import me.mrnavastar.protoweaver.api.util.ProtoLogger;
-import me.mrnavastar.protoweaver.impl.bukkit.api.nms.IProtoWeaver;
 import me.mrnavastar.protoweaver.core.loader.netty.ProtoDeterminer;
 import me.mrnavastar.protoweaver.core.loader.netty.SSLContext;
+import me.mrnavastar.protoweaver.impl.bukkit.api.nms.IProtoWeaver;
 import net.kyori.adventure.key.Key;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -23,8 +23,8 @@ public class ProtoWeaver_1_18_R1 implements IProtoWeaver {
         SSLContext.initContext();
         if (isModernProxy()) {
             info("Detected modern proxy");
-            ChannelInitializeListenerHolder.addListener(Key.key("protoweaver", "internal"), new Paper());
-            VelocityAuth.setSecret(new String(PaperConfig.velocitySecretKey));
+            ChannelInitializeListenerHolder.addListener(Key.key("rslib", "protoweaver"), new Paper());
+            VelocityAuth.setSecret(PaperConfig.velocitySecretKey);
         }
     }
 
@@ -49,7 +49,7 @@ public class ProtoWeaver_1_18_R1 implements IProtoWeaver {
     }
 
     @Override
-    public void error(String message) {
+    public void err(String message) {
         log.error(message);
     }
 

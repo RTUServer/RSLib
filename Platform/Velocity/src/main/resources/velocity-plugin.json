@@ -7,5 +7,5 @@
     "${author}"
   ],
   "dependencies": [],
-  "main": "com.github.ipecter.rtuserver.lib.velocity.RSLib"
+  "main": "kr.rtuserver.lib.velocity.RSLib"
 }
