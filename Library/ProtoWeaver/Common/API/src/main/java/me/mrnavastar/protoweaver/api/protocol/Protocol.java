@@ -28,7 +28,6 @@ public class Protocol {
     private final ObjectSerializer serializer = new ObjectSerializer();
     @Getter
     private final MessageDigest packetMD = MessageDigest.getInstance("SHA-1");
-    private final static Gson GSON = new Gson();
 
     @Getter
     private final String namespace;

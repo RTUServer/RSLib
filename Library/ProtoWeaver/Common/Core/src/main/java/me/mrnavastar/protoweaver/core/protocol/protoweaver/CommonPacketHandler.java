@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.callback.HandlerCallback;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
+import me.mrnavastar.protoweaver.api.protocol.Protocol;
+import me.mrnavastar.protoweaver.core.proxy.ProtoProxy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,17 +16,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommonPacketHandler implements ProtoConnectionHandler {
 
-    private static ProtoConnection server;
     private static final List<ProtoConnection> servers = new ArrayList<>();
     private final HandlerCallback callable;
 
     public CommonPacketHandler() {
         this.callable = null;
-    }
-
-    public static ProtoConnection getServer() {
-        if (server == null || !server.isOpen()) return null;
-        return server;
     }
 
     public static List<ProtoConnection> getServers() {
@@ -38,7 +34,6 @@ public class CommonPacketHandler implements ProtoConnectionHandler {
 
     @Override
     public void onReady(ProtoConnection protoConnection) {
-        server = protoConnection;
         servers.add(protoConnection);
         log.info("Connected to Server");
         log.info("┠ Address: {}", protoConnection.getRemoteAddress());
@@ -48,6 +43,11 @@ public class CommonPacketHandler implements ProtoConnectionHandler {
     @Override
     public void handlePacket(ProtoConnection protoConnection, Object packet) {
         if (callable != null) callable.handlePacket(protoConnection, packet);
-        if (protoConnection.getProtocol().isGlobal()) getServers().forEach(connection -> connection.send(packet));
+        Protocol protocol = protoConnection.getProtocol();
+        if (protocol.isGlobal()) {
+            getServers().forEach(connection -> {
+                if (protocol.equals(connection.getProtocol())) connection.send(packet);
+            });
+        }
     }
 }

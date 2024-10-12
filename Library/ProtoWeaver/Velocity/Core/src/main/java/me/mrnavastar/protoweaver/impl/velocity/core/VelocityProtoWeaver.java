@@ -138,7 +138,7 @@ public class VelocityProtoWeaver implements me.mrnavastar.protoweaver.impl.veloc
         if (data.packet() instanceof RegisterRequest request) {
             boolean findClass = findClass(request.getType());
             boolean alreadyLoaded = ProtoWeaver.getLoadedProtocols().stream().anyMatch(p -> p.getNamespaceKey().equalsIgnoreCase(request.getNamespaceKey()));
-            System.out.println(alreadyLoaded + "/" + request.getNamespaceKey());
+            //System.out.println(alreadyLoaded + "/" + request.getNamespaceKey());
             data.protoConnection().send(new RegisterResponse(request.getNamespace(), request.getKey(), request.getType(), request.isGlobal(), new Result(alreadyLoaded, !findClass)));
         }
         if (data.packet() instanceof RegisterResponse response) {

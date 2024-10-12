@@ -21,11 +21,15 @@ public class ServerConnectionHandler extends InternalConnectionHandler implement
     @SneakyThrows
     @Override
     public void handlePacket(ProtoConnection connection, Object packet) {
+        System.out.println("?" + packet);
         if (packet instanceof ProtocolStatus status) {
             switch (status.getStatus()) {
                 case START -> {
                     // Check if protocol loaded
+                    System.out.println("??" + status.getNextProtocol());
                     nextProtocol = ProtoWeaver.getLoadedProtocol(status.getNextProtocol());
+                    ProtoWeaver.getLoadedProtocols().forEach(protocol1 -> System.out.println("???" + protocol1.getNamespaceKey()));
+                    System.out.println("????" + nextProtocol);
                     if (nextProtocol == null) {
                         protocolNotLoaded(connection, status.getNextProtocol());
                         return;
