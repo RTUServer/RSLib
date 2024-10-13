@@ -40,7 +40,6 @@ public class ProtoProxy {
 
     private void startProtocol(Protocol protocol) {
         if (protocol.toString().equals("rslib:protoweaver")) return;
-
         servers.forEach((server, clients) -> {
             for (ProtoClient client : clients) {
                 // Don't start a new connection if one already exists for this protocol

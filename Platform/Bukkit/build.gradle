@@ -59,10 +59,12 @@ dependencies {
     implementation 'com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4'
 
 }
-
-shadowJar {
+compileJava {
     mustRunAfter(":Library:MiniMessage:shadowJar")
     mustRunAfter(":Library:LightDI:shadowJar")
+}
+
+shadowJar {
     relocate 'io.papermc.lib', 'kr.rtuserver.lib.bukkit.api.utility.paper'
     relocate 'net.kyori.adventure.platform.bukkit', 'kr.rtuserver.lib.bukkit.api.utility.kyori'
 }

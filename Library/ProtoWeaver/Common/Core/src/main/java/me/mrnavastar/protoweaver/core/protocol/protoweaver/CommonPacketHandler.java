@@ -44,7 +44,7 @@ public class CommonPacketHandler implements ProtoConnectionHandler {
     public void handlePacket(ProtoConnection protoConnection, Object packet) {
         if (callable != null) callable.handlePacket(protoConnection, packet);
         Protocol protocol = protoConnection.getProtocol();
-        if (protocol.isGlobal()) {
+        if (protocol.isGlobal(packet)) {
             getServers().forEach(connection -> {
                 if (protocol.equals(connection.getProtocol())) connection.send(packet);
             });

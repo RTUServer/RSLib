@@ -16,8 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VelocityProtoHandler implements ProtoConnectionHandler {
 
-    private static ProtoConnection server;
     private static final List<ProtoConnection> servers = new ArrayList<>();
+    private static ProtoConnection server;
     private final HandlerCallback callable;
 
     public static ProtoConnection getServer() {
@@ -51,6 +51,6 @@ public class VelocityProtoHandler implements ProtoConnectionHandler {
         if (callable != null) {
             callable.handlePacket(protoConnection, packet);
         }
-        if (protoConnection.getProtocol().isGlobal()) getServers().forEach(connection -> connection.send(packet));
+        if (protoConnection.getProtocol().isGlobal(packet)) getServers().forEach(connection -> connection.send(packet));
     }
 }

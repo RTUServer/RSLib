@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.callback.HandlerCallback;
+import me.mrnavastar.protoweaver.api.protocol.Packet;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -128,30 +129,17 @@ public abstract class RSPlugin extends JavaPlugin {
         framework.registerPermission(name, permissionDefault);
     }
 
-
     /**
      * 프록시의 RSLib과 통신을 위한 프로토콜 등록
      *
      * @param namespace       네임스페이스
      * @param key             키
-     * @param packetType      패킷 정보
-     * @param protocolHandler 수신을 담당하는 핸들러
-     */
-    protected void registerProtocol(String namespace, String key, Class<?> packetType, boolean global, Class<? extends ProtoConnectionHandler> protocolHandler) {
-        framework.registerProtocol(namespace, key, packetType, global, protocolHandler, null);
-    }
-
-    /**
-     * 프록시의 RSLib과 통신을 위한 프로토콜 등록
-     *
-     * @param namespace       네임스페이스
-     * @param key             키
-     * @param packetType      패킷 정보
+     * @param packet          패킷 정보
      * @param protocolHandler 수신을 담당하는 핸들러
      * @param callback        핸들러 외부에서 수신 이벤트를 받는 callback
      */
-    protected void registerProtocol(String namespace, String key, Class<?> packetType, boolean global, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
-        framework.registerProtocol(namespace, key, packetType, global, protocolHandler, callback);
+    protected void registerProtocol(String namespace, String key, Packet packet, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
+        framework.registerProtocol(namespace, key, packet, protocolHandler, callback);
     }
 
     protected void initialize() {

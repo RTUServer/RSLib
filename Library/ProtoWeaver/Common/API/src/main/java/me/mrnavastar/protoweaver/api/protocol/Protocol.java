@@ -1,6 +1,5 @@
 package me.mrnavastar.protoweaver.api.protocol;
 
-import com.google.gson.Gson;
 import lombok.*;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.ProtoWeaver;
@@ -8,6 +7,7 @@ import me.mrnavastar.protoweaver.api.auth.ClientAuthHandler;
 import me.mrnavastar.protoweaver.api.auth.ServerAuthHandler;
 import me.mrnavastar.protoweaver.api.callback.HandlerCallback;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
+import me.mrnavastar.protoweaver.api.protocol.internal.CustomPacket;
 import me.mrnavastar.protoweaver.api.util.ObjectSerializer;
 import me.mrnavastar.protoweaver.api.util.ProtoLogger;
 
@@ -16,6 +16,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
@@ -34,7 +36,7 @@ public class Protocol {
     @Getter
     private final String key;
     @Getter
-    private Class<?> packetType;
+    private final Map<Class<?>, Packet> packetMap = new ConcurrentHashMap<>();
     @Getter
     private CompressionType compression = CompressionType.NONE;
     @Getter
@@ -43,8 +45,6 @@ public class Protocol {
     private int maxPacketSize = 16384;
     @Getter
     private int maxConnections = -1;
-    @Getter
-    private boolean global = false;
     @Getter
     private Level loggingLevel = Level.ALL;
 
@@ -70,6 +70,11 @@ public class Protocol {
         return namespace + ":" + key;
     }
 
+    public boolean isGlobal(Object packetObject) {
+        Packet packet = this.packetMap.get(packetObject.getClass());
+        if (packet == null) return false;
+        else return packet.isGlobal();
+    }
     /**
      * <p>Creates a new protocol builder. A good rule of thumb for naming that ensures maximum compatibility is to use
      * your mod id or project id for the namespace and to give the name something unique.</p>
@@ -279,14 +284,13 @@ public class Protocol {
 
 
         /**
-         * Register a class to the {@link Protocol}. Does nothing if the class has already been registered.
+         * Register a class to the {@link Protocol} with proxy protocol. Does nothing if the class has already been registered.
          *
          * @param packet The packet to register.
          */
         public Builder addPacket(@NonNull Class<?> packet) {
-            protocol.global = false;
-            protocol.packetType = packet;
-            protocol.serializer.register(packet, false);
+            protocol.packetMap.put(packet, Packet.of(packet));
+            protocol.serializer.register(packet, true);
             protocol.packetMD.update(packet.getName().getBytes(StandardCharsets.UTF_8));
             return this;
         }
@@ -296,11 +300,10 @@ public class Protocol {
          *
          * @param packet The packet to register.
          */
-        public Builder addPacket(@NonNull PacketType packet) {
-            protocol.global = packet.isGlobal();
-            protocol.packetType = packet.getTypeClass();
-            protocol.serializer.register(packet.getTypeClass(), packet.isNotFound());
-            String type = packet.isNotFound() ? String.class.getName() : packet.getType();
+        public Builder addPacket(@NonNull Packet packet) {
+            protocol.packetMap.put(packet.getTypeClass(), packet);
+            protocol.serializer.register(packet.getTypeClass(), packet.isBothSide());
+            String type = packet.isBothSide() ? packet.getType() : CustomPacket.class.getName();
             protocol.packetMD.update(type.getBytes(StandardCharsets.UTF_8));
             return this;
         }

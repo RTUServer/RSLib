@@ -9,4 +9,5 @@ dependencies {
 
 compileJava {
     mustRunAfter(":Library:ProtoWeaver:Common:Core:shadowJar")
+    mustRunAfter(":Library:ProtoWeaver:Velocity:API:shadowJar")
 }

@@ -4,6 +4,8 @@ import lombok.Getter;
 import me.mrnavastar.protoweaver.api.netty.ProtoConnection;
 import me.mrnavastar.protoweaver.api.netty.Sender;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
+import me.mrnavastar.protoweaver.api.protocol.internal.CustomPacket;
+import me.mrnavastar.protoweaver.api.protocol.internal.ProtocolRegister;
 import me.mrnavastar.protoweaver.api.util.ProtoLogger;
 
 public class InternalConnectionHandler {
@@ -14,6 +16,8 @@ public class InternalConnectionHandler {
             .setClientHandler(ClientConnectionHandler.class)
             .addPacket(AuthStatus.class)
             .addPacket(ProtocolStatus.class)
+            .addPacket(CustomPacket.class)
+            .addPacket(ProtocolRegister.class)
             .load();
 
     protected void disconnectIfNeverUpgraded(ProtoConnection connection, Sender sender) {

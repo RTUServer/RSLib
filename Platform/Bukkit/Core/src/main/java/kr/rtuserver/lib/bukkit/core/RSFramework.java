@@ -26,6 +26,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.callback.HandlerCallback;
+import me.mrnavastar.protoweaver.api.protocol.Packet;
 import me.mrnavastar.protoweaver.impl.bukkit.core.BukkitProtoWeaver;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -160,8 +161,8 @@ public class RSFramework implements kr.rtuserver.lib.bukkit.api.core.RSFramework
         Bukkit.getPluginManager().addPermission(new Permission(name, permissionDefault));
     }
 
-    public void registerProtocol(String namespace, String key, Class<?> packetType, boolean global, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
-        protoWeaver.registerProtocol(namespace, key, packetType, global, protocolHandler, callback);
+    public void registerProtocol(String namespace, String key, Packet packet, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
+        protoWeaver.registerProtocol(namespace, key, packet, protocolHandler, callback);
     }
 
 

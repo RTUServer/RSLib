@@ -6,6 +6,11 @@ runVelocity {
     velocityVersion("3.3.0-SNAPSHOT")
 }
 
+compileJava {
+    mustRunAfter(":Library:ProtoWeaver:Velocity:API:shadowJar")
+    mustRunAfter(":Library:ProtoWeaver:Velocity:Core:shadowJar")
+}
+
 dependencies {
     implementation project(":Library:ProtoWeaver:Common:API")
     implementation project(":Library:ProtoWeaver:Common:Core")

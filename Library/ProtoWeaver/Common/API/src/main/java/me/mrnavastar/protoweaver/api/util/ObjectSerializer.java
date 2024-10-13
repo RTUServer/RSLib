@@ -1,14 +1,16 @@
 package me.mrnavastar.protoweaver.api.util;
 
 import com.google.gson.Gson;
+import me.mrnavastar.protoweaver.api.protocol.internal.CustomPacket;
 import me.mrnavastar.r.R;
 import org.apache.fury.Fury;
 import org.apache.fury.ThreadSafeFury;
 import org.apache.fury.exception.InsecureException;
 import org.apache.fury.logging.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class ObjectSerializer {
 
@@ -24,25 +26,30 @@ public class ObjectSerializer {
         if (type == null || type == Object.class || registered.contains(type)) return;
         fury.register(type);
         registered.add(type);
+        list.add(type);
 
         List.of(type.getDeclaredFields()).forEach(field -> recursiveRegister(field.getType(), registered));
         List.of(R.of(type).generics()).forEach(t -> recursiveRegister(t, registered));
         if (!type.isEnum()) recursiveRegister(type.getSuperclass(), registered);
     }
 
-    private Class<?> type;
-    private boolean notFound = false;
+    private final Map<Class<?>, Boolean> packetMap = new HashMap<>();
 
-    public void register(Class<?> type, boolean notFound) {
-        this.type = type;
-        this.notFound = notFound;
-        recursiveRegister(notFound ? String.class : type, new ArrayList<>());
+    private final static Set<Class<?>> list = new CopyOnWriteArraySet<>();
+    public void register(Class<?> type, boolean isBothSide) {
+        packetMap.put(type, isBothSide);
+        recursiveRegister(isBothSide ? type : CustomPacket.class, new ArrayList<>());
     }
 
     public byte[] serialize(Object object) throws IllegalArgumentException {
         try {
-            return fury.serialize(notFound ? GSON.toJson(object, type) : object);
+            if (!packetMap.getOrDefault(object.getClass(), false)) {
+                return fury.serialize(new CustomPacket(object.getClass().getName(), GSON.toJson(object)));
+            } else {
+                return fury.serialize(object);
+            }
         } catch (InsecureException e) {
+            e.printStackTrace();
             throw new IllegalArgumentException("unregistered object: " + object.getClass().getName());
         }
     }
@@ -50,7 +57,13 @@ public class ObjectSerializer {
     public Object deserialize(byte[] bytes) throws IllegalArgumentException {
         try {
             Object result = fury.deserialize(bytes);
-            return notFound ? GSON.fromJson((String) result, type) : result;
+            if (result instanceof CustomPacket custom) {
+                try {
+                    return GSON.fromJson(custom.json(), Class.forName(custom.classType()));
+                } catch (ClassNotFoundException e) {
+                    return result;
+                }
+            } else return result;
         } catch (InsecureException e) {
             String packet = e.getMessage().split(" is not registered")[0].replace("class ", "");
             throw new IllegalArgumentException("unregistered object: " + packet);

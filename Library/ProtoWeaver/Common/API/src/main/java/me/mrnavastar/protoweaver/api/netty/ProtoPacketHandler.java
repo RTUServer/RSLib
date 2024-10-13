@@ -87,6 +87,7 @@ public class ProtoPacketHandler extends ByteToMessageDecoder {
             return sender;
         } catch (IllegalArgumentException e) {
             connection.getProtocol().logErr("Tried to send an " + e.getMessage());
+            e.printStackTrace();
             return new Sender(connection, ctx.newSucceededFuture(), false);
         } catch (Exception e) {
             connection.getProtocol().logErr("Threw an error when trying to send: " + packet.getClass() + "!");

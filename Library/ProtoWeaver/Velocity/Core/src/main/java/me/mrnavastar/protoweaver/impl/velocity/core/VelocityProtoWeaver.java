@@ -10,15 +10,12 @@ import com.velocitypowered.api.proxy.server.ServerInfo;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
-import me.mrnavastar.protoweaver.api.ProtoWeaver;
 import me.mrnavastar.protoweaver.api.callback.HandlerCallback;
 import me.mrnavastar.protoweaver.api.protocol.CompressionType;
-import me.mrnavastar.protoweaver.api.protocol.PacketType;
+import me.mrnavastar.protoweaver.api.protocol.Packet;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
-import me.mrnavastar.protoweaver.api.protocol.Request;
-import me.mrnavastar.protoweaver.api.protocol.internal.RegisterRequest;
-import me.mrnavastar.protoweaver.api.protocol.internal.RegisterResponse;
-import me.mrnavastar.protoweaver.api.protocol.internal.Result;
+import me.mrnavastar.protoweaver.api.protocol.internal.CustomPacket;
+import me.mrnavastar.protoweaver.api.protocol.internal.ProtocolRegister;
 import me.mrnavastar.protoweaver.api.protocol.velocity.VelocityAuth;
 import me.mrnavastar.protoweaver.api.proxy.ProtoServer;
 import me.mrnavastar.protoweaver.api.util.ProtoLogger;
@@ -31,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j(topic = "RSLib/ProtoWeaver")
 @Getter
@@ -38,12 +36,12 @@ public class VelocityProtoWeaver implements me.mrnavastar.protoweaver.impl.veloc
 
     private final ProxyServer server;
     private final Protocol.Builder protocol;
-    private final HandlerCallback callable = new HandlerCallback(null, this::onPacket);
 
     private final Toml velocityConfig;
     private final Path dir;
 
     private final ProtoProxy protoProxy;
+    private final HandlerCallback callable = new HandlerCallback(null, this::onPacket);
 
     public VelocityProtoWeaver(ProxyServer server, Path dir) {
         this.server = server;
@@ -54,9 +52,8 @@ public class VelocityProtoWeaver implements me.mrnavastar.protoweaver.impl.veloc
         protocol = Protocol.create("rslib", "internal");
         protocol.setCompression(CompressionType.SNAPPY);
         protocol.setMaxPacketSize(67108864); // 64mb
-        protocol.addPacket(Object.class);
-        protocol.addPacket(RegisterRequest.class);
-        protocol.addPacket(RegisterResponse.class);
+        protocol.addPacket(ProtocolRegister.class);
+        protocol.addPacket(Packet.class);
         if (isModernProxy()) {
             info("Detected modern proxy");
             protocol.setServerAuthHandler(VelocityAuth.class);
@@ -65,21 +62,23 @@ public class VelocityProtoWeaver implements me.mrnavastar.protoweaver.impl.veloc
         protocol.setClientHandler(VelocityProtoHandler.class, callable).load();
     }
 
-
-    public void registerProtocol(Request request) {
-        registerProtocol(request.namespace(), request.key(), request.packetType(), request.global(), request.protocolHandler(), null);
+    public void registerProtocol(String namespace, String key, Packet packet, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
+        registerProtocol(namespace, key, Set.of(packet), protocolHandler, callback);
     }
 
-    public void registerProtocol(String namespace, String key, Class<?> packetType, boolean global, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
+    public void registerProtocol(String namespace, String key, Set<Packet> packets, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
         Protocol.Builder protocol = Protocol.create(namespace, key);
         protocol.setCompression(CompressionType.SNAPPY);
         protocol.setMaxPacketSize(67108864); // 64mb
-        protocol.addPacket(PacketType.of(packetType, global));
+        for (Packet packet : packets) {
+            if (packet.isBothSide()) protocol.addPacket(packet);
+            else protocol.addPacket(Packet.of(CustomPacket.class, packet.isGlobal(), false));
+        }
         if (isModernProxy()) {
             protocol.setServerAuthHandler(VelocityAuth.class);
             protocol.setClientAuthHandler(VelocityAuth.class);
         }
-        protocol.setClientHandler(CommonPacketHandler.class, callback).load();
+        protocol.setClientHandler(CommonPacketHandler.class, null).load();
     }
 
     private boolean isModernProxy() {
@@ -135,25 +134,8 @@ public class VelocityProtoWeaver implements me.mrnavastar.protoweaver.impl.veloc
     }
 
     private void onPacket(HandlerCallback.Packet data) {
-        if (data.packet() instanceof RegisterRequest request) {
-            boolean findClass = findClass(request.getType());
-            boolean alreadyLoaded = ProtoWeaver.getLoadedProtocols().stream().anyMatch(p -> p.getNamespaceKey().equalsIgnoreCase(request.getNamespaceKey()));
-            //System.out.println(alreadyLoaded + "/" + request.getNamespaceKey());
-            data.protoConnection().send(new RegisterResponse(request.getNamespace(), request.getKey(), request.getType(), request.isGlobal(), new Result(alreadyLoaded, !findClass)));
-        }
-        if (data.packet() instanceof RegisterResponse response) {
-            boolean findClass = findClass(response.getType());
-            Class<?> type = findClass ? response.getClassType() : String.class;
-            registerProtocol(response.getNamespace(), response.getKey(), type, response.isGlobal(), CommonPacketHandler.class, null);
-        }
-    }
-
-    private boolean findClass(String className) {
-        try {
-            Class.forName(className);
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
+        if (data.packet() instanceof ProtocolRegister register) {
+            registerProtocol(register.namespace(), register.key(), register.packet(), CommonPacketHandler.class, null);
         }
     }
 }
