@@ -8,6 +8,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import lombok.Setter;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.protocol.Side;
+import me.mrnavastar.protoweaver.api.protocol.internal.CustomPacket;
 import me.mrnavastar.protoweaver.api.util.DrunkenBishop;
 import me.mrnavastar.protoweaver.api.util.ProtoConstants;
 import me.mrnavastar.protoweaver.api.util.ProtoLogger;
@@ -62,6 +63,13 @@ public class ProtoPacketHandler extends ByteToMessageDecoder {
             byte[] bytes = new byte[byteBuf.readInt()];
             byteBuf.readBytes(bytes);
             packet = connection.getProtocol().deserialize(bytes);
+            if (packet instanceof CustomPacket custom) {
+                if (handler.getClass().getName().equals(custom.handlerClass())) {
+                    try {
+                        packet = GSON.fromJson(custom.json(), Class.forName(custom.classType()));
+                    } catch(ClassNotFoundException ignore) {}
+                }
+            }
             handler.handlePacket(connection, (Object) packet);
 
         } catch (IllegalArgumentException e) {
@@ -76,7 +84,7 @@ public class ProtoPacketHandler extends ByteToMessageDecoder {
     // Done with two bufs to prevent the user from messing with the internal data
     public Sender send(Object packet) {
         try {
-            byte[] packetBuf = connection.getProtocol().serialize((Object) packet);
+            byte[] packetBuf = connection.getProtocol().serialize(packet, connection.getHandler());
             if (packetBuf.length == 0) return new Sender(connection, ctx.newSucceededFuture(), false);
 
             buf.writeInt(packetBuf.length); // Packet Len

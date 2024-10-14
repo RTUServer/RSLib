@@ -130,8 +130,8 @@ public class Protocol {
         return clientAuthHandler.getDeclaredConstructor().newInstance();
     }
 
-    public byte[] serialize(@NonNull Object packet) throws IllegalArgumentException {
-        return serializer.serialize(packet);
+    public byte[] serialize(@NonNull Object packet, ProtoConnectionHandler handler) throws IllegalArgumentException {
+        return serializer.serialize(packet, handler);
     }
 
     public Object deserialize(byte @NonNull [] packet) throws IllegalArgumentException {

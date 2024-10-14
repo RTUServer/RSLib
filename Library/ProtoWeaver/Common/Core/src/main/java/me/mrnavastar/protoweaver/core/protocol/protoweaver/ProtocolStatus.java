@@ -3,10 +3,12 @@ package me.mrnavastar.protoweaver.core.protocol.protoweaver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import me.mrnavastar.protoweaver.api.util.ProtoConstants;
 
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 public class ProtocolStatus {
 

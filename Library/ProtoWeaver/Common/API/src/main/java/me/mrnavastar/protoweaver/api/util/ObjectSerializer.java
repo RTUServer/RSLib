@@ -1,6 +1,7 @@
 package me.mrnavastar.protoweaver.api.util;
 
 import com.google.gson.Gson;
+import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.protocol.internal.CustomPacket;
 import me.mrnavastar.r.R;
 import org.apache.fury.Fury;
@@ -33,18 +34,18 @@ public class ObjectSerializer {
         if (!type.isEnum()) recursiveRegister(type.getSuperclass(), registered);
     }
 
-    private final Map<Class<?>, Boolean> packetMap = new HashMap<>();
+    private final Map<String, Boolean> packetMap = new HashMap<>();
 
     private final static Set<Class<?>> list = new CopyOnWriteArraySet<>();
     public void register(Class<?> type, boolean isBothSide) {
-        packetMap.put(type, isBothSide);
+        packetMap.put(type.getName(), isBothSide);
         recursiveRegister(isBothSide ? type : CustomPacket.class, new ArrayList<>());
     }
 
-    public byte[] serialize(Object object) throws IllegalArgumentException {
+    public byte[] serialize(Object object, ProtoConnectionHandler handler) throws IllegalArgumentException {
         try {
-            if (!packetMap.getOrDefault(object.getClass(), false)) {
-                return fury.serialize(new CustomPacket(object.getClass().getName(), GSON.toJson(object)));
+            if (!packetMap.getOrDefault(object.getClass().getName(), false)) {
+                return fury.serialize(new CustomPacket(object.getClass().getName(), handler.getClass().getName(),  GSON.toJson(object)));
             } else {
                 return fury.serialize(object);
             }
