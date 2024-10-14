@@ -154,4 +154,7 @@ public abstract class RSPlugin extends JavaPlugin {
     protected void disable() {
     }
 
+    public void syncStorage(String name) {
+    }
+
 }

@@ -16,6 +16,7 @@ import com.mongodb.client.result.UpdateResult;
 import kr.rtuserver.lib.bukkit.api.RSPlugin;
 import kr.rtuserver.lib.bukkit.api.storage.Storage;
 import kr.rtuserver.lib.bukkit.api.storage.config.MongoDBConfig;
+import me.mrnavastar.protoweaver.api.protocol.internal.StorageSync;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -58,7 +59,10 @@ public class MongoDB implements Storage {
     public boolean add(String collectionName, JsonObject data) {
         MongoCollection<Document> collection = database.getCollection(prefix + collectionName);
         Document document = Document.parse(gson.toJson(data));
-        return collection.insertOne(document).wasAcknowledged();
+        if (!collection.insertOne(document).wasAcknowledged()) return false;
+        StorageSync sync = new StorageSync(plugin.getName(), collectionName);
+        plugin.getFramework().getProtoWeaver().sendPacket(sync);
+        return true;
     }
 
     @Override
@@ -71,7 +75,10 @@ public class MongoDB implements Storage {
             } else filter = Filters.eq(find.getKey(), (String) find.getValue());
             if (data == null) {
                 DeleteResult result = collection.deleteMany(filter);
-                return result.wasAcknowledged();
+                if (!result.wasAcknowledged()) return false;
+                StorageSync sync = new StorageSync(plugin.getName(), collectionName);
+                plugin.getFramework().getProtoWeaver().sendPacket(sync);
+                return true;
             } else {
                 UpdateOptions options = new UpdateOptions().upsert(true);
                 Bson update;
@@ -79,11 +86,16 @@ public class MongoDB implements Storage {
                     update = Updates.set(data.getKey(), Document.parse(jsonObject.toString()));
                 } else update = Updates.set(data.getKey(), data.getValue());
                 UpdateResult result = collection.updateOne(filter, update, options);
-                return result.wasAcknowledged();
+                if (!result.wasAcknowledged()) return false;
+                StorageSync sync = new StorageSync(plugin.getName(), collectionName);
+                plugin.getFramework().getProtoWeaver().sendPacket(sync);
+                return true;
             }
         } else {
-            FindIterable<Document> documents = collection.find();
-            for (Document document : documents) collection.deleteMany(document);
+            DeleteResult result = collection.deleteMany(Filters.empty());
+            if (!result.wasAcknowledged()) return false;
+            StorageSync sync = new StorageSync(plugin.getName(), collectionName);
+            plugin.getFramework().getProtoWeaver().sendPacket(sync);
             return true;
         }
     }

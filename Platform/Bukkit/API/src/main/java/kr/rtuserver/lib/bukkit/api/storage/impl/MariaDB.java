@@ -8,6 +8,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import kr.rtuserver.lib.bukkit.api.RSPlugin;
 import kr.rtuserver.lib.bukkit.api.storage.Storage;
 import kr.rtuserver.lib.bukkit.api.storage.config.MariaDBConfig;
+import me.mrnavastar.protoweaver.api.ProtoWeaver;
+import me.mrnavastar.protoweaver.api.protocol.internal.StorageSync;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -82,7 +84,10 @@ public class MariaDB implements Storage {
         try {
             //INSERT INTO `test` (`data`) VALUES ('{"A": B"}');
             PreparedStatement ps = getConnection().prepareStatement("INSERT INTO " + prefix + table + " (data) VALUES ('" + json + "');");
-            return ps.execute();
+            if (!ps.execute()) return false;
+            StorageSync sync = new StorageSync(plugin.getName(), table);
+            plugin.getFramework().getProtoWeaver().sendPacket(sync);
+            return true;
         } catch (SQLException e) {
             //if (verbose) throw new RuntimeException(e);
             e.printStackTrace();
@@ -116,7 +121,9 @@ public class MariaDB implements Storage {
         }
         try {
             PreparedStatement ps = getConnection().prepareStatement(query + ";");
-            ps.execute();
+            if (!ps.execute()) return false;
+            StorageSync sync = new StorageSync(plugin.getName(), table);
+            plugin.getFramework().getProtoWeaver().sendPacket(sync);
             return true;
         } catch (SQLException e) {
             //if (verbose) throw new RuntimeException(e);

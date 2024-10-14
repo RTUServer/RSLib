@@ -16,6 +16,7 @@ import me.mrnavastar.protoweaver.api.protocol.Packet;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
 import me.mrnavastar.protoweaver.api.protocol.internal.CustomPacket;
 import me.mrnavastar.protoweaver.api.protocol.internal.ProtocolRegister;
+import me.mrnavastar.protoweaver.api.protocol.internal.StorageSync;
 import me.mrnavastar.protoweaver.api.protocol.velocity.VelocityAuth;
 import me.mrnavastar.protoweaver.api.proxy.ProtoServer;
 import me.mrnavastar.protoweaver.api.util.ProtoLogger;
@@ -54,6 +55,7 @@ public class VelocityProtoWeaver implements me.mrnavastar.protoweaver.impl.veloc
         protocol.setMaxPacketSize(67108864); // 64mb
         protocol.addPacket(ProtocolRegister.class);
         protocol.addPacket(Packet.class);
+        protocol.addPacket(Packet.of(StorageSync.class, true, true));
         if (isModernProxy()) {
             info("Detected modern proxy");
             protocol.setServerAuthHandler(VelocityAuth.class);

@@ -9,6 +9,7 @@ import me.mrnavastar.protoweaver.api.protocol.Packet;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
 import me.mrnavastar.protoweaver.api.protocol.internal.CustomPacket;
 import me.mrnavastar.protoweaver.api.protocol.internal.ProtocolRegister;
+import me.mrnavastar.protoweaver.api.protocol.internal.StorageSync;
 import me.mrnavastar.protoweaver.api.protocol.velocity.VelocityAuth;
 import me.mrnavastar.protoweaver.api.proxy.ProtoServer;
 import me.mrnavastar.protoweaver.api.util.ProtoLogger;
@@ -43,6 +44,7 @@ public class BungeeProtoWeaver implements me.mrnavastar.protoweaver.impl.bungee.
         protocol.setMaxPacketSize(67108864); // 64mb
         protocol.addPacket(ProtocolRegister.class);
         protocol.addPacket(Packet.class);
+        protocol.addPacket(Packet.of(StorageSync.class, true, true));
         protocol.setClientHandler(BungeeProtoHandler.class, callable).load();
     }
 

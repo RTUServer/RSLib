@@ -10,7 +10,9 @@ import me.mrnavastar.protoweaver.api.netty.Sender;
 import me.mrnavastar.protoweaver.api.protocol.CompressionType;
 import me.mrnavastar.protoweaver.api.protocol.Packet;
 import me.mrnavastar.protoweaver.api.protocol.Protocol;
+import me.mrnavastar.protoweaver.api.protocol.internal.InternalPacket;
 import me.mrnavastar.protoweaver.api.protocol.internal.ProtocolRegister;
+import me.mrnavastar.protoweaver.api.protocol.internal.StorageSync;
 import me.mrnavastar.protoweaver.api.protocol.velocity.VelocityAuth;
 import me.mrnavastar.protoweaver.impl.bukkit.api.BukkitProtoHandler;
 import me.mrnavastar.protoweaver.impl.bukkit.api.nms.IProtoWeaver;
@@ -35,13 +37,13 @@ import java.util.List;
 public class BukkitProtoWeaver implements me.mrnavastar.protoweaver.impl.bukkit.api.BukkitProtoWeaver {
 
     private final IProtoWeaver protoWeaver;
+    private final HandlerCallback callback;
     private final boolean isModernProxy;
     private final List<Protocol> protocols = new ArrayList<>();
     private final List<Protocol> unregistered = new ArrayList<>();
     private ProtoConnection connection;
-    private final HandlerCallback callable = new HandlerCallback(this::onReady, null);
 
-    public BukkitProtoWeaver(String sslFolder, String nmsVersion) {
+    public BukkitProtoWeaver(String sslFolder, String nmsVersion, HandlerCallback callback) {
         this.protoWeaver = switch (nmsVersion) {
             case "v1_17_R1" -> new ProtoWeaver_1_17_R1(sslFolder);
             case "v1_18_R1" -> new ProtoWeaver_1_18_R1(sslFolder);
@@ -56,22 +58,28 @@ public class BukkitProtoWeaver implements me.mrnavastar.protoweaver.impl.bukkit.
             case "v1_21_R1" -> new ProtoWeaver_1_21_R1(sslFolder);
             default -> throw new IllegalStateException();
         };
+        this.callback = callback;
         this.isModernProxy = protoWeaver.isModernProxy();
         Protocol.Builder protocol = Protocol.create("rslib", "internal");
         protocol.setCompression(CompressionType.SNAPPY);
         protocol.setMaxPacketSize(67108864); // 64mb
         protocol.addPacket(ProtocolRegister.class);
         protocol.addPacket(Packet.class);
+        protocol.addPacket(Packet.of(StorageSync.class, true, true));
         if (isModernProxy) {
             protocol.setServerAuthHandler(VelocityAuth.class);
             protocol.setClientAuthHandler(VelocityAuth.class);
         }
-        protocol.setServerHandler(BukkitProtoHandler.class, callable);
+        protocol.setServerHandler(BukkitProtoHandler.class, this.callback);
         protocol.load();
     }
 
+    public void sendPacket(InternalPacket packet) {
+        connection.send(packet);
+    }
 
-    private void onReady(HandlerCallback.Ready data) {
+
+    public void onReady(HandlerCallback.Ready data) {
         connection = data.protoConnection();
         List<Protocol> copy = ImmutableList.copyOf(unregistered);
         for (Protocol protocol : copy) {

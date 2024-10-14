@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mrnavastar.protoweaver.api.ProtoConnectionHandler;
 import me.mrnavastar.protoweaver.api.callback.HandlerCallback;
 import me.mrnavastar.protoweaver.api.protocol.Packet;
+import me.mrnavastar.protoweaver.api.protocol.internal.StorageSync;
 import me.mrnavastar.protoweaver.impl.bukkit.core.BukkitProtoWeaver;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -52,6 +53,7 @@ public class RSFramework implements kr.rtuserver.lib.bukkit.api.core.RSFramework
     private kr.rtuserver.lib.bukkit.api.nms.NMS NMS;
     @Getter
     private BukkitProtoWeaver protoWeaver;
+    private final HandlerCallback callback = new HandlerCallback(this::onReady, this::onPacket);
     @Getter
     private String NMSVersion;
     @Getter
@@ -69,6 +71,18 @@ public class RSFramework implements kr.rtuserver.lib.bukkit.api.core.RSFramework
     public void unloadPlugin(RSPlugin plugin) {
         log.info("unloading RSPlugin: {}", plugin.getName());
         plugins.remove(plugin.getName());
+    }
+
+    private void onReady(HandlerCallback.Ready ready) {
+        protoWeaver.onReady(ready);
+    }
+
+    private void onPacket(HandlerCallback.Packet packet) {
+        if (packet.packet() instanceof StorageSync sync) {
+            RSPlugin plugin = plugins.get(sync.plugin());
+            if (plugin == null) return;
+            plugin.syncStorage(sync.name());
+        }
     }
 
     public boolean isEnabledDependency(String dependencyName) {
@@ -103,7 +117,7 @@ public class RSFramework implements kr.rtuserver.lib.bukkit.api.core.RSFramework
                 Bukkit.getPluginManager().disablePlugin(plugin);
             }
         }
-        protoWeaver = new BukkitProtoWeaver(plugin.getDataFolder().getPath(), NMSVersion);
+        protoWeaver = new BukkitProtoWeaver(plugin.getDataFolder().getPath(), NMSVersion, callback);
     }
 
     public void enable(RSPlugin plugin) {
@@ -164,6 +178,4 @@ public class RSFramework implements kr.rtuserver.lib.bukkit.api.core.RSFramework
     public void registerProtocol(String namespace, String key, Packet packet, Class<? extends ProtoConnectionHandler> protocolHandler, HandlerCallback callback) {
         protoWeaver.registerProtocol(namespace, key, packet, protocolHandler, callback);
     }
-
-
 }

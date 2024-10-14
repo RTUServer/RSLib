@@ -16,3 +16,7 @@ dependencies {
     compileOnly project(path: ':Platform:Bukkit:NMS:1_20_R4', configuration: 'reobf')
     compileOnly project(path: ':Platform:Bukkit:NMS:1_21_R1', configuration: 'reobf')
 }
+
+compileJava {
+    mustRunAfter(":Library:ProtoWeaver:Common:Core:shadowJar")
+}

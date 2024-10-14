@@ -12,7 +12,7 @@ public enum StorageType {
     POSTGRESQL;
 
     public static StorageType getType(String storageType) {
-        if (List.of("JSON", "SQLITE", "MYSQL", "MONGODB", "MARIADB", "POSTGRESQL").contains(storageType.toUpperCase())) {
+        if (List.of("JSON", "MYSQL", "MONGODB", "MARIADB").contains(storageType.toUpperCase())) {
             return StorageType.valueOf(storageType.toUpperCase());
         } else return StorageType.JSON;
     }
